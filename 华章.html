@@ -1,0 +1,1990 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>檐上华章——明故宫屋顶与檐部营构</title>
+  <style>
+    :root {
+      --bg-1: #070506;
+      --bg-2: #140b12;
+      --gold: #f6d18b;
+      --gold-soft: rgba(246, 209, 139, 0.35);
+      --gold-line: rgba(246, 209, 139, 0.65);
+      --rose: #efb0bd;
+      --text-main: #8d4600;
+      --text-sub: rgba(255, 239, 215, 0.78);
+      --shadow: 0 0 18px rgba(246, 209, 139, 0.18), 0 0 40px rgba(218, 150, 121, 0.12);
+      --transition: 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+      --bg-img: url("img/a明故宫内页8.png");
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: "agency fb","隶书",sans-serif;
+      color: var(--text-main);
+    }
+
+    body::before {
+      content: none;
+    }
+
+    .page {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      isolation: isolate;
+      overflow: hidden;
+    }
+
+    .page::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: var(--bg-img) center / cover no-repeat;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .foreground {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      will-change: transform;
+      transition: transform 0.22s ease-out;
+    }
+
+    .header {
+      position: absolute;
+      top: 1vh;
+      left: 3vw;
+      right: 3vw;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      z-index: 6;
+      opacity: 0;
+      transform: translateY(-20px);
+      animation: fadeSlideDown 1s 0.2s forwards;
+    }
+
+    @keyframes fadeSlideDown {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .brand {
+		
+		padding-top: 5px;
+      display: flex;
+      gap: 5px;
+      align-items: center;
+    }
+
+    .brand-mark {
+      width: 48px;
+      height: 48px;
+      border: 1px solid rgba(246, 209, 139, 0.35);
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      color: var(--gold);
+      background: rgba(255,255,255,0.03);
+      box-shadow: inset 0 0 18px rgba(246, 209, 139, 0.06), var(--shadow);
+      font-size: 22px;
+      letter-spacing: 1px;
+    }
+
+    .brand-text h1 {
+      font-size: clamp(24px, 2.2vw, 40px);
+      font-weight: 500;
+      letter-spacing: 2px;
+      font-size: 60px;
+      color: #5a2d00;
+      text-shadow: 0 0 18px rgba(246, 209, 139, 0.18);
+	  margin-bottom: -5px;
+    }
+
+    .brand-text p {
+      margin-top: 4px;
+      font-size: 13px;
+      letter-spacing: 2px;
+      color: var(--text-sub);
+    }
+
+    .topic-tabs {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      max-width: 50vw;
+      justify-content: flex-end;
+    }
+
+    .tab {
+      padding: 10px 18px;
+      border: 1px solid rgba(246, 209, 139, 0.45);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.03);
+      backdrop-filter: blur(8px);
+      color: var(--text-main);
+      font-size: 14px;
+      letter-spacing: 2px;
+      box-shadow: var(--shadow);
+    }
+
+    .side-title {
+      position: absolute;
+      right: 2.2vw;
+      top: 16vh;
+      z-index: 5;
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+      font-size: clamp(24px, 2vw, 34px);
+      line-height: 1.8;
+      letter-spacing: 4px;
+      color: rgba(255, 241, 220, 0.88);
+      opacity: 0;
+      animation: fadeIn 1s 0.8s forwards;
+    }
+
+    .side-title span {
+      color: var(--gold);
+      text-shadow: 0 0 16px rgba(246, 209, 139, 0.22);
+    }
+
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+
+    .stage {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+    }
+
+    .pointer-line-layer {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 3;
+      pointer-events: none;
+      overflow: visible;
+    }
+
+    .pointer-line {
+      fill: none;
+      stroke: rgba(100, 50, 0, 0.7);
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      filter: drop-shadow(0 0 6px rgba(246, 209, 139, 0.18));
+    }
+
+    /* 便于后续单独调整每一根线 */
+    .line-1 {}
+    .line-2 {}
+    .line-3 {}
+    .line-4 {}
+
+    }
+
+    .main-visual {
+      position: absolute;
+      left: 50%;
+      bottom: 8.5vh;
+      width: min(46vw, 780px);
+      transform: translateX(-50%) scale(0.95);
+      z-index: 4;
+      opacity: 0;
+      animation: revealMain 1.4s 0.45s forwards;
+      filter: drop-shadow(0 20px 35px rgba(0, 0, 0, 0.45)) drop-shadow(0 0 25px rgba(246, 209, 139, 0.06));
+      transform-origin: center bottom;
+    }
+
+    @keyframes revealMain {
+      to {
+        opacity: 1;
+        transform: translateX(-50%) scale(1);
+      }
+    }
+
+    .building-wrap {
+      position: relative;
+      width: 100%;
+    }
+
+    .building-wrap img {
+      display: block;
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    .highlight-zone {
+      position: absolute;
+      border: 1px solid rgba(255, 232, 179, 0.75);
+      background: radial-gradient(circle at center, rgba(247, 213, 129, 0.18), rgba(247, 213, 129, 0.03));
+      box-shadow: 0 0 15px rgba(246, 209, 139, 0.18), inset 0 0 20px rgba(246, 209, 139, 0.12);
+      border-radius: 14px;
+      opacity: 0;
+      transform: scale(0.96);
+      pointer-events: none;
+      transition: var(--transition);
+    }
+
+    .highlight-zone.show {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .hint {
+      position: absolute;
+      left: 50%;
+      bottom: 3vh;
+      transform: translateX(-50%);
+      font-size: 12px;
+      letter-spacing: 2px;
+      color: rgba(255, 240, 220, 0.58);
+      z-index: 4;
+      opacity: 0;
+      animation: fadeIn 1s 2.2s forwards;
+    }
+
+    .node,
+    .info-card,
+    .pulse-dot {
+      position: absolute;
+      z-index: 5;
+      opacity: 0;
+      transform: translateY(12px) scale(0.92);
+      transition: var(--transition);
+    }
+
+    .node.show,
+    .info-card.show,
+    .pulse-dot.show {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    .pulse-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 245, 221, 0.95), rgba(246, 209, 139, 0.8));
+      box-shadow: 0 0 12px rgba(246, 209, 139, 0.6), 0 0 26px rgba(239, 176, 189, 0.28);
+      animation: pulse 2.4s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 10px rgba(246, 209, 139, 0.45), 0 0 20px rgba(239, 176, 189, 0.18); }
+      50% { box-shadow: 0 0 18px rgba(246, 209, 139, 0.75), 0 0 36px rgba(239, 176, 189, 0.28); }
+    }
+
+    .node {
+      width: min(10vw, 150px);
+      cursor: pointer;
+      transform-origin: center;
+    }
+
+    .node button {
+      all: unset;
+      display: block;
+      width: 100%;
+      cursor: pointer;
+    }
+
+    .node .thumb {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 1px solid rgba(246, 209, 139, 0.52);
+      box-shadow: 0 0 0 2px rgba(255,255,255,0.03), var(--shadow);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.01)),
+        rgba(42, 24, 19, 0.56);
+      backdrop-filter: blur(10px);
+      transition: var(--transition);
+      position: relative;
+    }
+
+    .node .thumb::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 35%, rgba(255,255,255,0.16), transparent 38%);
+      pointer-events: none;
+    }
+
+    .node img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.7s ease;
+    }
+
+    .node .label {
+      margin-top: 10px;
+      text-align: center;
+      font-size: 15px;
+      letter-spacing: 2px;
+      color: var(--text-main);
+      text-shadow: 0 0 12px rgba(246, 209, 139, 0.15);
+    }
+
+    .node:hover .thumb,
+    .node.active .thumb {
+      transform: translateY(-4px) scale(1.04);
+     border-color: rgba(255, 230, 176, 0.95);
+      box-shadow: 0 0 24px rgba(246, 209, 139, 0.32), 0 0 42px rgba(239, 176, 189, 0.22);
+    }
+
+    .node:hover img,
+    .node.active img {
+      transform: scale(1.08);
+    }
+
+    .info-card {
+      width: min(20vw, 570px);
+      padding: 12px 12px 10px;
+     /* border-radius: 18px; */
+     /* background: linear-gradient(180deg, rgba(255,247,231,0.96), rgba(255,238,217,0.84)); */
+	 background-image:url(img/038.png) ;
+	 background-size: 100% 100%;
+      /* border: 1px solid rgba(246, 209, 139, 0.34);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.22), inset 0 0 28px rgba(246, 209, 139, 0.06); */
+      color: #593d28;
+      backdrop-filter: blur(16px);
+    }
+
+    .info-card h3 {
+      font-size: 20px;
+      color: #8a5635;
+      margin-bottom: 8px;
+      letter-spacing: 2px;
+    }
+
+    .info-card .summary {
+      font-size: 17px;
+      line-height: 1.7;
+      color: #7a5641;
+      margin-bottom: 10px;
+    }
+
+    .info-card .detail {
+      font-size: 17px;
+      line-height: 1.85;
+      color: #ab1a0c;
+      opacity: 0.95;
+    }
+
+    .info-card.active {
+      transform: translateY(-4px) scale(1.01);
+      box-shadow: 0 12px 50px rgba(0,0,0,0.26), 0 0 26px rgba(246, 209, 139, 0.24);
+    }
+
+    .decor-line {
+      position: absolute;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(246, 209, 139, 0.5), transparent);
+      z-index: 3;
+      opacity: 0.3;
+      pointer-events: none;
+    }
+
+    .legend {
+      position: absolute;
+      left: 3vw;
+      bottom: 4vh;
+      z-index: 5;
+      width: min(26vw, 360px);
+      padding: 14px 16px;
+      border-left: 2px solid rgba(246, 209, 139, 0.45);
+      background: rgba(255,255,255,0.02);
+      backdrop-filter: blur(10px);
+      color: rgba(255, 241, 220, 0.82);
+      font-size: 13px;
+      line-height: 1.9;
+      letter-spacing: 1px;
+      opacity: 0;
+      animation: fadeIn 1s 2.4s forwards;
+    }
+
+    .legend strong {
+      color: var(--gold);
+      font-weight: 600;
+    }
+
+    .footer-note {
+      position: absolute;
+      right: 3vw;
+      bottom: 4vh;
+      z-index: 5;
+      text-align: right;
+      color: rgba(255, 241, 220, 0.55);
+      font-size: 12px;
+      letter-spacing: 2px;
+      line-height: 1.8;
+      opacity: 0;
+      animation: fadeIn 1s 2.5s forwards;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(7, 5, 6, 0.72);
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 20;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s ease;
+    }
+
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal {
+      width: min(250vw, 980px);
+      height: min(150vh, 760px);
+      background-image: url(img/038.png);
+      background-size: 100% 100%;
+      color: var(--text-main);
+      transform: scale(0.92);
+      transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+      overflow: auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .modal-overlay.open .modal {
+      transform: scale(1);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 24px 16px 32px;
+      border-bottom: 1px solid rgba(246, 209, 139, 0.16);
+      flex-shrink: 0;
+    }
+
+    .modal-title {
+      margin-left: 430px;
+      margin-right: auto;
+      font-size: 28px;
+      letter-spacing: 2px;
+      color: var(--gold);
+    }
+
+    .modal-close {
+      all: unset;
+      cursor: pointer;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(246, 209, 139, 0.22);
+      color: var(--text-main);
+      transition: var(--transition);
+      font-size: 18px;
+      position: relative;
+      right: 70px;
+      flex-shrink: 0;
+    }
+
+    .modal-close:hover {
+      transform: rotate(90deg);
+      box-shadow: 0 0 16px rgba(246, 209, 139, 0.18);
+    }
+
+    .modal-body {
+      padding: 22px 24px 24px;
+      overflow: auto;
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 22px;
+    }
+
+    .modal-visual {
+      min-height: 320px;
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid rgba(246, 209, 139, 0.18);
+      background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));;
+    }
+
+    .modal-visual img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .modal-body-jishou {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      overflow-y: auto;
+    }
+
+    .modal-body-jishou .modal-visual {
+      min-height: 560px;
+      flex: 0 0 auto;
+    }
+
+    .modal-copy {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .modal-copy section {
+      padding: 16px 18px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));;
+      border: 1px solid rgba(246, 209, 139, 0.12);
+    }
+
+    .modal-copy h4 {
+		font-weight: 400;
+      font-size: 22px;
+      margin-bottom: 10px;
+      color: #ffdca6;
+      letter-spacing: 1px;
+    }
+
+    .modal-copy p,
+    .modal-copy li {
+      font-size: 17px;
+      line-height: 1.9;
+      color: rgba(255, 240, 220, 0.9);
+    }
+
+    .modal-copy ul {
+      padding-left: 18px;
+    }
+
+    .shape-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    .shape-card {
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(246, 209, 139, 0.12);
+    }
+
+    .shape-card strong {
+      display: block;
+      color: #ffdca6;
+      margin-bottom: 6px;
+      font-size: 15px;
+    }
+
+    .shape-card span {
+      font-size: 13px;
+      color: rgba(255, 240, 220, 0.82);
+      line-height: 1.75;
+    }
+
+    /* ===== 脊兽交互图 ===== */
+    .jishou-map {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      min-height: 520px;
+      border-radius: 18px;
+      overflow: hidden;
+      background: transparent;
+    }
+
+    .jishou-map-title {
+      position: absolute;
+      top: 20px;
+      left: 22px;
+      z-index: 6;
+      color: #ffdca6;
+    }
+
+    .jishou-map-title h4 {
+		font-weight: 500;
+      font-size: 22px;
+      margin-bottom: 6px;
+      letter-spacing: 2px;
+      color: #ffdca6;
+    }
+
+    .jishou-map-title p {
+      font-size: 15px;
+      color: #ffdca6;
+      letter-spacing: 1px;
+    }
+
+    .jishou-map-hint {
+      position: absolute;
+      top: 22px;
+      right: 18px;
+      z-index: 6;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 15px;
+      color: #9a745f;
+      background: rgba(255,255,255,0.45);
+      border: 1px solid rgba(198, 106, 68, 0.16);
+    }
+
+    .jishou-axis {
+      position: absolute;
+      left: 42px;
+      right: 42px;
+      bottom: 92px;
+      height: 2px;
+      background: linear-gradient(90deg, rgba(143, 63, 47, 0.08), rgba(143, 63, 47, 0.32), rgba(143, 63, 47, 0.08));
+      z-index: 2;
+    }
+
+    .jishou-connector-layer {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: none;
+      overflow: visible;
+    }
+
+    .jishou-link {
+      fill: none;
+      stroke: rgba(143, 63, 47, 0.28);
+      stroke-width: 2;
+      transition: all 0.35s ease;
+    }
+
+    .jishou-link.inactive {
+      opacity: 0.1;
+    }
+
+    .jishou-link.active {
+      stroke: #b95b3e;
+      stroke-width: 3.2;
+      opacity: 1;
+      filter: drop-shadow(0 0 4px rgba(185, 91, 62, 0.22));
+    }
+
+    .jishou-meaning,
+    .jishou-beast {
+      position: absolute;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      transition: all 0.35s ease;
+      user-select: none;
+    }
+
+    .jishou-meaning {
+      z-index: 3;
+      background: #7ea2a1;
+      color: #fffaf2;
+      padding: 8px;
+      font-size: 20px;
+      line-height: 1.25;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.08);
+      animation: jishouFloat 5s ease-in-out infinite;
+      border: 2px solid rgba(255,255,255,0.22);
+    }
+
+    .jishou-meaning.small { width: 56px; height: 56px; }
+    .jishou-meaning.medium { width: 74px; height: 74px; }
+    .jishou-meaning.large { width: 92px; height: 92px; }
+
+    .jishou-meaning.active {
+      background: #c76a44;
+      transform: scale(1.1);
+      box-shadow: 0 10px 20px rgba(199, 106, 68, 0.26);
+    }
+
+    .jishou-meaning.inactive {
+      opacity: 0.2;
+    }
+
+    .jishou-beast {
+      z-index: 4;
+      width: 52px;
+      height: 52px;
+      background: #c76a44;
+      color: #fff7ef;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+      border: 2px solid rgba(255,255,255,0.2);
+    }
+
+    .jishou-beast:hover {
+      transform: translateY(-4px);
+      background: #b65136;
+    }
+
+    .jishou-beast.active {
+      background: #8f3f2f;
+      transform: translateY(-4px) scale(1.08);
+      box-shadow: 0 10px 20px rgba(143, 63, 47, 0.26);
+    }
+
+    .jishou-beast.inactive {
+      opacity: 0.25;
+    }
+	
+	.jishou-beast-text {
+		font-size: 17px;
+		font-weight: 450;
+	  display: block;
+	  width: 100%;
+	  word-break: break-all;
+	}
+
+    .jishou-beast-label {
+      position: absolute;
+      top: 58px;
+      left: 50%;
+      transform: translateX(-50%);
+      white-space: nowrap;
+      font-size: 20px;
+      color: #8f6652;
+      font-weight: 500;
+      letter-spacing: 1px;
+    }
+
+    @keyframes jishouFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    /* ===== 脊兽图片区 ===== */
+    .jishou-gallery-wrap {
+      padding: 18px 20px;
+      border-radius: 18px;
+      background: rgba(222, 190, 133, 0.4);
+      border: 1px solid rgba(246, 209, 139, 0.12);
+    }
+
+    .jishou-gallery-title {
+      font-size: 22px;
+      color: #ffdca6;
+      margin-bottom: 12px;
+      letter-spacing: 1px;
+    }
+
+    .jishou-gallery {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .jishou-item {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(246, 209, 139, 0.12);
+      border-radius: 14px;
+      padding: 10px;
+      text-align: center;
+    }
+
+    .jishou-item img {
+      width: 100%;
+	  height: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: contain;
+      border-radius: 10px;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .jishou-item span {
+      display: block;
+      font-size: 20px;
+      color: rgba(255, 240, 220, 0.92);
+      letter-spacing: 1px;
+    }
+	
+	/* 隐藏滚动条 - 通用样式（适配所有滚动容器） */
+	.modal,
+	.modal-body,
+	.roof-modal-body,
+	.modal-body-jishou,
+	.jishou-gallery-wrap {
+	  /* Chrome/Safari/Edge */
+	  -ms-overflow-style: none;  /* IE/Edge 旧版 */
+	  scrollbar-width: none;     /* Firefox */
+	}
+	/* Chrome/Safari/Edge 隐藏滚动条 */
+	.modal::-webkit-scrollbar,
+	.modal-body::-webkit-scrollbar,
+	.roof-modal-body::-webkit-scrollbar,
+	.modal-body-jishou::-webkit-scrollbar,
+	.jishou-gallery-wrap::-webkit-scrollbar {
+	  display: none;
+	}
+
+    /* ===== 屋顶弹窗 ===== */
+    .roof-modal-body {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      overflow-y: auto;
+    }
+
+    .roof-top {
+      display: grid;
+      grid-template-columns: 6fr 4fr;
+      gap: 20px;
+      align-items: stretch;
+    }
+
+    .roof-visual {
+      height: 400px;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid rgba(246, 209, 139, 0.18);
+      background: rgba(255,255,255,0.05);
+    }
+
+    .roof-visual img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    .roof-copy-box {
+      border-radius: 18px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(246, 209, 139, 0.12);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+
+    .roof-copy-box h3 {
+		text-align: center;
+		font-weight: 500;
+      font-size: 28px;
+      color: #ffdca6;
+      margin-bottom: 12px;
+      letter-spacing: 1px;
+    }
+
+    .roof-copy-box p {
+		text-indent: 2em;
+      font-size: 17px;
+      line-height: 1.95;
+      color: rgba(255, 240, 220, 0.9);
+    }
+
+    .roof-switcher {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding: 6px 4px 4px 210px;
+    }
+
+    .roof-switch-btn {
+		font-family: "agency fb","隶书",sans-serif;
+      border: 1px solid rgba(246, 209, 139, 0.28);
+      background: rgba(255,255,255,0.05);
+      color: rgba(255, 240, 220, 0.92);
+      border-radius: 999px;
+      padding: 10px 18px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .roof-switch-btn:hover,
+    .roof-switch-btn.active {
+      background: rgba(198, 106, 68, 0.24);
+      border-color: rgba(246, 209, 139, 0.45);
+      color: #ffdca6;
+      transform: translateY(-2px);
+    }
+
+    /* ========== 返回首页按钮样式 ========== */
+    .back-home-btn {
+      position: fixed;
+      top: 52px;
+      right: 57px;
+      z-index: 19;
+      width: 120px;
+      height: 120px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: bold;
+      color: #733900;
+      text-decoration: none;
+      overflow: hidden;
+    }
+
+    .btn-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url("img/027.png") no-repeat center center;
+      background-size: cover;
+      transition: transform 0.5s ease;
+      z-index: 1;
+    }
+
+    .btn-text {
+      position: relative;
+      z-index: 2;
+    }
+
+    .back-home-btn:hover .btn-bg {
+      transform: rotate(360deg);
+    }
+
+    @media (max-width: 1200px) {
+      .main-visual { width: min(58vw, 760px); }
+      .info-card { width: min(24vw, 280px); }
+      .node { width: min(12vw, 140px); }
+      .modal { width: min(92vw, 980px); max-height: 88vh; }
+      .jishou-gallery { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 900px) {
+      html, body { overflow: auto; }
+      .page { min-height: 980px; }
+      .side-title { display: none; }
+      .header {
+        flex-direction: column;
+        gap: 16px;
+      }
+      .topic-tabs {
+        justify-content: flex-start;
+        max-width: 100%;
+      }
+      .main-visual {
+        width: min(76vw, 760px);
+        bottom: 20vh;
+      }
+      .node { width: 112px; }
+      .info-card { width: 240px; }
+      .legend { width: 88vw; bottom: 1.5vh; }
+      .modal {
+        width: 94vw;
+        max-height: 88vh;
+      }
+      .modal-body {
+        grid-template-columns: 1fr;
+      }
+      .roof-top {
+        grid-template-columns: 1fr;
+      }
+      .jishou-gallery {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .footer-note {
+        display: none;
+      }
+    }
+	/* ===== 屋顶拖动排序互动 ===== */
+	.roof-sort-game {
+	  margin-top: 10px;
+	  padding: 20px;
+	  border-radius: 20px;
+	  background: rgba(255,255,255,0.04);
+	  border: 1px solid rgba(246, 209, 139, 0.12);
+	}
+	
+	.roof-sort-head h4 {
+		font-weight: 500;
+		font-size: 24px;
+	  color: #ffdca6;
+	  margin-bottom: 8px;
+	  letter-spacing: 1px;
+	}
+	
+	.roof-sort-head p {
+	  font-size: 17px;
+	  line-height: 1.95;
+	  color: rgba(255, 240, 220, 0.88);
+	  margin-bottom: 16px;
+	}
+	
+	.roof-sort-list {
+	  display: flex;
+	  flex-direction: column;
+	  gap: 12px;
+	}
+	
+	.roof-sort-item {
+	  display: flex;
+	  text-align: center;
+	  align-items: center;
+	  gap: 14px;
+	  padding: 14px 16px;
+	  border-radius: 14px;
+	  background: rgba(255,255,255,0.06);
+	  border: 1px solid rgba(246, 209, 139, 0.16);
+	  color: rgba(255, 240, 220, 0.95);
+	  cursor: grab;
+	  transition: var(--transition);
+	  user-select: none;
+	}
+	
+	.roof-sort-layout {
+	  display: grid;
+	  grid-template-columns: 1.2fr 0.8fr;
+	  gap: 18px;
+	  align-items: start;
+	}
+	
+	.roof-sort-left,
+	.roof-sort-right {
+	  min-width: 0;
+	}
+	
+	.roof-sort-right {
+		margin-top: -18px;
+	  display: flex;
+	  flex-direction: column;
+	  gap: 14px;
+	}
+	
+	.roof-sort-actions {
+	  display: flex;
+	  flex-direction: column;
+	  gap: 12px;
+	  margin-top: 0;
+	}
+	
+	.roof-sort-action-btn {
+	  width: 100%;
+	  text-align: center;
+	}
+	
+	.roof-sort-feedback {
+	  margin-top: 0;
+	  padding: 12px 14px;
+	  border-radius: 14px;
+	  background: rgba(255,255,255,0.04);
+	  border: 1px solid rgba(246, 209, 139, 0.12);
+	}
+	
+	.roof-sort-reference {
+	  margin-top: 0;
+	}
+	
+	@media (max-width: 900px) {
+	  .roof-sort-layout {
+	    grid-template-columns: 1fr;
+	  }
+	
+	  .roof-sort-actions {
+	    flex-direction: row;
+	    flex-wrap: wrap;
+	  }
+	
+	  .roof-sort-action-btn {
+	    width: auto;
+	  }
+	}
+	
+	.roof-sort-item:hover {
+	  transform: translateY(-2px);
+	  border-color: rgba(246, 209, 139, 0.36);
+	  box-shadow: 0 8px 20px rgba(0,0,0,0.14);
+	}
+	
+	.roof-sort-item.dragging {
+	  opacity: 0.45;
+	  transform: scale(0.98);
+	}
+	
+	.roof-sort-item.correct {
+	  background: rgba(106, 163, 120, 0.18);
+	  border-color: rgba(132, 205, 150, 0.52);
+	}
+	
+	.roof-sort-item.wrong {
+	  background: rgba(199, 106, 68, 0.18);
+	  border-color: rgba(199, 106, 68, 0.48);
+	}
+	
+	.roof-sort-handle {
+	  flex: 0 0 auto;
+	  font-size: 18px;
+	  color: #ffdca6;
+	  opacity: 0.9;
+	}
+	
+	.roof-sort-name {
+	  font-size: 18px;
+	  letter-spacing: 1px;
+	}
+	
+	.roof-sort-actions {
+	  display: flex;
+	  gap: 12px;
+	  margin-top: 16px;
+	  flex-wrap: wrap;
+	}
+	
+	.roof-sort-action-btn {
+	  font-family: "agency fb","隶书",sans-serif;
+	  border: 1px solid rgba(246, 209, 139, 0.28);
+	  background: rgba(198, 106, 68, 0.24);
+	  color: #ffdca6;
+	  border-radius: 999px;
+	  padding: 10px 18px;
+	  font-size: 16px;
+	  cursor: pointer;
+	  transition: var(--transition);
+	}
+	
+	.roof-sort-action-btn:hover {
+	  transform: translateY(-2px);
+	  border-color: rgba(246, 209, 139, 0.45);
+	}
+	
+	.roof-sort-action-btn.secondary {
+	  background: rgba(255,255,255,0.05);
+	  color: rgba(255, 240, 220, 0.92);
+	}
+	
+	.roof-sort-feedback {
+		text-align: center;
+	  margin-top: 14px;
+	  min-height: 28px;
+	  font-size: 17px;
+	  line-height: 1.8;
+	  color: rgba(255, 240, 220, 0.92);
+	}
+	
+	.roof-sort-feedback.success {
+	  color: #b9f1c2;
+	}
+	
+	.roof-sort-feedback.error {
+	  color: #ffcfb8;
+	}
+	
+	.roof-sort-reference {
+	  margin-top: 12px;
+	  padding: 14px 16px;
+	  border-radius: 14px;
+	  background: rgba(255,255,255,0.03);
+	  border: 1px solid rgba(246, 209, 139, 0.1);
+	  font-size: 17px;
+	  line-height: 1.9;
+	  color: rgba(255, 240, 220, 0.84);
+	}
+	
+	.roof-sort-reference strong {
+		font-weight: 500;
+	  color: #ffdca6;
+	}
+	
+	@media (max-width: 900px) {
+	  .roof-sort-head h4 {
+	    font-size: 20px;
+	  }
+	
+	  .roof-sort-head p,
+	  .roof-sort-feedback,
+	  .roof-sort-reference {
+		padding-left: 20px;
+	    font-size: 14px;
+	  }
+	
+	  .roof-sort-name,
+	  .roof-sort-action-btn {
+	    font-size: 15px;
+	  }
+	}
+	.roof-watch-tip {
+	  margin-top: 8px;
+	  padding: 18px 20px;
+	  border-radius: 18px;
+	  background: rgba(255,255,255,0.04);
+	  border: 1px solid rgba(246, 209, 139, 0.12);
+	}
+	
+	.roof-watch-tip h4 {
+	  font-size: 22px;
+	  color: #ffdca6;
+	  margin-bottom: 10px;
+	  letter-spacing: 1px;
+	}
+	
+	.roof-watch-tip p {
+	  font-size: 17px;
+	  line-height: 1.9;
+	  color: rgba(255, 240, 220, 0.9);
+	}
+  </style>
+</head>
+<body>
+  <a href="导航.html" class="back-home-btn">
+    <div class="btn-bg"></div>
+    <span class="btn-text">返回首页</span>
+  </a>
+
+  <div class="page" id="page">
+    <header class="header">
+      <div class="brand">
+        <div class="brand-text">
+          <h1>宫</h1>
+          <h1>檐</h1>
+          <h1>神</h1>
+          <h1>韵</h1>
+        </div>
+      </div>
+    </header>
+
+    <main class="stage">
+      <div class="foreground" id="foreground">
+        <svg class="pointer-line-layer" viewBox="0 0 1920 1080" preserveAspectRatio="none" aria-hidden="true">
+          <line class="pointer-line line-1" x1="250" y1="720" x2="630" y2="600" />
+            <line class="pointer-line line-2" x1="700" y1="370" x2="670" y2="570" />
+            <line class="pointer-line line-3" x1="1280" y1="370" x2="1220" y2="635" />
+            <line class="pointer-line line-4" x1="1640" y1="720" x2="1280" y2="680" />
+        </svg>
+
+        <!-- <div class="main-visual" id="mainVisual">
+          <div class="building-wrap">
+            <div class="highlight-zone" data-zone="dougong" style="left: 28%; top: 28%; width: 19%; height: 14%;"></div>
+            <div class="highlight-zone" data-zone="jishou" style="left: 63%; top: 7%; width: 13%; height: 9%;"></div>
+            <div class="highlight-zone" data-zone="liuliwa" style="left: 23%; top: 3%; width: 54%; height: 20%; border-radius: 30px;"></div>
+            <div class="highlight-zone" data-zone="roof" style="left: 18%; top: 0%; width: 63%; height: 25%; border-radius: 38px;"></div>
+          </div>
+        </div> -->
+
+       <!-- <div class="decor-line" style="left: 15vw; top: 30vh; width: 16vw;"></div>
+        <div class="decor-line" style="right: 15vw; top: 31vh; width: 16vw;"></div>
+
+        <div class="pulse-dot" data-seq="1" style="left: 22.3vw; top: 57vh;"></div>
+        <div class="pulse-dot" data-seq="2" style="left: 37vw; top: 28vh;"></div>
+        <div class="pulse-dot" data-seq="3" style="left: 61vw; top: 28vh;"></div>
+        <div class="pulse-dot" data-seq="4" style="left: 76vw; top: 57vh;"></div> -->
+
+        <div class="node" data-seq="1" data-zone="dougong" data-action="jump" data-target="建筑成就—斗拱结构.html" style="left: 10vw; top: 56vh;">
+          <button aria-label="打开斗拱专题页面">
+            <div class="thumb">
+              <img src="img/g斗拱.png" alt="斗拱细节图" />
+            </div>
+            <div class="label">斗拱</div>
+          </button>
+        </div>
+
+        <div class="node" data-seq="2" data-zone="jishou" data-action="modal" data-modal="modal-jishou" style="left: 29vw; top: 27vh;">
+          <button aria-label="打开脊兽说明弹窗">
+            <div class="thumb">
+              <img src="img/g脊兽.png" alt="脊兽细节图" />
+            </div>
+            <div class="label">脊兽</div>
+          </button>
+        </div>
+
+        <div class="node" data-seq="3" data-zone="liuliwa" data-action="jump" data-target="琉璃瓦.html" style="left: 61vw; top: 27vh;">
+          <button aria-label="打开琉璃瓦专题页面">
+            <div class="thumb">
+              <img src="img/g琉璃瓦.png" alt="琉璃瓦细节图" />
+            </div>
+            <div class="label">琉璃瓦</div>
+          </button>
+        </div>
+
+        <div class="node" data-seq="4" data-zone="roof" data-action="modal" data-modal="modal-roof" style="left: 81vw; top: 56vh;">
+          <button aria-label="打开屋顶形制说明弹窗">
+            <div class="thumb">
+              <img src="img/g屋顶.png" alt="屋顶形制细节图" />
+            </div>
+            <div class="label">屋顶形制</div>
+          </button>
+        </div>
+
+        <article class="info-card" data-seq="1" style="left: 7vw; top: 30vh;">
+          <h3>斗拱</h3>
+          <p class="summary">承檐托顶，层层出挑，是木构体系中结构与装饰合一的关键部位。</p>
+          <p class="detail">明故宫檐下斗拱组织出檐深度与礼制节奏，既分担屋顶荷载，也强化了大木构架的层次感。</p>
+        </article>
+
+        <article class="info-card" data-seq="2" style="left: 27vw; top: 1vh;">
+          <h3>脊兽</h3>
+          <p class="summary">安置于屋脊与檐角之上的装饰构件，兼具压脊、镇护与礼仪象征功能。</p>
+          <p class="detail">明故宫建筑中的脊兽组合体现等级秩序，也在屋面轮廓线上形成生动有力的视觉节奏。</p>
+        </article>
+
+        <article class="info-card" data-seq="3" style="left: 55vw; top: 1vh;">
+          <h3>琉璃瓦</h3>
+          <p class="summary">以色泽、材质与铺设秩序塑造宫殿屋面的光感与庄严气象。</p>
+          <p class="detail">明故宫屋面常用黄色琉璃瓦，瓦当与滴水等部件共同组成了完整且富于装饰性的屋面系统。</p>
+        </article>
+
+        <article class="info-card" data-seq="4" style="left: 75vw; top: 30vh;">
+          <h3>屋顶形制</h3>
+          <p class="summary">屋顶不仅决定建筑轮廓，也体现建筑等级、空间秩序与整体气势。</p>
+          <p class="detail">明故宫建筑群中可见礼制鲜明的屋顶构成方式，正脊、垂脊、檐口与屋面坡度共同塑造宫殿风貌。</p>
+        </article>
+      </div>
+    </main>
+  </div>
+
+  <!-- 脊兽弹窗 -->
+  <div class="modal-overlay" id="modal-jishou" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-jishou-title">
+      <div class="modal-header">
+        <div class="modal-title" id="modal-jishou-title">脊兽</div>
+        <button class="modal-close" data-close="modal-jishou" aria-label="关闭弹窗">✕</button>
+      </div>
+
+      <div class="modal-body modal-body-jishou">
+		<div class="jishou-gallery-wrap">
+		  <div class="jishou-gallery-title">脊兽图鉴</div>
+		  <div class="jishou-gallery">
+		    <div class="jishou-item"><img src="img/j龙.png" alt="龙"></div>
+		    <div class="jishou-item"><img src="img/j凤.png" alt="凤"></div>
+		    <div class="jishou-item"><img src="img/j狮子.png" alt="狮子"></div>
+		    <div class="jishou-item"><img src="img/j海马.png" alt="海马"></div>
+		    <div class="jishou-item"><img src="img/j天马.png" alt="天马"></div>
+		    <div class="jishou-item"><img src="img/j狻猊.png" alt="狻猊"></div>
+		    <div class="jishou-item"><img src="img/j狎鱼.png" alt="狎鱼"></div>
+		    <div class="jishou-item"><img src="img/j獬豸.png" alt="獬豸"></div>
+		    <div class="jishou-item"><img src="img/j斗牛.png" alt="斗牛"></div>
+		    <div class="jishou-item"><img src="img/j什么.png" alt="行什"></div>
+		  </div>
+		</div>
+		  
+        <div class="modal-visual">
+          <div class="jishou-map" id="jishouMeaningMap">
+            <div class="jishou-map-title">
+              <h4>脊兽寓意关系图</h4>
+              <p>点击下方脊兽，查看其对应的象征寓意</p>
+            </div>
+            <div class="jishou-map-hint">点击空白处取消高亮</div>
+            <svg class="jishou-connector-layer" id="jishouConnectorLayer"></svg>
+            <div class="jishou-axis"></div>
+          </div>
+        </div>
+
+        
+        <div class="modal-copy">
+          <section>
+            <h4>脊兽的总体作用</h4>
+            <p>脊兽位于中国古代建筑屋脊之上，既有压脊、防风、保护屋面节点的实用作用，也承担镇火辟邪、祈福纳祥、彰显建筑等级的重要功能。它们沿屋脊次第排列，使建筑轮廓更有节奏感，也强化了皇家建筑庄严而神圣的视觉气势。</p>
+          </section>
+
+          <section>
+            <h4>明故宫主要宫殿的脊兽数量与形制</h4>
+            <ul>
+              <li>奉天殿：作为最高等级的大朝正殿，屋脊兽数通常最多，形制最完整，用以体现至尊皇权与最高礼制规格。</li>
+              <li>华盖殿：等级略次于正殿，脊兽数量相应减少，但仍保持完整的皇家序列，突出礼仪空间的重要性。</li>
+              <li>谨身殿：作为重要殿宇，屋顶脊兽配置依旧庄重有序，体现次一级宫殿的典礼属性。</li>
+              <li>东西六宫及后廷宫殿：脊兽数量进一步减少，形制趋于简化，更强调居住与日常使用功能。</li>
+              <li>附属殿庑、配殿、门庑：脊兽数量较少，甚至只保留简化装饰，其重点在于服从总体秩序，而非突出等级。</li>
+            </ul>
+          </section>
+
+          <section>
+            <h4>明故宫脊兽的观看重点</h4>
+            <p>在明故宫相关展示中，可重点观察三点：一是脊兽数量随建筑等级而变化；二是脊兽与屋顶形制之间的关系；三是脊兽在礼制、装饰和象征意义上的统一。通过比较不同宫殿屋顶上的脊兽配置，可以更直观理解明代宫殿建筑的等级制度。</p>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 屋顶弹窗 -->
+  <div class="modal-overlay" id="modal-roof" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-roof-title">
+      <div class="modal-header">
+        <div class="modal-title" id="modal-roof-title">屋顶形制</div>
+        <button class="modal-close" data-close="modal-roof" aria-label="关闭弹窗">✕</button>
+      </div>
+
+      <div class="modal-body roof-modal-body">
+        <div class="roof-top">
+          <div class="roof-visual">
+            <img id="roofDisplayImg" src="img/b奉天殿.png" alt="奉天殿屋顶" />
+          </div>
+          <div class="roof-copy-box">
+            <h3 id="roofDisplayTitle">奉天殿｜重檐庑殿顶</h3>
+            <p id="roofDisplayText">
+              重檐庑殿顶是中国古代宫殿建筑中等级最高、气势最为庄严的屋顶形制之一。其四面出坡，上下两层檐部层层展开，正脊、垂脊分明，既增强了建筑的体量感，也使整体轮廓更加雄浑开阔。奉天殿作为明故宫最重要的外朝正殿，采用重檐庑殿顶，不仅体现了至高无上的皇家礼制等级，也强化了大朝会建筑应有的庄重、威严与中心地位。
+            </p>
+          </div>
+        </div>
+
+        <div class="roof-switcher">
+          <button class="roof-switch-btn active" data-roof="fengtian">奉天殿</button>
+          <button class="roof-switch-btn" data-roof="huagai">华盖殿</button>
+          <button class="roof-switch-btn" data-roof="jinshen">洪武门</button>
+          <button class="roof-switch-btn" data-roof="kunning">谨身殿</button>
+          <button class="roof-switch-btn" data-roof="donggong">东宫建筑</button>
+        </div>
+		<div class="roof-watch-tip">
+		  <h4>观看重点</h4>
+		  <p>
+		    观看屋顶时可重点留意三点：一是屋面有几面出坡；二是是否出现重檐；三是屋脊与檐口的组合方式。
+		    比较不同建筑的轮廓变化，可以更直观理解宫殿建筑的等级秩序。
+		  </p>
+		</div>
+		<div class="roof-sort-game">
+		  <div class="roof-sort-head">
+		    <h4>拖动排序｜屋顶等级由高到低</h4>
+		    <p>请将左侧屋顶类型拖动排序，右侧可查看提示并检查答案。</p>
+		  </div>
+		
+		  <div class="roof-sort-layout">
+		    <div class="roof-sort-left">
+		      <div class="roof-sort-list" id="roofSortList">
+		        <div class="roof-sort-item" draggable="true" data-rank="4">
+		          <span class="roof-sort-handle">☰</span>
+		          <span class="roof-sort-name">悬山顶</span>
+		        </div>
+		        <div class="roof-sort-item" draggable="true" data-rank="1">
+		          <span class="roof-sort-handle">☰</span>
+		          <span class="roof-sort-name">庑殿顶</span>
+		        </div>
+		        <div class="roof-sort-item" draggable="true" data-rank="5">
+		          <span class="roof-sort-handle">☰</span>
+		          <span class="roof-sort-name">硬山顶</span>
+		        </div>
+		        <div class="roof-sort-item" draggable="true" data-rank="2">
+		          <span class="roof-sort-handle">☰</span>
+		          <span class="roof-sort-name">重檐歇山顶</span>
+		        </div>
+		        <div class="roof-sort-item" draggable="true" data-rank="3">
+		          <span class="roof-sort-handle">☰</span>
+		          <span class="roof-sort-name">歇山顶</span>
+		        </div>
+		      </div>
+		    </div>
+		
+		    <div class="roof-sort-right">
+		      <div class="roof-sort-actions">
+		        <button class="roof-sort-action-btn" id="roofCheckBtn">检查答案</button>
+		        <button class="roof-sort-action-btn secondary" id="roofResetBtn">重新打乱</button>
+		      </div>
+		
+		      <div class="roof-sort-feedback" id="roofSortFeedback">
+		        拖动完成后点击“检查答案”。
+		      </div>
+		
+		      <div class="roof-sort-reference">
+		        <strong>提示：</strong> 一般而言，皇家正殿等级最高，常用庑殿顶；重要殿宇多见歇山顶；悬山顶、硬山顶更多见于次要或附属建筑。
+		      </div>
+		    </div>
+		  </div>
+		</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const sequenceElements = [...document.querySelectorAll('[data-seq]')]
+      .sort((a, b) => Number(a.dataset.seq) - Number(b.dataset.seq));
+
+    function revealSequence() {
+      sequenceElements.forEach((el, index) => {
+        const delay = 1800 + index * 240;
+        setTimeout(() => el.classList.add('show'), delay);
+      });
+    }
+
+    revealSequence();
+
+    const nodes = document.querySelectorAll('.node');
+    const infoCards = document.querySelectorAll('.info-card');
+    const zones = document.querySelectorAll('.highlight-zone');
+
+    function clearActive() {
+      nodes.forEach(n => n.classList.remove('active'));
+      infoCards.forEach(c => c.classList.remove('active'));
+      zones.forEach(z => z.classList.remove('show'));
+    }
+
+    nodes.forEach((node, index) => {
+      node.addEventListener('mouseenter', () => {
+        clearActive();
+        node.classList.add('active');
+        if (infoCards[index]) infoCards[index].classList.add('active');
+        const zone = document.querySelector(`.highlight-zone[data-zone="${node.dataset.zone}"]`);
+        if (zone) zone.classList.add('show');
+      });
+
+      node.addEventListener('mouseleave', () => {
+        clearActive();
+      });
+
+      node.addEventListener('click', () => {
+        const action = node.dataset.action;
+        if (action === 'jump') {
+          const target = node.dataset.target;
+          if (target) window.location.href = target;
+        }
+        if (action === 'modal') {
+          const modalId = node.dataset.modal;
+          openModal(modalId);
+        }
+      });
+    });
+
+    const overlays = document.querySelectorAll('.modal-overlay');
+
+    function openModal(id) {
+      const overlay = document.getElementById(id);
+      if (!overlay) return;
+      overlay.classList.add('open');
+      overlay.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal(id) {
+      const overlay = document.getElementById(id);
+      if (!overlay) return;
+      overlay.classList.remove('open');
+      overlay.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+
+    document.querySelectorAll('.modal-close').forEach(btn => {
+      btn.addEventListener('click', () => closeModal(btn.dataset.close));
+    });
+
+    overlays.forEach(overlay => {
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) closeModal(overlay.id);
+      });
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        overlays.forEach(overlay => closeModal(overlay.id));
+      }
+    });
+
+    const page = document.getElementById('page');
+    const foreground = document.getElementById('foreground');
+    const mainVisual = document.getElementById('mainVisual');
+
+    function applyParallax(clientX, clientY) {
+      if (!foreground || !mainVisual) return;
+      const { innerWidth, innerHeight } = window;
+      const x = clientX / innerWidth - 0.5;
+      const y = clientY / innerHeight - 0.5;
+
+      const fgX = x * 14;
+      const fgY = y * 10;
+      const mainX = x * 22;
+      const mainY = y * 16;
+
+      foreground.style.transform = `translate3d(${fgX}px, ${fgY}px, 0)`;
+      mainVisual.style.transform = `translateX(calc(-50% + ${mainX}px)) translateY(${mainY}px) scale(1)`;
+    }
+
+    function resetParallax() {
+      if (foreground) foreground.style.transform = 'translate3d(0, 0, 0)';
+      if (mainVisual) mainVisual.style.transform = 'translateX(-50%) translateY(0) scale(1)';
+    }
+
+    if (page) {
+      page.addEventListener('mousemove', (e) => {
+        applyParallax(e.clientX, e.clientY);
+      });
+
+      page.addEventListener('mouseleave', () => {
+        resetParallax();
+      });
+    }
+
+    function runSelfChecks() {
+      const requiredIds = ['page', 'foreground', 'mainVisual'];
+      const missing = requiredIds.filter(id => !document.getElementById(id));
+      if (missing.length > 0) {
+        console.warn('缺少关键节点:', missing.join(', '));
+      }
+      if (nodes.length !== 4) {
+        console.warn('当前节点数量不是 4，请检查 .node 元素。');
+      }
+      if (infoCards.length !== 4) {
+        console.warn('当前说明框数量不是 4，请检查 .info-card 元素。');
+      }
+    }
+
+    runSelfChecks();
+
+    /* ===== 脊兽交互图脚本 ===== */
+    const jishouMap = document.getElementById('jishouMeaningMap');
+    const jishouSvg = document.getElementById('jishouConnectorLayer');
+
+    if (jishouMap && jishouSvg) {
+      const jishouBeastData = [
+        { id: 'dragon', label: '龙' },
+        { id: 'phoenix', label: '凤' },
+        { id: 'lion', label: '狮子' },
+        { id: 'haima', label: '海马' },
+        { id: 'tianma', label: '天马' },
+        { id: 'suanni', label: '狻猊' },
+        { id: 'yazi', label: '狎鱼' },
+        { id: 'xiezhi', label: '獬豸' },
+        { id: 'douniu', label: '斗牛' },
+        { id: 'hangshi', label: '行什' }
+      ];
+
+      const jishouMeaningData = [
+        { id: 'auspicious', label: '吉祥', size: 'large', x: 110, y: 210, delay: '0s' },
+        { id: 'power', label: '威严', size: 'medium', x: 240, y: 110, delay: '0.6s' },
+        { id: 'blessing', label: '祈福', size: 'medium', x: 370, y: 220, delay: '1.2s' },
+        { id: 'ward', label: '辟邪', size: 'large', x: 500, y: 120, delay: '1.8s' },
+        { id: 'peace', label: '平安', size: 'medium', x: 640, y: 235, delay: '0.9s' },
+        { id: 'fireproof', label: '镇火', size: 'large', x: 770, y: 125, delay: '1.5s' },
+        { id: 'order', label: '礼制', size: 'medium', x: 450, y: 330, delay: '2.1s' }
+      ];
+
+      const jishouRelations = [
+        ['dragon', 'auspicious'],
+        ['dragon', 'power'],
+        ['phoenix', 'auspicious'],
+        ['phoenix', 'blessing'],
+        ['lion', 'power'],
+        ['lion', 'ward'],
+        ['haima', 'peace'],
+        ['haima', 'fireproof'],
+        ['tianma', 'auspicious'],
+        ['tianma', 'blessing'],
+        ['suanni', 'peace'],
+        ['suanni', 'ward'],
+        ['yazi', 'fireproof'],
+        ['yazi', 'ward'],
+        ['xiezhi', 'order'],
+        ['xiezhi', 'ward'],
+        ['douniu', 'fireproof'],
+        ['douniu', 'power'],
+        ['hangshi', 'order'],
+        ['hangshi', 'ward']
+      ];
+
+      const jishouBeastNodes = {};
+      const jishouMeaningNodes = {};
+      const jishouPathMap = [];
+
+      function createJishouMeaningNodes() {
+        jishouMeaningData.forEach(item => {
+          const el = document.createElement('div');
+          el.className = `jishou-meaning ${item.size}`;
+          el.dataset.id = item.id;
+          el.textContent = item.label;
+          el.style.left = `${item.x}px`;
+          el.style.top = `${item.y}px`;
+          el.style.animationDelay = item.delay;
+          jishouMap.appendChild(el);
+          jishouMeaningNodes[item.id] = el;
+        });
+      }
+
+      function createJishouBeastNodes() {
+        const startX = 54;
+        const gap = 80;
+        const y = 448;
+
+        jishouBeastData.forEach((item, index) => {
+          const el = document.createElement('div');
+          el.className = 'jishou-beast';
+          el.dataset.id = item.id;
+          el.style.left = `${startX + index * gap}px`;
+          el.style.top = `${y}px`;
+          el.innerHTML = `<span class="jishou-beast-text">${item.label}</span>`;
+          jishouMap.appendChild(el);
+          jishouBeastNodes[item.id] = el;
+        });
+      }
+
+      function getJishouCenter(el) {
+        const mapRect = jishouMap.getBoundingClientRect();
+        const rect = el.getBoundingClientRect();
+        return {
+          x: rect.left - mapRect.left + rect.width / 2,
+          y: rect.top - mapRect.top + rect.height / 2
+        };
+      }
+
+      function createJishouCurve(start, end) {
+        const midY = start.y - 150;
+        return `M ${start.x} ${start.y} C ${start.x} ${midY}, ${end.x} ${midY}, ${end.x} ${end.y}`;
+      }
+
+      function drawJishouPaths() {
+        jishouSvg.innerHTML = '';
+        jishouPathMap.length = 0;
+
+        jishouRelations.forEach(([beastId, meaningId]) => {
+          const beastEl = jishouBeastNodes[beastId];
+          const meaningEl = jishouMeaningNodes[meaningId];
+          if (!beastEl || !meaningEl) return;
+
+          const start = getJishouCenter(beastEl);
+          const end = getJishouCenter(meaningEl);
+
+          const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+          path.setAttribute('d', createJishouCurve(start, end));
+          path.setAttribute('class', 'jishou-link');
+          path.dataset.beast = beastId;
+          path.dataset.meaning = meaningId;
+
+          jishouSvg.appendChild(path);
+          jishouPathMap.push(path);
+        });
+      }
+
+      function clearJishouActive() {
+        Object.values(jishouBeastNodes).forEach(el => el.classList.remove('active', 'inactive'));
+        Object.values(jishouMeaningNodes).forEach(el => el.classList.remove('active', 'inactive'));
+        jishouPathMap.forEach(path => path.classList.remove('active', 'inactive'));
+      }
+
+      function setJishouActive(beastId) {
+        jishouBeastData.forEach(item => {
+          const el = jishouBeastNodes[item.id];
+          el.classList.toggle('active', item.id === beastId);
+          el.classList.toggle('inactive', item.id !== beastId);
+        });
+
+        const activeMeaningIds = new Set(
+          jishouRelations.filter(([b]) => b === beastId).map(([, m]) => m)
+        );
+
+        jishouMeaningData.forEach(item => {
+          const el = jishouMeaningNodes[item.id];
+          el.classList.toggle('active', activeMeaningIds.has(item.id));
+          el.classList.toggle('inactive', !activeMeaningIds.has(item.id));
+        });
+
+        jishouPathMap.forEach(path => {
+          const isActive = path.dataset.beast === beastId;
+          path.classList.toggle('active', isActive);
+          path.classList.toggle('inactive', !isActive);
+        });
+      }
+
+      createJishouMeaningNodes();
+      createJishouBeastNodes();
+
+      window.addEventListener('load', drawJishouPaths);
+      window.addEventListener('resize', drawJishouPaths);
+
+      Object.values(jishouBeastNodes).forEach(el => {
+        el.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const isActive = el.classList.contains('active');
+          if (isActive) {
+            clearJishouActive();
+          } else {
+            setJishouActive(el.dataset.id);
+          }
+        });
+      });
+
+      jishouMap.addEventListener('click', (e) => {
+        if (!e.target.closest('.jishou-beast')) {
+          clearJishouActive();
+        }
+      });
+    }
+
+    /* ===== 屋顶切换 ===== */
+    const roofData = {
+      fengtian: {
+        title: '奉天殿｜重檐庑殿顶',
+        img: 'img/b奉天殿.png',
+        text: '重檐庑殿顶是中国古代宫殿建筑中等级最高、气势最为庄严的屋顶形制之一。其四面出坡，上下两层檐部层层展开，正脊、垂脊分明，既增强了建筑的体量感，也使整体轮廓更加雄浑开阔。奉天殿作为明故宫最重要的外朝正殿，采用重檐庑殿顶，不仅体现了至高无上的皇家礼制等级，也强化了大朝会建筑应有的庄重、威严与中心地位。'
+      },
+      huagai: {
+        title: '华盖殿｜四角攒尖顶',
+        img: 'img/b华盖殿.png',
+        text: '四角攒尖顶屋面自四方汇聚于顶部，形体集中而完整，整体轮廓挺拔秀丽，具有鲜明的向心感和纪念性。这种屋顶形制常用于体量相对集中、空间意义突出的建筑，能够在较为凝练的结构中形成庄重而精巧的视觉效果。华盖殿采用四角攒尖顶，使建筑在外观上更显挺秀端整，也突出了其在宫殿礼仪空间中承前启后的特殊位置。'
+      },
+      jinshen: {
+        title: '洪武门｜歇山顶',
+        img: 'img/b洪武门.png',
+        text: '歇山顶兼具庑殿顶与悬山顶的特点，既有较强的稳定感，又富于轮廓变化，是宫殿建筑中十分重要的一类屋顶形式。它正脊明确，屋面转折丰富，能够使建筑在庄重之中呈现出更鲜明的层次感。洪武门作为明故宫的重要门殿建筑，采用歇山顶，既体现了较高的礼制等级，也通过舒展有序的屋顶轮廓强化了门户建筑应有的威仪感和过渡性。'
+      },
+      kunning: {
+        title: '谨身殿｜重檐歇山顶',
+        img: 'img/b谨身殿.png',
+        text: '重檐歇山顶是在歇山顶基础上增设一层檐部的高等级屋顶形式，既保留了歇山顶轮廓丰富、转折清晰的特点，又通过上下双檐增强了建筑的体量感和尊贵气象。谨身殿作为明故宫重要殿宇之一，采用重檐歇山顶，使建筑在整体上更显庄严厚重，也更能体现其在礼仪秩序中的重要地位。这样的屋顶处理，使殿宇既具有皇家建筑的华丽气势，又保持了规整沉稳的空间风貌。'
+      },
+      donggong: {
+        title: '东宫建筑｜悬山顶 / 硬山顶',
+        img: 'img/roof-donggong.png',
+        text: '明故宫东宫及附属建筑群中，除少数重要建筑外，常可见悬山顶与硬山顶等相对简洁的屋顶形式。悬山顶出檐较为明显，屋面线条舒展，具有一定的轻巧感；硬山顶则两侧山墙高起，轮廓更加简练平直，整体显得稳重朴实。这类屋顶虽不如高等级宫殿屋顶那样复杂华丽，却更强调实用性、秩序感与建筑群体的统一，是宫殿体系中不可缺少的重要组成部分。'
+      }
+    };
+
+    const roofDisplayImg = document.getElementById('roofDisplayImg');
+    const roofDisplayTitle = document.getElementById('roofDisplayTitle');
+    const roofDisplayText = document.getElementById('roofDisplayText');
+    const roofButtons = document.querySelectorAll('.roof-switch-btn');
+
+    roofButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const key = btn.dataset.roof;
+        const info = roofData[key];
+        if (!info) return;
+
+        roofDisplayImg.src = info.img;
+        roofDisplayImg.alt = info.title;
+        roofDisplayTitle.textContent = info.title;
+        roofDisplayText.textContent = info.text;
+
+        roofButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      });
+    });
+	 /* ===== 屋顶拖动排序互动 ===== */
+	  const roofSortList = document.getElementById('roofSortList');
+	  const roofCheckBtn = document.getElementById('roofCheckBtn');
+	  const roofResetBtn = document.getElementById('roofResetBtn');
+	  const roofSortFeedback = document.getElementById('roofSortFeedback');
+	
+	  if (roofSortList && roofCheckBtn && roofResetBtn && roofSortFeedback) {
+	    let draggedItem = null;
+	
+	    function getSortItems() {
+	      return [...roofSortList.querySelectorAll('.roof-sort-item')];
+	    }
+	
+	    function clearSortState() {
+	      getSortItems().forEach(item => {
+	        item.classList.remove('correct', 'wrong');
+	      });
+	      roofSortFeedback.classList.remove('success', 'error');
+	    }
+	
+	    function shuffleRoofItems(showMessage = true) {
+	      const items = getSortItems();
+	      for (let i = items.length - 1; i > 0; i--) {
+	        const j = Math.floor(Math.random() * (i + 1));
+	        [items[i], items[j]] = [items[j], items[i]];
+	      }
+	      items.forEach(item => roofSortList.appendChild(item));
+	      clearSortState();
+	    
+	      if (showMessage) {
+	        roofSortFeedback.textContent = '已重新打乱，请再次拖动排序。';
+	      } else {
+	        roofSortFeedback.textContent = '拖动完成后点击“检查答案”';
+	      }
+	    }
+	
+	    function getDragAfterElement(container, y) {
+	      const draggableElements = [...container.querySelectorAll('.roof-sort-item:not(.dragging)')];
+	
+	      return draggableElements.reduce((closest, child) => {
+	        const box = child.getBoundingClientRect();
+	        const offset = y - box.top - box.height / 2;
+	
+	        if (offset < 0 && offset > closest.offset) {
+	          return { offset, element: child };
+	        } else {
+	          return closest;
+	        }
+	      }, { offset: Number.NEGATIVE_INFINITY, element: null }).element;
+	    }
+	
+	    getSortItems().forEach(item => {
+	      item.addEventListener('dragstart', () => {
+	        draggedItem = item;
+	        item.classList.add('dragging');
+	      });
+	
+	      item.addEventListener('dragend', () => {
+	        item.classList.remove('dragging');
+	        draggedItem = null;
+	      });
+	    });
+	
+	    roofSortList.addEventListener('dragover', (e) => {
+	      e.preventDefault();
+	      const afterElement = getDragAfterElement(roofSortList, e.clientY);
+	      const currentDragging = roofSortList.querySelector('.dragging');
+	      if (!currentDragging) return;
+	
+	      if (afterElement == null) {
+	        roofSortList.appendChild(currentDragging);
+	      } else {
+	        roofSortList.insertBefore(currentDragging, afterElement);
+	      }
+	    });
+	
+	    roofCheckBtn.addEventListener('click', () => {
+	      const items = getSortItems();
+	      clearSortState();
+	
+	      let allCorrect = true;
+	
+	      items.forEach((item, index) => {
+	        const expectedRank = index + 1;
+	        const actualRank = Number(item.dataset.rank);
+	
+	        if (actualRank === expectedRank) {
+	          item.classList.add('correct');
+	        } else {
+	          item.classList.add('wrong');
+	          allCorrect = false;
+	        }
+	      });
+	
+	      if (allCorrect) {
+	        roofSortFeedback.textContent = '排序正确。你已经按屋顶等级由高到低完成排列：庑殿顶 → 重檐歇山顶 → 歇山顶 → 悬山顶 → 硬山顶。';
+	        roofSortFeedback.classList.add('success');
+	      } else {
+	        roofSortFeedback.textContent = '还有一些顺序不对。可根据皇家建筑等级再想一想：越重要的宫殿，屋顶形制通常越复杂、等级越高。';
+	        roofSortFeedback.classList.add('error');
+	      }
+	    });
+	
+	    roofResetBtn.addEventListener('click', () => shuffleRoofItems(true));
+	    
+	    shuffleRoofItems(false);
+	  }
+  </script>
+</body>
+</html>

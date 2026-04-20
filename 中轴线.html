@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>明故宫中轴线布局</title>
+
+    <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "agency fb","隶书",sans-serif;
+        }
+        
+        body.modal-open{
+            overflow: hidden;
+        }
+
+        .shell{
+            width: 100%;
+            position: relative;
+            padding: 80px 0;
+            background-attachment: fixed;
+            background-size: cover;
+            background-position: center;
+            min-height: 100vh;
+            background-image: url("img/a明故宫内页.png");
+        }
+        
+        .shell:before{
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            content: "";
+        }
+        
+        .header{
+            width: 100%;
+            text-align: center;
+            margin-bottom: 80px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .title{
+            color: #333;
+            font-size: 80px;
+            font-weight: 400;
+            margin: 0;
+        }
+
+        .intro-section {
+            max-width: 1200px;
+            margin: 40px auto 60px;
+            padding: 50px 140px;
+            background: url(img/13.png);
+            background-size: 100% 100%;
+            border-radius: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .intro-content {
+            color:#733900;
+            font-size: 18px;
+            line-height: 1.8;
+            text-indent: 2em;
+            margin: 0;
+        }
+        
+        .timeline{
+            margin: 0 auto;
+            max-width: 1500px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .timeline:before{
+            position: absolute;
+            left: 50%;
+            top: 0;
+            width: 2px;
+            height: 100%;
+            margin-left: -1px;
+            content: "";
+            background: rgba(115, 57, 0, 0.45);
+            z-index: 1;
+        }
+        
+        /* 恢复你原来的整体模糊->清晰动效 */
+        .item{
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 80px;
+            padding: 0 20px;
+            opacity: 0.3;
+            filter: blur(2px);
+            transform: translateY(40px);
+            transition: all 0.6s ease-out;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .item--active{
+            opacity: 1;
+            filter: blur(0px);
+            transform: translateY(0);
+        }
+        
+        .img-wrap{
+            width: 650px;
+            transition: all 0.4s ease-out 0.2s;
+            background-size: 100% 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .text-wrap-left{
+            width: calc(50% - 180px);
+            padding: 30px;
+            background: url(img/13.png);
+            background-size: 100% 100%;
+            border-radius: 10px;
+            transition: all 0.4s ease-out 0.2s;
+            margin-right: 30px;
+        }
+        
+        .text-wrap-right{
+            width: calc(50% - 180px);
+            padding: 30px;
+            background: url(img/13.png);
+            background-size: 100% 100%;
+            border-radius: 10px;
+            transition: all 0.4s ease-out 0.2s;
+            margin-left: 30px;
+        }
+        
+        .img{
+            max-width: 100%;
+            max-height: 350px;
+            border-radius: 8px;
+            transition: transform 0.35s ease, box-shadow 0.35s ease;
+            object-fit: cover;
+            display: block;
+        }
+
+        .img-wrap:hover .img{
+            transform: scale(1.02);
+            /* box-shadow: 0 12px 30px rgba(0,0,0,0.25); */
+        }
+
+        .img-wrap::after{
+            content: "点击查看建筑模型";
+            position: absolute;
+            bottom: -26px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 8px 16px;
+            font-size: 14px;
+            color: #fff;
+            background: rgba(0,0,0,0.45);
+            border-radius: 999px;
+            letter-spacing: 1px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .img-wrap:hover::after{
+            opacity: 1;
+        }
+        
+        .content-title{
+            color: #333;
+            font-size: 28px;
+            font-weight: normal;
+            margin-bottom: 10px;
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.4s ease-out 0.3s;
+            text-align: center;
+        }
+        
+        .content-desc{
+            color: #733900;
+            font-size: 18px;
+            line-height: 24px;
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.4s ease-out 0.4s;
+            margin-left: 20px;
+            margin-right: 20px;
+        }
+        
+        .item--active .content-title,
+        .item--active .content-desc{
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .back-home-btn {
+            position: fixed;
+            top: 52px;
+            right: 57px;
+            z-index: 999;
+            width: 120px;
+            height: 120px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+            color: #733900;
+            text-decoration: none;
+            overflow: hidden;
+        }
+
+        .btn-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url("img/027.png") no-repeat center center;
+            background-size: cover;
+            transition: transform 0.5s ease;
+            z-index: 1;
+        }
+
+        .btn-text {
+            position: relative;
+            z-index: 2;
+        }
+
+        .back-home-btn:hover .btn-bg {
+            transform: rotate(360deg);
+        }
+
+        /* 全屏遮罩弹窗 */
+        .model-modal{
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.72);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 0.35s ease, visibility 0.35s ease;
+        }
+
+        .model-modal.show{
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+
+        .model-modal-panel{
+            width: min(1380px, 92vw);
+            height: min(78vh, 820px);
+            display: flex;
+            gap: 24px;
+            position: relative;
+        }
+
+        .model-left{
+            flex: 3;
+            min-width: 0;
+            background: rgba(18,18,18,0.9);
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+            border: 1px solid rgba(255,255,255,0.08);
+            position: relative;
+        }
+
+        .model-right{
+            flex: 2;
+            min-width: 0;
+            background: url("img/038.png");
+            background-size: 100% 100%;
+			
+            /* border-radius: 18px; */
+            padding: 42px 36px;
+            overflow-y: auto;
+            /* box-shadow: 0 20px 50px rgba(0,0,0,0.35); */
+        }
+
+        model-viewer{
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, #505050 0%, #232323 58%, #121212 100%);
+            --poster-color: transparent;
+        }
+
+        .modal-title{
+            color: #e5ceb2;
+            font-size: 34px;
+            font-weight: normal;
+            text-align: center;
+            margin-bottom: 35px;
+            line-height: 1.35;
+        }
+
+        .modal-desc{
+            color: #f0dfaa;
+            font-size: 20px;
+            line-height: 1.9;
+            text-indent: 2em;
+            white-space: pre-line;
+			text-indent: 2em;
+        }
+
+        .modal-tip{
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 15px;
+            text-align: center;
+            margin-top: 18px;
+            line-height: 1.7;
+        }
+
+        .modal-close{
+            position: absolute;
+            top: -18px;
+            right: -25px;
+            width: 52px;
+            height: 52px;
+            border: none;
+            border-radius: 50%;
+            background: #fff;
+            color: #733900;
+            font-size: 30px;
+            line-height: 52px;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 0 8px 22px rgba(0,0,0,0.3);
+            transition: transform 0.25s ease, background 0.25s ease;
+            z-index: 20;
+        }
+
+        .modal-close:hover{
+            transform: scale(1.08) rotate(90deg);
+            background: #f7e7cf;
+        }
+
+        /* 模型加载百分比层 */
+        .model-loading{
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            background: rgba(10,10,10,0.72);
+            z-index: 8;
+            transition: opacity 0.35s ease, visibility 0.35s ease;
+        }
+
+        .model-loading.hide{
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .loading-ring{
+            width: 96px;
+            height: 96px;
+            border-radius: 50%;
+            border: 4px solid rgba(255,255,255,0.15);
+            border-top-color: rgba(255,255,255,0.9);
+            animation: spin 1s linear infinite;
+            margin-bottom: 18px;
+        }
+
+        .loading-percent{
+            color: #fff;
+            font-size: 30px;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .loading-text{
+            color: rgba(255,255,255,0.82);
+            font-size: 16px;
+            letter-spacing: 2px;
+        }
+
+        @keyframes spin{
+            from{ transform: rotate(0deg); }
+            to{ transform: rotate(360deg); }
+        }
+
+        @media only screen and (max-width: 1024px){
+            .model-modal-panel{
+                width: min(96vw, 1200px);
+                height: auto;
+                max-height: 90vh;
+                flex-direction: column;
+            }
+
+            .model-left{
+                flex: none;
+                height: 45vh;
+            }
+
+            .model-right{
+                flex: none;
+                max-height: 36vh;
+            }
+        }
+        
+        @media only screen and (max-width: 767px) {
+            .timeline:before{
+                left: 40px;
+            }
+            
+            .item{
+                flex-direction: column;
+                align-items: flex-start;
+                margin-bottom: 80px;
+                padding-left: 80px;
+            }
+            
+            .img-wrap{
+                width: 100%;
+                margin-bottom: 20px;
+            }
+            
+            .text-wrap-left, .text-wrap-right{
+                width: 100%;
+                margin: 0 0 20px 0;
+            }
+            
+            .title{
+                font-size: 32px;
+                padding: 0 20px;
+            }
+            
+            .content-title{
+                font-size: 24px;
+            }
+
+            .intro-section{
+                padding: 34px 28px;
+                margin: 30px 16px 50px;
+            }
+
+            .intro-content{
+                font-size: 16px;
+            }
+
+            .model-modal{
+                padding: 16px;
+            }
+
+            .model-left{
+                height: 34vh;
+            }
+
+            .model-right{
+                padding: 28px 22px;
+            }
+
+            .modal-title{
+                font-size: 26px;
+            }
+
+            .modal-desc{
+                font-size: 17px;
+                line-height: 1.85;
+            }
+
+            .back-home-btn{
+                width: 92px;
+                height: 92px;
+                top: 18px;
+                right: 18px;
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="导航.html" class="back-home-btn">
+        <div class="btn-bg"></div>
+        <span class="btn-text">返回首页</span>
+    </a>
+
+    <div class="shell" id="shell">
+        <div class="header">
+            <h2 class="title">皇宫范式—中轴布局</h2>
+        </div>
+
+        <div class="intro-section">
+            <p class="intro-content">
+                明故宫虽已湮没于历史长河，但通过详实的史料记载，以及以明故宫为蓝本建造的北京故宫，我们得以复原其恢弘的中轴线建筑布局。本页面依托中轴线脉络，依次展现明故宫从南至北的核心建筑，并对比其与北京故宫对应建筑的异同，还原这座明初皇家宫殿的规制与风貌。
+            </p>
+        </div>
+
+        <div class="timeline">
+            <div class="item">
+                <div class="text-wrap-left">
+                    <h2 class="content-title">明故宫正阳门</h2>
+                    <p class="content-desc">明故宫外郭城的正南门，是进入皇城的第一道门户，始建于明初，为南京城南部重要的标志性建筑，整体形制恢弘，是明代都城城门建筑的典型代表，兼具防御与礼仪功能。</p>
+                </div>
+                <div class="img-wrap" data-name="明故宫正阳门" data-model="model/a正阳门1.glb" data-desc="正阳门是明故宫外郭城正南方向的重要门户，也是进入皇城礼仪空间的起点。它不仅承担交通与防御功能，更在都城秩序中具有鲜明的象征意义。作为南向第一重门禁建筑，正阳门以高大的城楼和厚重的门体强调皇城威严，并与后续洪武门、承天门共同构成由城门向宫门层层递进的空间序列。通过模型可以重点观察门楼体量、城台高度以及屋顶形制，进一步理解明初都城南部门户的整体格局。">
+                    <img src="img/b正阳门.png" alt="正阳门" class="img">
+                </div>
+                <div class="text-wrap-right">
+                    <h2 class="content-title">北京故宫正阳门</h2>
+                    <p class="content-desc">北京正阳门（前门）虽与明故宫正阳门同名，但并非故宫核心区域建筑，仅为北京内城正南门；北京故宫的正南门户为天安门（承天门），相较于明故宫正阳门，功能更偏向皇城礼仪正门，建筑规制也更为繁复。</p>
+                </div>
+            </div>
+
+            <div class="item">
+                <div class="text-wrap-left">
+                    <h2 class="content-title">明故宫洪武门</h2>
+                    <p class="content-desc">明故宫皇城的正南门，位于正阳门北侧，是进入宫城前的重要门户，建筑为单檐歇山顶，面阔五间，是明代皇城门户的标准形制，象征皇权的威严与等级。</p>
+                </div>
+                <div class="img-wrap" data-name="明故宫洪武门" data-model="models/hongwumen.glb" data-desc="洪武门位于正阳门以北，是明故宫皇城的正南门，也是由外郭城进入皇城区域的重要节点。它既延续了南部门户的礼仪秩序，又进一步强化了皇城与都城其他区域的等级区分。洪武门在功能上既承担出入与门禁作用，也在空间上起到收束视线、引导轴线的作用，使宫城的中轴序列更具层次。通过模型可重点观察其门体比例、屋面形式以及与前后建筑之间的衔接关系，从而理解明故宫南部礼制空间的组织方式。">
+                    <img src="img/b洪武门.png" alt="洪武门" class="img">
+                </div>
+                <div class="text-wrap-right">
+                    <h2 class="content-title">北京故宫大清门</h2>
+                    <p class="content-desc">北京故宫的大明门（清代改称大清门）对应明故宫洪武门的功能，是皇城正南门；相较于明故宫洪武门，北京大明门规制更高，面阔增至九间，且与天安门形成更纵深的礼仪序列。</p>
+                </div>
+            </div>
+
+            <div class="item">
+                <div class="text-wrap-left">
+                    <h2 class="content-title">明故宫承天门</h2>
+                    <p class="content-desc">明故宫宫城的正南第一道门，连接洪武门与端门，建筑形制为重檐歇山顶，是明代宫廷礼仪的重要节点，凡重大典礼均需从此门出入，彰显宫城的庄重氛围。</p>
+                </div>
+                <div class="img-wrap" data-name="明故宫承天门" data-model="models/chengtianmen.glb" data-desc="承天门位于洪武门以北、端门以南，是明故宫宫城南部极具礼仪意义的重要建筑。它既是宫门体系中的关键节点，也是皇帝举行典礼、百官朝觐时必须经过的重要空间。承天门在形制上较普通城门更强调威仪与庄重，体现出皇家门户的等级特征。它与端门、午朝门共同构成层层推进的南部门禁系统，使明故宫中轴线的礼仪节奏更加鲜明。通过模型可重点观察门楼、城台与开间布局，感受明初宫门建筑的整体气势。">
+                    <img src="img/b承天门.png" alt="承天门" class="img">
+                </div>
+                <div class="text-wrap-right">
+                    <h2 class="content-title">北京故宫天安门</h2>
+                    <p class="content-desc">北京天安门原名亦为承天门，是故宫皇城的核心门户；相较于明故宫承天门，北京天安门体量更大，面阔九间、进深五间，融合了更多的装饰元素，成为明清王朝最重要的礼仪建筑之一。</p>
+                </div>
+            </div>
+
+            <div class="item">
+                <div class="text-wrap-left">
+                    <h2 class="content-title">明故宫端门</h2>
+                    <p class="content-desc">明故宫承天门北侧的重要宫门，形制与承天门相近，为单檐歇山顶，是宫城南部的缓冲节点，主要用于存放皇家仪仗，也是百官朝觐时的等候区域。</p>
+                </div>
+                <div class="img-wrap" data-name="明故宫端门" data-model="model/a端门.glb" data-desc="端门位于承天门以北，是由宫城南部继续进入核心礼仪空间的重要过渡建筑。它虽然不像正殿那样具有最高等级，却在中轴布局中承担承上启下的作用：既连接前方宫门体系，也为后方午朝门和外朝核心区域作铺垫。端门常被视作礼仪序列中的缓冲节点，使宫城南部空间不至于突兀，而是形成有秩序的递进关系。通过模型可以重点观察端门的体量控制、门体构造与屋顶形式，从而理解其在宫城门禁体系中的中介作用。">
+                    <img src="img/b端门.png" alt="端门" class="img">
+                </div>
+                <div class="text-wrap-right">
+                    <h2 class="content-title">北京故宫端门</h2>
+                    <p class="content-desc">北京故宫端门直接承袭明故宫端门的功能与名称，建筑形制基本一致，但在细节装饰上更为精致，且与天安门、午门形成更完整的宫城南部门户序列，空间层次感更强。</p>
+                </div>
+            </div>
+
+            <div class="item">
+                <div class="text-wrap-left">
+                    <h2 class="content-title">明故宫午朝门</h2>
+                    <p class="content-desc">明故宫宫城的正南门（午门），又称午朝门，是宫城的核心门户，建筑为凹字形布局，上设城楼，是皇帝举行献俘、颁诏等重大仪式的场所，彰显皇权至高无上。</p>
+                </div>
+                <div class="img-wrap" data-name="明故宫午朝门" data-model="models/wuchaomen.glb" data-desc="午朝门是明故宫宫城的重要正门，也是中轴线南部最具标志性的门户建筑之一。它既承担宫门出入功能，更是举行献俘、颁诏等重大礼仪活动的重要场所，体现出皇权威仪最集中的一面。午朝门在布局上具有很强的展开性，使宫城入口不仅是单一通道，更成为一个具有仪式感的礼制空间。通过模型可重点观察其城楼、门阙及两侧展开关系，理解它如何在建筑尺度与空间控制中塑造“入宫”的庄重体验，并为后续外朝区域奠定气氛。">
+                    <img src="img/b午朝门.png" alt="午朝门" class="img">
+                </div>
+                <div class="text-wrap-right">
+                    <h2 class="content-title">北京故宫午门</h2>
+                    <p class="content-desc">北京故宫午门完全承袭明故宫午朝门的凹字形形制，但体量更为宏大，增设了左右掖门，且城楼为重檐庑殿顶，等级更高；功能上延续了献俘、颁诏等礼仪，是故宫最具标志性的建筑之一。</p>
+                </div>
+            </div>
+
+            <div class="item">
+                <div class="text-wrap-left">
+                    <h2 class="content-title">明故宫奉天门</h2>
+                    <p class="content-desc">明故宫外朝区域的核心门户，位于午朝门北侧，是皇帝日常上朝听政、接见群臣的重要场所，建筑为单檐歇山顶，面阔五间，是外朝礼仪与行政功能的核心节点。</p>
+                </div>
+                <div class="img-wrap" data-name="明故宫奉天门" data-model="models/fengtianmen.glb" data-desc="奉天门位于午朝门之后，是明故宫外朝区域的重要门户，也是皇帝日常御门听政、群臣朝见的重要场所。它在功能上兼具礼仪与行政双重属性：一方面是进入三大殿区域的关键门殿，另一方面也是皇帝处理政务、接见百官的实际空间。奉天门使外朝活动不必全部集中于正殿，而能在门殿层面展开，体现出明代宫廷空间使用的层次性。通过模型可以重点观察其门体尺度、屋顶形制及前后空间关系，理解它在外朝秩序中的核心作用。">
+                    <img src="img/b奉天门.png" alt="奉天门" class="img">
+                </div>
+                <div class="text-wrap-right">
+                    <h2 class="content-title">北京故宫太和门</h2>
+                    <p class="content-desc">北京故宫太和门对应明故宫奉天门的功能，是外朝三大殿的门户；相较于奉天门，太和门面阔增至九间，为重檐歇山顶，建筑规制大幅提升，且门前增设铜狮等装饰，彰显皇权威仪。</p>
+                </div>
+            </div>
+
+            <div class="item">
+                <div class="text-wrap-left">
+                    <h2 class="content-title">明故宫奉天殿</h2>
+                    <p class="content-desc">明故宫外朝正殿，是皇帝举行登基、大婚、册立等重大典礼的核心建筑，面阔九间，重檐庑殿顶，为明代宫殿建筑的最高规制，是明初皇权的核心象征。</p>
+                </div>
+                <div class="img-wrap" data-name="明故宫奉天殿" data-model="model/a奉天殿.glb" data-desc="奉天殿是明故宫外朝的正殿，也是整组宫殿建筑中等级最高、象征意义最强的核心建筑。皇帝登基、大婚、册立等最重要的国家礼仪活动都在此举行，因此它不仅是建筑意义上的中心，更是政治与礼制意义上的中心。奉天殿在形制上体量宏大、屋顶等级极高，并通过高台基和对称布局强化皇权威严。通过模型可重点观察其整体比例、殿身与屋顶关系，以及高台基对建筑气势的提升，从而理解其为何成为北京故宫太和殿的直接蓝本。">
+                    <img src="img/b奉天殿.png" alt="奉天殿" class="img">
+                </div>
+                <div class="text-wrap-right">
+                    <h2 class="content-title">北京故宫太和殿</h2>
+                    <p class="content-desc">北京故宫太和殿（金銮殿）承袭明故宫奉天殿的功能与规制，是故宫体量最大的建筑；相较于奉天殿，太和殿面阔增至十一间，增设三层汉白玉台基，装饰更为繁复，成为中国古代宫殿建筑的巅峰之作。</p>
+                </div>
+            </div>
+
+            <div class="item">
+                <div class="text-wrap-left">
+                    <h2 class="content-title">明故宫华盖殿</h2>
+                    <p class="content-desc">明故宫外朝三大殿之一，位于奉天殿北侧，是皇帝大典前休息、接受内阁大臣奏事的场所，建筑为单檐攒尖顶，体量小于奉天殿，布局紧凑，功能偏向辅助性。</p>
+                </div>
+                <div class="img-wrap" data-name="明故宫华盖殿" data-model="model/a华盖殿.glb" data-desc="华盖殿位于奉天殿之后、谨身殿之前，是外朝三大殿序列中的中间建筑。它虽然体量小于奉天殿，却在礼制流程中承担重要的过渡作用，常作为皇帝大典前休憩、更衣和处理临时事务的空间。正因如此，华盖殿并非单纯的陪衬建筑，而是使三大殿序列更完整、更有节奏的重要节点。通过模型可以重点观察其较为紧凑的体量、屋顶形式以及与前后两殿的呼应关系，进一步理解明故宫外朝建筑如何通过主次搭配形成严整而层层递进的礼仪秩序。">
+                    <img src="img/b华盖殿.png" alt="华盖殿" class="img">
+                </div>
+                <div class="text-wrap-right">
+                    <h2 class="content-title">北京故宫中和殿</h2>
+                    <p class="content-desc">北京故宫中和殿对应明故宫华盖殿，功能一致；建筑形制改为四角攒尖顶，体量略有增大，装饰更为精致，是外朝三大殿中唯一未设廊柱的建筑，形制更为独特。</p>
+                </div>
+            </div>
+
+            <div class="item">
+                <div class="text-wrap-left">
+                    <h2 class="content-title">明故宫谨身殿</h2>
+                    <p class="content-desc">明故宫外朝三大殿的最后一座，是皇帝举行册立皇后、太子等仪式的场所，面阔七间，重檐歇山顶，建筑规制略低于奉天殿，是外朝礼仪序列的收尾。</p>
+                </div>
+                <div class="img-wrap" data-name="明故宫谨身殿" data-model="model/a谨身殿.glb" data-desc="谨身殿位于外朝三大殿最北端，是这一礼仪序列中的收束性建筑。它主要承担册立皇后、册封太子、举行宴飨等礼仪活动，在功能上与奉天殿、华盖殿共同构成完整的外朝空间体系。相较于奉天殿的宏伟和华盖殿的过渡性，谨身殿更强调礼仪流程的 заверш与收束，使外朝活动具有完整的起承转合。通过模型可以重点观察其殿体比例、屋面层次与整体秩序感，理解它如何在建筑序列中以较高等级但更内敛的方式完成三大殿格局的闭合。">
+                    <img src="img/b谨身殿.png" alt="谨身殿" class="img">
+                </div>
+                <div class="text-wrap-right">
+                    <h2 class="content-title">北京故宫保和殿</h2>
+                    <p class="content-desc">北京故宫保和殿对应明故宫谨身殿，清代新增殿试功能；建筑形制改为重檐歇山顶，面阔九间，体量更大，且台基与中和殿相连，形成更完整的外朝三大殿序列。</p>
+                </div>
+            </div>
+
+            <div class="item">
+                <div class="text-wrap-left">
+                    <h2 class="content-title">明故宫乾清门</h2>
+                    <p class="content-desc">明故宫内廷区域的正南门，是外朝与内廷的分界门户，建筑为单檐歇山顶，面阔五间，是皇帝日常处理政务、召见军机大臣的重要场所，兼具门禁与行政功能。</p>
+                </div>
+                <div class="img-wrap" data-name="明故宫乾清门" data-model="models/qianqingmen.glb" data-desc="乾清门是明故宫外朝与内廷之间的重要分界门户，具有“前朝之尽、后寝之始”的空间意义。门南是处理朝政、举行典礼的外朝区域，门北则逐渐进入帝后日常起居的内廷空间，因此乾清门不仅是一座建筑，更是一条明确的礼制边界。它兼具门禁、通行和行政功能，是宫廷运转中的关键节点。通过模型可以重点观察乾清门的开间、屋顶与门前尺度，理解它如何在看似单纯的门户建筑中，承载明故宫“前朝后寝”总体格局最核心的空间转换作用。">
+                    <img src="img/b乾清门.png" alt="乾清门" class="img">
+                </div>
+                <div class="text-wrap-right">
+                    <h2 class="content-title">北京故宫乾清门</h2>
+                    <p class="content-desc">北京故宫乾清门直接承袭明故宫乾清门的功能与名称，建筑形制基本一致，但增设了鎏金铜狮、琉璃照壁等装饰，且门前广场更为开阔，成为内廷核心门户的标志性建筑。</p>
+                </div>
+            </div>
+
+            <div class="item">
+                <div class="text-wrap-left">
+                    <h2 class="content-title">明故宫乾清宫</h2>
+                    <p class="content-desc">明故宫内廷正殿，是皇帝的寝宫与日常理政之所，面阔九间，重檐庑殿顶，为内廷建筑的最高规制，殿内设有宝座、御案，是皇权在后宫的核心象征。</p>
+                </div>
+                <div class="img-wrap" data-name="明故宫乾清宫" data-model="model/a乾清宫.glb" data-desc="乾清宫是明故宫内廷的核心正殿，也是皇帝日常寝居、批阅奏章和召见近臣的重要场所。与外朝正殿相比，乾清宫虽处内廷，但在等级与象征意义上依然极高，体现出皇权由礼仪空间延伸至日常生活空间的特征。它既是皇帝私密生活的中心，也是宫廷权力继续运作的场所，因此兼具居住与政务双重属性。通过模型可以重点观察重檐庑殿顶、殿体尺度以及严整对称的构图方式，理解内廷核心建筑如何在庄严与居住功能之间取得平衡。">
+                    <img src="img/b乾清宫.png" alt="乾清宫" class="img">
+                </div>
+                <div class="text-wrap-right">
+                    <h2 class="content-title">北京故宫乾清宫</h2>
+                    <p class="content-desc">北京故宫乾清宫完全承袭明故宫乾清宫的功能与规制，清代增设“正大光明”匾，成为秘密立储的核心场所；建筑装饰更为奢华，且与交泰殿、坤宁宫形成更完整的后三宫序列。</p>
+                </div>
+            </div>
+
+            <div class="item">
+                <div class="text-wrap-left">
+                    <h2 class="content-title">明故宫坤宁宫</h2>
+                    <p class="content-desc">明故宫内廷后三宫的最后一座，是皇后的寝宫，面阔九间，重檐歇山顶，建筑形制与乾清宫呼应，体现“乾坤对应”的礼制思想，是明代后宫的核心建筑。</p>
+                </div>
+                <div class="img-wrap" data-name="明故宫坤宁宫" data-model="models/kunninggong.glb" data-desc="坤宁宫位于内廷后三宫序列之中，是皇后居住与后宫礼仪活动的重要建筑。它与乾清宫形成“乾坤对应”的礼制关系，象征帝后秩序与阴阳调和的宫廷观念，因此在空间意义上远不只是单纯的寝宫。坤宁宫的建筑规制较高，形制上与乾清宫相呼应，共同构成内廷核心区域最具代表性的建筑组合。通过模型可重点观察其屋顶形式、殿体比例以及与中轴线的关系，从而理解明代后宫建筑如何在礼制秩序、生活功能与整体格局中保持高度统一。">
+                    <img src="img/b坤宁宫.png" alt="坤宁宫" class="img">
+                </div>
+                <div class="text-wrap-right">
+                    <h2 class="content-title">北京故宫坤宁宫</h2>
+                    <p class="content-desc">北京故宫坤宁宫承袭明故宫坤宁宫的名称，但清代功能大幅调整，东侧为皇后寝宫，西侧改为萨满祭祀场所；建筑形制保留基本布局，但内部装饰融入满族文化元素，与明故宫坤宁宫风格差异显著。</p>
+                </div>
+            </div>
+
+            <div class="item">
+                <div class="text-wrap-left">
+                    <h2 class="content-title">明故宫玄武门</h2>
+                    <p class="content-desc">明故宫宫城的正北门，是内廷区域的最后一道门户，建筑为单檐歇山顶，面阔三间，兼具防御与交通功能，是宫城南北中轴线的终点。</p>
+                </div>
+                <div class="img-wrap" data-name="明故宫玄武门" data-model="models/xuanwumen.glb" data-desc="玄武门是明故宫宫城北端的重要门户，也是整条中轴线在宫城范围内的收束节点。与南部层层展开的礼仪门殿相比，玄武门更强调防御、交通与边界控制功能，但它同样参与构成宫城完整的轴线秩序，使明故宫的南北主线在空间上形成明确闭合。玄武门不仅标志着内廷与宫城北部边界，也体现出宫廷建筑体系在末端仍保持严格的门禁观念。通过模型可以重点观察其门体构成、屋顶形制与整体尺度，理解其在宫城北部防卫与空间收束中的双重作用。">
+                    <img src="img/b玄武门.png" alt="玄武门" class="img">
+                </div>
+                <div class="text-wrap-right">
+                    <h2 class="content-title">北京故宫神武门</h2>
+                    <p class="content-desc">北京故宫神武门（清代避康熙讳改名）对应明故宫玄武门，是故宫北门；建筑形制改为重檐歇山顶，体量更大，且增设钟鼓设施，成为故宫日常门禁与报时的重要节点，功能更为丰富。</p>
+                </div>
+                <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+            </div>
+        </div>
+    </div>
+
+    <div class="model-modal" id="modelModal">
+        <div class="model-modal-panel" id="modelModalPanel">
+            <button class="modal-close" id="modalClose" aria-label="关闭">×</button>
+
+            <div class="model-left">
+                <model-viewer
+                    id="buildingViewer"
+                    src=""
+                    alt="建筑3D模型"
+                    camera-controls
+                    auto-rotate
+                    shadow-intensity="1"
+                    exposure="1"
+                    environment-image="neutral"
+                    interaction-prompt="auto"
+                    touch-action="pan-y">
+                </model-viewer>
+
+                <div class="model-loading" id="modelLoading">
+                    <div class="loading-ring"></div>
+                    <div class="loading-percent" id="loadingPercent">0%</div>
+                    <div class="loading-text">模型加载中</div>
+                </div>
+            </div>
+
+            <div class="model-right">
+                <h3 class="modal-title" id="modalTitle">建筑名称</h3>
+                <div class="modal-desc" id="modalDesc">建筑简介</div>
+                <div class="modal-tip">可在左侧拖拽旋转模型，滚轮缩放查看细节。</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        (function($){
+            $.fn.timeline = function(){
+                var selectors = {
+                    item: $(this).find(".item"),
+                    activeClass: "item--active"
+                };
+                
+                selectors.item.eq(0).addClass(selectors.activeClass);
+                
+                function checkActiveItem() {
+                    var scrollPos = $(window).scrollTop();
+                    var windowHeight = $(window).height();
+                    
+                    selectors.item.each(function(){
+                        var $this = $(this);
+                        var itemTop = $this.offset().top;
+                        var itemBottom = itemTop + $this.outerHeight();
+                        var triggerPos = scrollPos + windowHeight * 0.5;
+
+                        if (triggerPos > itemTop && triggerPos < itemBottom) {
+                            selectors.item.removeClass(selectors.activeClass);
+                            $this.addClass(selectors.activeClass);
+                        }
+                    });
+                }
+                
+                checkActiveItem();
+                $(window).on("scroll resize", checkActiveItem);
+            };
+        })(jQuery);
+
+        $(document).ready(function(){
+            $("#shell").timeline();
+
+            const modal = document.getElementById("modelModal");
+            const modalPanel = document.getElementById("modelModalPanel");
+            const modalClose = document.getElementById("modalClose");
+            const viewer = document.getElementById("buildingViewer");
+            const modalTitle = document.getElementById("modalTitle");
+            const modalDesc = document.getElementById("modalDesc");
+            const clickableImages = document.querySelectorAll(".img-wrap");
+            const modelLoading = document.getElementById("modelLoading");
+            const loadingPercent = document.getElementById("loadingPercent");
+
+            let fakeProgressTimer = null;
+            let currentProgress = 0;
+
+            function resetLoading(){
+                clearInterval(fakeProgressTimer);
+                currentProgress = 0;
+                loadingPercent.textContent = "0%";
+                modelLoading.classList.remove("hide");
+            }
+
+            function startFakeProgress(){
+                clearInterval(fakeProgressTimer);
+                fakeProgressTimer = setInterval(() => {
+                    if(currentProgress < 90){
+                        currentProgress += Math.max(1, Math.floor((90 - currentProgress) / 8));
+                        if(currentProgress > 90) currentProgress = 90;
+                        loadingPercent.textContent = currentProgress + "%";
+                    }
+                }, 120);
+            }
+
+            function finishLoading(){
+                clearInterval(fakeProgressTimer);
+                currentProgress = 100;
+                loadingPercent.textContent = "100%";
+                setTimeout(() => {
+                    modelLoading.classList.add("hide");
+                }, 180);
+            }
+
+            function openModal(name, modelSrc, desc){
+                modalTitle.textContent = name || "建筑名称";
+                modalDesc.textContent = desc || "暂无简介";
+                resetLoading();
+                startFakeProgress();
+                viewer.setAttribute("src", modelSrc || "");
+                viewer.setAttribute("alt", name ? name + "3D模型" : "建筑3D模型");
+                modal.classList.add("show");
+                document.body.classList.add("modal-open");
+            }
+
+            function closeModal(){
+                modal.classList.remove("show");
+                document.body.classList.remove("modal-open");
+                clearInterval(fakeProgressTimer);
+
+                setTimeout(() => {
+                    if(!modal.classList.contains("show")){
+                        viewer.setAttribute("src", "");
+                        resetLoading();
+                    }
+                }, 300);
+            }
+
+            clickableImages.forEach(item => {
+                item.addEventListener("click", function(e){
+                    e.stopPropagation();
+                    const name = this.dataset.name;
+                    const model = this.dataset.model;
+                    const desc = this.dataset.desc;
+                    openModal(name, model, desc);
+                });
+            });
+
+            modalClose.addEventListener("click", function(e){
+                e.stopPropagation();
+                closeModal();
+            });
+
+            modal.addEventListener("click", function(e){
+                if(!modalPanel.contains(e.target)){
+                    closeModal();
+                }
+            });
+
+            document.addEventListener("keydown", function(e){
+                if(e.key === "Escape" && modal.classList.contains("show")){
+                    closeModal();
+                }
+            });
+
+            viewer.addEventListener("progress", (event) => {
+                if(event.detail && typeof event.detail.totalProgress === "number"){
+                    const percent = Math.round(event.detail.totalProgress * 100);
+                    if(percent > currentProgress){
+                        currentProgress = percent;
+                        loadingPercent.textContent = currentProgress + "%";
+                    }
+                }
+            });
+
+            viewer.addEventListener("load", () => {
+                finishLoading();
+            });
+
+            viewer.addEventListener("error", () => {
+                clearInterval(fakeProgressTimer);
+                loadingPercent.textContent = "加载失败";
+            });
+        });
+    </script>
+</body>
+</html>

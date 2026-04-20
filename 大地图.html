@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>明故宫总览地图</title>
+    <style type="text/css">
+        /* 全局样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "agency fb","隶书",sans-serif;
+        }
+        /* 页面背景 */
+        body {
+            background-image: url("img/a明故宫内页7.png");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+            background-color: #f8f9fa;
+            color: #333;
+            position: relative;
+            overflow-x: hidden;
+        }
+        /* 标题容器 */
+        .title-container {
+            width: 100%;
+            height: 10vh;
+            display: flex;
+            align-items: center;
+			justify-content: center;
+            /* padding-left: 30rem; */
+            padding-top: 5rem;
+        }
+        .title-container h1{
+            font-size: 80px;
+            font-weight: 400;
+            margin-bottom: 1px;
+            font-family: "agency fb","隶书";
+        }
+        /* 返回首页按钮 */
+        .back-home-btn {
+            position: absolute;
+            top: 52px;
+            right: 57px;
+            z-index: 999;
+            width: 120px;
+            height: 120px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+            color: #733900;
+            text-decoration: none;
+            overflow: hidden;
+        }
+        .btn-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url("img/027.png") no-repeat center center;
+            background-size: cover;
+            transition: transform 0.5s ease;
+            z-index: 1;
+        }
+        .btn-text {
+            position: relative;
+            z-index: 2;
+        }
+        .back-home-btn:hover .btn-bg {
+            transform: rotate(360deg);
+        }
+
+        /* 标注点容器 */
+        .spot-markers {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            transition: transform 0.8s ease;
+        }
+        .spot-markers.hide {
+            transform: translateX(-100%);
+        }
+
+        /* 单个标注点 */
+        .spot-marker {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #733900;
+            border: 3px solid white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            cursor: pointer;
+            pointer-events: auto;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            animation: fadeInUp 0.8s ease forwards;
+            z-index: 10;
+        }
+        .spot-marker:hover {
+            background: #ff3838;
+            transform: translate(-50%, -50%) scale(1.2);
+            transition: transform 0.3s ease;
+        }
+
+        /* 指示线容器 */
+        .indicator-line-container {
+            position: absolute;
+            top: 50%;
+            left: 100%;
+            height: 2px;
+            display: flex;
+            align-items: center;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInLine 1s ease forwards;
+            pointer-events: none;
+        }
+        .indicator-line-container.left {
+            left: auto;
+            right: 100%;
+            flex-direction: row-reverse;
+        }
+        .indicator-line-container.left .spot-card {
+            margin-left: 0;
+            margin-right: 10px;
+        }
+        .indicator-line {
+            height: 2px;
+            background: #733900;
+            background: linear-gradient(to right, #733900, #d35400);
+            flex: 1;
+            min-width: 50px;
+        }
+        .indicator-line-container.left .indicator-line {
+            background: linear-gradient(to left, #733900, #d35400);
+        }
+
+        /* 景点小卡片 */
+        .spot-card {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 8px 15px;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            min-width: 120px;
+            max-width: 350px;
+            margin-left: 10px;
+        }
+        .spot-card p {
+            text-align: center;
+            font-size: 16px;
+            color: #333;
+            line-height: 1.4;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* 遮罩层 */
+        .mask {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 9999;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        .mask.active {
+            display: block;
+            opacity: 1;
+        }
+
+        /* 弹窗容器 */
+        .popup-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+        }
+
+        /* 左侧媒体容器 */
+        .popup-img-container {
+            width: 800px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+            padding: 20px;
+            margin-left: 100px;
+            position: relative;
+        }
+
+        .popup-media-stage {
+            position: relative;
+            width: 100%;
+            height: 80%;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        /* 建模容器 */
+        .popup-model-wrap {
+            position: absolute;
+            inset: 0;
+            border-radius: 16px;
+            overflow: hidden;
+            background: radial-gradient(circle at center, rgba(255,255,255,0.22), rgba(255,255,255,0.06));
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12);
+            backdrop-filter: blur(2px);
+            display: block;
+        }
+
+        #popupModel {
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            --poster-color: transparent;
+            cursor: grab;
+        }
+        #popupModel:active {
+            cursor: grabbing;
+        }
+
+        .model-loading-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 18px;
+            background: rgba(0, 0, 0, 0.38);
+            backdrop-filter: blur(4px);
+            transition: opacity 0.35s ease;
+            z-index: 3;
+        }
+        .model-loading-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .model-loading-ring {
+            width: 96px;
+            height: 96px;
+            border-radius: 50%;
+            border: 6px solid rgba(255,255,255,0.16);
+            border-top-color: #f6d48c;
+            animation: modelSpin 1s linear infinite;
+        }
+        .model-loading-text {
+            font-size: 30px;
+            color: #fff;
+            letter-spacing: 1px;
+        }
+        .model-tip {
+            position: absolute;
+            left: 20px;
+            bottom: 18px;
+            z-index: 2;
+            padding: 10px 14px;
+            border-radius: 10px;
+            background: rgba(0,0,0,0.35);
+            color: rgba(255,255,255,0.92);
+            font-size: 16px;
+            line-height: 1.5;
+            pointer-events: none;
+        }
+
+        /* 图片容器 */
+        .popup-photo-wrap {
+            position: absolute;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            /* border-radius: 16px; */
+            /* overflow: hidden; */
+            /* background: radial-gradient(circle at center, rgba(255,255,255,0.22), rgba(255,255,255,0.06));
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12); */
+            backdrop-filter: blur(2px);
+        }
+
+        .popup-photo-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+
+        /* 文字介绍容器 */
+        .popup-text-container {
+            height: 100%;
+            width: 400px;
+            background:#d4b98c;
+            padding-top: 250px;
+            padding-left: 30px;
+            padding-right: 30px;
+            margin-left: 100px;
+            transform: translateY(100%);
+            transition: transform 0.6s ease 0.2s;
+            overflow-y: auto;
+        }
+        .popup-text-container h2 {
+            font-size: 40px;
+            color: #733900;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #d35400;
+            padding-bottom: 10px;
+        }
+        .popup-text-container p {
+            font-size: 20px;
+            line-height: 1.8;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .mask.active .popup-img-container {
+            transform: translateX(0);
+        }
+        .mask.active .popup-text-container {
+            transform: translateY(0);
+        }
+
+        /* 关闭按钮 */
+        .close-btn {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: #ff4757;
+            border-radius: 50%;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            z-index: 99999;
+            pointer-events: auto;
+            transition: background 0.3s ease;
+        }
+        .close-btn:hover {
+            background: #ff3838;
+        }
+
+        /* 游戏按钮 */
+        .game-btn {
+            position: fixed;
+            bottom: 100px;
+            right: 300px;
+            z-index: 998;
+            width: 180px;
+            height: 70px;
+            background: #733900;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+        }
+        .game-btn:hover {
+            background: #9e5100;
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+        }
+
+        /* 游戏容器 */
+        .game-container {
+            position: fixed;
+            top: 120px;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 997;
+            display: flex;
+            padding-top: 50px;
+            padding-left: 40px;
+            padding-right: 40px;
+            transform: translateX(-100%);
+            transition: transform 0.8s ease;
+            overflow: hidden;
+        }
+        .game-container.show {
+            transform: translateX(0);
+        }
+
+        .game-back-btn {
+            position: absolute;
+            top: 1px;
+            left: 55px;
+            width: 50px;
+            height: 50px;
+            background: #733900;
+            border-radius: 50%;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        .game-area {
+            flex: 1;
+            height: 100%;
+            padding-top: 20px;
+            padding-left: 80px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .game-left-area  {
+            flex: 1;
+            height: 100%;
+            padding-top: 20px;
+            padding-left: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .game-right-area  {
+            flex: 1;
+            height: 100%;
+            padding-top: 20px;
+            padding-left: 700px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .game-middle-area {
+            flex: 2;
+            display: flex;
+            flex-wrap: wrap;
+            align-content: flex-start;
+            gap: 15px;
+            border-radius: 10px;
+            margin: 0 20px;
+        }
+
+        .spot-tag {
+            width: 130px;
+            padding: 15px 25px;
+            background: #733900;
+            color: white;
+            border-radius: 8px;
+            font-size: 20px;
+            text-align: center;
+            cursor: grab;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+            user-select: none;
+            transition: transform 0.2s ease;
+        }
+        .spot-tag:active {
+            cursor: grabbing;
+            transform: scale(0.95);
+        }
+
+        .match-container {
+            width: 100px;
+            height: 35px;
+            border: 2px dashed #733900;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.9);
+            position: relative;
+        }
+        .match-container .spot-tag {
+            cursor: default;
+            background: #2ed573;
+            box-shadow: none;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        .correct-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: rgba(46, 213, 115, 0.95);
+            color: white;
+            padding: 30px 60px;
+            border-radius: 10px;
+            font-size: 32px;
+            font-weight: bold;
+            z-index: 99999;
+            box-shadow: 0 0 20px rgba(0,0,0,0.3);
+            transition: transform 0.3s ease;
+        }
+        .correct-popup.show {
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        /* 游戏规则容器 */
+        .game-rule-container {
+            position: absolute;
+            bottom: 180px;
+            left: 260px;
+            z-index: 10;
+            width: 350px;
+            max-width: 90%;
+        }
+        .game-rule-btn {
+            width: 100px;
+            height: 50px;
+            background: #aa0000;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-left: auto;
+            animation: breathe 2s ease-in-out infinite;
+        }
+        .game-rule-btn:hover {
+            background: #d80000;
+            animation-play-state: paused;
+            transform: scale(1);
+        }
+        .game-rule-content {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 10px;
+            padding: 10px;
+            margin-top: 5px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            display: none;
+            animation: fadeIn 0.3s ease forwards;
+        }
+        .game-rule-content.show {
+            display: block;
+        }
+        .game-rule-title {
+            font-size: 24px;
+            color: #733900;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #d35400;
+            padding-bottom: 8px;
+        }
+        .game-rule-list {
+            list-style: none;
+        }
+        .game-rule-list li {
+            font-size: 16px;
+            line-height: 1.2;
+            color: #333;
+            padding-left: 10px;
+            position: relative;
+        }
+        .game-rule-list li:before {
+            content: "•";
+            color: #733900;
+            font-size: 20px;
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -50%) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%) translateY(0);
+            }
+        }
+        @keyframes fadeInLine {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        @keyframes breathe {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        @keyframes modelSpin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .spot-marker:nth-child(1), .indicator-line-container:nth-child(1) { animation-delay: 0.1s; }
+        .spot-marker:nth-child(2), .indicator-line-container:nth-child(2) { animation-delay: 0.2s; }
+        .spot-marker:nth-child(3), .indicator-line-container:nth-child(3) { animation-delay: 0.3s; }
+        .spot-marker:nth-child(4), .indicator-line-container:nth-child(4) { animation-delay: 0.4s; }
+        .spot-marker:nth-child(5), .indicator-line-container:nth-child(5) { animation-delay: 0.5s; }
+        .spot-marker:nth-child(6), .indicator-line-container:nth-child(6) { animation-delay: 0.6s; }
+        .spot-marker:nth-child(7), .indicator-line-container:nth-child(7) { animation-delay: 0.7s; }
+        .spot-marker:nth-child(8), .indicator-line-container:nth-child(8) { animation-delay: 0.8s; }
+        .spot-marker:nth-child(9), .indicator-line-container:nth-child(9) { animation-delay: 0.9s; }
+        .spot-marker:nth-child(10), .indicator-line-container:nth-child(10) { animation-delay: 1.0s; }
+        .spot-marker:nth-child(11), .indicator-line-container:nth-child(11) { animation-delay: 1.1s; }
+        .spot-marker:nth-child(12), .indicator-line-container:nth-child(12) { animation-delay: 1.2s; }
+        .spot-marker:nth-child(13), .indicator-line-container:nth-child(13) { animation-delay: 1.3s; }
+    </style>
+    <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+</head>
+<body>
+    <div class="title-container">
+        <h1>明故宫总览地图</h1>
+    </div>
+
+    <a href="导航.html" class="back-home-btn"> 
+        <div class="btn-bg"></div> 
+        <span class="btn-text">返回首页</span> 
+    </a>
+
+    <div class="spot-markers" id="spotMarkers">
+        <div class="spot-marker" style="bottom: 30%; left: 49.5%;" 
+             data-img="img/b午朝门.png" 
+             data-title="午朝门"
+             data-model="models/wuchaomen.glb"
+             data-desc="午朝门是南京明故宫宫城正南门，因 “居中向阳、位当子午” 得名，是宫城礼制核心。设三孔券门，原建五凤楼，为帝后、百官出入要道，也是皇帝举行大典、传旨之地。现存须弥座刻有明初卷云纹，青石板路留存至今，是明故宫最具标志性的遗址之一，见证大明皇权威仪。">
+            <div class="indicator-line-container left">
+                <div class="indicator-line" style="width: 550px;"></div>
+                <div class="spot-card"><p>午朝门</p></div>
+            </div>
+        </div>
+
+        <div class="spot-marker" style="bottom: 37%; left: 49.5%;" 
+             data-img="img/b奉天门.png" 
+             data-title="奉天门"
+             data-model="models/fengtianmen.glb"
+             data-desc="奉天门位于午门以北，是明故宫外朝门户，明初 “御门听政” 的核心场所。北接奉天殿，南连午门，是宫廷门禁与正殿仪式的过渡空间，重大政务、朝见议事多在此举行。原建筑已毁，考古发掘的夯土台基与柱础，为复原外朝格局提供了关键依据。">
+            <div class="indicator-line-container left">
+                <div class="indicator-line" style="width: 500px;"></div>
+                <div class="spot-card"><p>奉天门</p></div>
+            </div>
+        </div>
+
+        <div class="spot-marker" style="bottom: 43%; left: 63%;" 
+             data-img="img/b文华殿.png" 
+             data-title="文华殿"
+             data-model="models/wenhuadian.glb"
+             data-desc="文华殿位于明故宫中轴线东侧，与武英殿对称，是前朝重要殿宇。明初为太子讲学、大臣经筵之所，兼具礼仪与教育功能，也用于皇帝召见儒臣、商议政务。北京故宫文华殿仿此建制，现存夯土台基与柱础，是复原宫城东侧格局的重要线索。">
+            <div class="indicator-line-container">
+                <div class="indicator-line" style="width: 280px;"></div>
+                <div class="spot-card"><p>文华殿</p></div>
+            </div>
+        </div>
+
+        <div class="spot-marker" style="bottom: 43%; left: 33%;" 
+             data-img="img/武英殿.jpg" 
+             data-title="武英殿"
+             data-model="models/wuyingdian.glb"
+             data-desc="武英殿位于明故宫中轴线西侧，与东侧文华殿对称，是前朝重要辅助殿宇。明初为皇帝处理日常政务、召见臣子、举行礼仪的场所，依 “左文右武” 规制布局。地表建筑已无存，仅存夯土台基与柱础，是研究明初宫殿功能分区的重要实物。">
+            <div class="indicator-line-container left">
+                <div class="indicator-line" style="width: 200px;"></div>
+                <div class="spot-card"><p>武英殿</p></div>
+            </div>
+        </div>
+
+        <div class="spot-marker" style="bottom: 50.5%; left: 49.5%;" 
+             data-img="img/b奉天殿.png" 
+             data-title="奉天殿"
+             data-model="model/a奉天殿.glb"
+             data-desc="奉天殿是明故宫三大殿之首，俗称金銮殿，为宫城正殿，是皇帝登基、大婚等重大典礼的举办地。位于奉天门正北，台基宏伟，形制空前，是北京故宫太和殿的直接蓝本。原建筑毁于战火，考古发现的巨型台基、龙纹散水，再现了明初皇家建筑的最高水准。">
+            <div class="indicator-line-container">
+                <div class="indicator-line" style="width: 420px;"></div>
+                <div class="spot-card"><p>奉天殿</p></div>
+            </div>
+        </div>
+
+        <div class="spot-marker" style="top: 43.5%; left: 49.5%;" 
+             data-img="img/b华盖殿.png" 
+             data-title="华盖殿"
+             data-model="model/a华盖殿.glb"
+             data-desc="华盖殿是明故宫三大殿之一，位于奉天殿与谨身殿之间，对应北京故宫中和殿。主要供皇帝上朝前更衣、审阅奏章，举行小型典礼。建筑精巧，台基高耸，是 “三朝五门” 礼制的重要节点。现存夯土台基与柱础，为研究明初宫殿序列布局提供了关键实物。">
+            <div class="indicator-line-container left">
+                <div class="indicator-line" style="width: 400px;"></div>
+                <div class="spot-card"><p>华盖殿</p></div>
+            </div>
+        </div>
+
+        <div class="spot-marker" style="top: 40%; left: 49.5%;" 
+             data-img="img/b谨身殿.png" 
+             data-title="谨身殿"
+             data-model="model/a谨身殿.glb"
+             data-desc="谨身殿是明故宫三大殿末座，对应北京故宫保和殿，是皇帝册立后妃、太子，举行宴飨的场所，殿名寓意帝王修身立德。坐落于三台之上，规制严谨，明正统年间遭雷击损毁，后逐渐衰败。现存夯土台基与柱础，是明故宫礼制格局的重要实物见证。">
+            <div class="indicator-line-container">
+                <div class="indicator-line" style="width: 400px;"></div>
+                <div class="spot-card"><p>谨身殿</p></div>
+            </div>
+        </div>
+
+        <div class="spot-marker" style="top: 37%; left: 49.5%;" 
+             data-img="img/b乾清门.png" 
+             data-title="乾清门"
+             data-model="models/qianqingmen.glb"
+             data-desc="乾清门是明故宫外朝与内廷的分界之门，有 “外朝之尽，内廷之始” 之称。门南为政务区，门北为帝后起居的内廷，是宫廷空间礼制划分的核心节点，也是传达内廷诏令、连接内外政务的枢纽。现存夯土台基，清晰勾勒出明故宫 “前朝后寝” 的核心布局。">
+            <div class="indicator-line-container left">
+                <div class="indicator-line" style="width: 350px;"></div>
+                <div class="spot-card"><p>乾清门</p></div>
+            </div>
+        </div>
+
+        <div class="spot-marker" style="top: 34%; left: 49.5%;" 
+             data-img="img/b乾清宫.png" 
+             data-title="乾清宫"
+             data-model="model/a乾清宫.glb"
+             data-desc="乾清宫是明故宫内廷核心，为皇帝日常起居、批阅奏章、召见近臣的场所，寓意 “乾纲独断、清和安宁”。位于内廷中轴线，是内廷礼制核心，北京故宫乾清宫仿此建制。现存夯土台基与柱础，见证了明初内廷生活与政务交融的历史场景。">
+            <div class="indicator-line-container">
+                <div class="indicator-line" style="width: 350px;"></div>
+                <div class="spot-card"><p>乾清宫</p></div>
+            </div>
+        </div>
+
+        <div class="spot-marker" style="top: 31%; left: 49.5%;" 
+             data-img="img/b坤宁宫.png" 
+             data-title="坤宁宫"
+             data-model="models/kunninggong.glb"
+             data-desc="坤宁宫位于明故宫内廷中轴线北端，与乾清宫相对，是皇后寝宫，寓意 “坤德安宁”，为内廷后妃居住体系的核心。承载皇后起居、主持内廷礼仪的功能，体现 “阴阳调和” 的礼制思想。现存夯土台基，是研究明初内廷布局与礼制的重要实物。">
+            <div class="indicator-line-container left">
+                <div class="indicator-line" style="width: 300px;"></div>
+                <div class="spot-card"><p>坤宁宫</p></div>
+            </div>
+        </div>
+
+        <div class="spot-marker" style="top: 27%; left: 49.5%;" 
+             data-img="img/b玄武门.png" 
+             data-title="玄武门"
+             data-model="models/xuanwumen.glb"
+             data-desc="玄武门又称厚载门，是明故宫宫城北门，取 “厚德载物” 之意，为宫城北部屏障。与午门、东华门等共同构成宫城门禁体系，承担宫廷防卫与日常出入功能。原建筑已湮没，仅存夯土台基，完善了明故宫宫城四至边界的布局认知，是研究明初防卫体系的重要线索。">
+            <div class="indicator-line-container">
+                <div class="indicator-line" style="width: 300px;"></div>
+                <div class="spot-card"><p>玄武门</p></div>
+            </div>
+        </div>
+
+        <div class="spot-marker" style="bottom: 36.5%; right: 20%;" 
+             data-img="img/东华门.png" 
+             data-title="东华门"
+             data-model="models/donghuamen.glb"
+             data-desc="东华门是明故宫宫城东门，与西华门对称，设三孔券门，须弥座素面，体现明初简朴建宫理念。是通往文华殿、文渊阁的重要通道，为官员出入宫廷的次门。城楼已毁，台基保存完好，经整治辟为遗址公园，是直观感受明初宫城城门形制的重要遗存。">
+            <div class="indicator-line-container">
+                <div class="indicator-line" style="width: 80px;"></div>
+                <div class="spot-card"><p>东华门</p></div>
+            </div>
+        </div>
+
+        <div class="spot-marker" style="bottom: 30%; left: 59%;" 
+             data-img="img/文渊阁.png" 
+             data-title="文渊阁"
+             data-model="models/wenyuange.glb"
+             data-desc="文渊阁位于明故宫内廷东侧，是明初皇家藏书、编修典籍的核心场所，《永乐大典》等重要典籍多在此编纂。兼具藏书与办公功能，与文华殿呼应，构成宫城东部文化区。北京故宫文渊阁仿此建制，现存夯土台基，见证了明初崇文重教的风气。">
+            <div class="indicator-line-container">
+                <div class="indicator-line" style="width: 420px;"></div>
+                <div class="spot-card"><p>文渊阁</p></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mask" id="spotMask">
+        <button class="close-btn" id="closeBtn">×</button>
+        <div class="popup-container">
+            <div class="popup-img-container">
+                <div class="popup-media-stage">
+                    <!-- 建模模式 -->
+                    <div class="popup-model-wrap" id="popupModelWrap">
+                        <model-viewer
+                            id="popupModel"
+                            src=""
+                            alt="建筑三维模型"
+                            camera-controls
+                            touch-action="pan-y"
+                            disable-tap
+                            interaction-prompt="none"
+                            shadow-intensity="1"
+                            exposure="1"
+                            min-camera-orbit="auto 45deg auto"
+                            max-camera-orbit="auto 120deg auto"
+                            min-field-of-view="20deg"
+                            max-field-of-view="70deg">
+                        </model-viewer>
+                        <div class="model-loading-overlay" id="modelLoadingOverlay">
+                            <div class="model-loading-ring"></div>
+                            <div class="model-loading-text" id="modelLoadingText">模型加载中 0%</div>
+                        </div>
+                        <div class="model-tip">拖拽旋转模型｜滚轮缩放｜双指可缩放/旋转</div>
+                    </div>
+
+                    <!-- 图片模式 -->
+                    <div class="popup-photo-wrap" id="popupPhotoWrap">
+                        <img id="popupPhoto" src="" alt="建筑图片" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="popup-text-container" id="popupText">
+                <h2 id="popupTitle"></h2>
+                <p id="popupDesc"></p>
+            </div>
+        </div>
+    </div>
+
+    <button class="game-btn" id="gameBtn">地图游戏</button>
+
+    <div class="game-container" id="gameContainer">
+        <button class="game-back-btn" id="gameBackBtn">×</button>
+
+        <div class="game-left-area">
+            <div class="spot-tag" draggable="true" data-name="午朝门">午朝门</div>
+            <div class="spot-tag" draggable="true" data-name="奉天门">奉天门</div>
+            <div class="spot-tag" draggable="true" data-name="武英殿">武英殿</div>
+            <div class="spot-tag" draggable="true" data-name="文华殿">文华殿</div>
+            <div class="spot-tag" draggable="true" data-name="奉天殿">奉天殿</div>
+            <div class="spot-tag" draggable="true" data-name="华盖殿">华盖殿</div>
+            <div class="spot-tag" draggable="true" data-name="谨身殿">谨身殿</div>
+        </div>
+
+        <div class="game-area game-middle-area">
+            <div class="match-container" data-target="午朝门" style="top: 400px; left: 400px;"></div>
+            <div class="match-container" data-target="奉天门" style="top: 270px; left: 450px;"></div>
+            <div class="match-container" data-target="武英殿" style="top: 160px; left: 150px;"></div>
+            <div class="match-container" data-target="文华殿" style="top: 120px; left: 600px;"></div>
+            <div class="match-container" data-target="奉天殿" style="top: 30px; left: 370px;"></div>
+            <div class="match-container" data-target="华盖殿" style="bottom: 80px; left: 440px;"></div>
+            <div class="match-container" data-target="谨身殿" style="bottom: 160px; left: 330px;"></div>
+            <div class="match-container" data-target="乾清门" style="bottom: 240px; left: 450px;"></div>
+            <div class="match-container" data-target="乾清宫" style="bottom: 320px; left: 330px;"></div>
+            <div class="match-container" data-target="坤宁宫" style="bottom: 400px; left: 450px;"></div>
+            <div class="match-container" data-target="文渊阁" style="bottom: 120px; left: 620px;"></div>
+            <div class="match-container" data-target="东华门" style="bottom: 250px; left: 830px;"></div>
+            <div class="match-container" data-target="玄武门" style="bottom: 600px; left: 400px;"></div>
+        </div>
+
+        <div class="game-right-area">
+            <div class="spot-tag" draggable="true" data-name="乾清门">乾清门</div>
+            <div class="spot-tag" draggable="true" data-name="乾清宫">乾清宫</div>
+            <div class="spot-tag" draggable="true" data-name="坤宁宫">坤宁宫</div>
+            <div class="spot-tag" draggable="true" data-name="文渊阁">文渊阁</div>
+            <div class="spot-tag" draggable="true" data-name="东华门">东华门</div>
+            <div class="spot-tag" draggable="true" data-name="玄武门">玄武门</div>
+        </div>
+
+        <div class="game-rule-container">
+            <button class="game-rule-btn" id="gameRuleBtn">游戏规则</button>
+            <div class="game-rule-content" id="gameRuleContent">
+                <h4 class="game-rule-title">地图匹配游戏规则</h4>
+                <ul class="game-rule-list">
+                    <li>将左侧和右侧的景点标签拖拽到中间对应的匹配容器中</li>
+                    <li>只有将标签拖拽到正确的匹配容器中，标签才会固定并变为绿色</li>
+                    <li>拖拽错误时，标签会自动返回原位置</li>
+                    <li>匹配成功后会有“真棒！答对了”的提示</li>
+                    <li>完成所有匹配即可通关游戏</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="correct-popup" id="correctPopup">真棒！答对了👍</div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 弹窗相关
+            const spotMarkers = document.querySelectorAll('.spot-marker');
+            const mask = document.getElementById('spotMask');
+            const closeBtn = document.getElementById('closeBtn');
+
+            const popupModel = document.getElementById('popupModel');
+            const popupModelWrap = document.getElementById('popupModelWrap');
+            const popupPhotoWrap = document.getElementById('popupPhotoWrap');
+            const popupPhoto = document.getElementById('popupPhoto');
+
+            const modelLoadingOverlay = document.getElementById('modelLoadingOverlay');
+            const modelLoadingText = document.getElementById('modelLoadingText');
+            const popupTitle = document.getElementById('popupTitle');
+            const popupDesc = document.getElementById('popupDesc');
+
+            // 标题
+            const pageTitle = document.querySelector('.title-container h1');
+            const defaultTitle = '明故宫总览地图';
+            const gameTitle = '宫阙寻踪';
+
+            // 建模建筑
+            const modelBuildings = new Set(['奉天殿', '华盖殿', '谨身殿', '乾清宫']);
+
+            spotMarkers.forEach(marker => {
+                marker.addEventListener('click', function() {
+                    const modelSrc = this.getAttribute('data-model') || '';
+                    const imgSrc = this.getAttribute('data-img') || '';
+                    const title = this.getAttribute('data-title') || '';
+                    const desc = this.getAttribute('data-desc') || '';
+
+                    popupTitle.textContent = title;
+                    popupDesc.textContent = desc;
+
+                    const useModel = modelBuildings.has(title);
+
+                    if (useModel) {
+                        popupModelWrap.style.display = 'block';
+                        popupPhotoWrap.style.display = 'none';
+
+                        modelLoadingOverlay.classList.remove('hidden');
+                        modelLoadingText.textContent = '模型加载中 0%';
+
+                        popupModel.src = modelSrc;
+                        popupModel.alt = title + '三维模型';
+
+                        popupPhoto.src = '';
+                        popupPhoto.alt = '';
+                    } else {
+                        popupModelWrap.style.display = 'none';
+                        popupPhotoWrap.style.display = 'flex';
+
+                        popupModel.src = '';
+                        popupModel.alt = '';
+
+                        modelLoadingOverlay.classList.add('hidden');
+
+                        popupPhoto.src = imgSrc;
+                        popupPhoto.alt = title + '建筑图片';
+                    }
+
+                    mask.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                });
+            });
+
+            closeBtn.addEventListener('click', function() {
+                mask.classList.remove('active');
+                document.body.style.overflow = 'auto';
+
+                setTimeout(() => {
+                    popupModel.src = '';
+                    popupModel.removeAttribute('poster');
+                    popupPhoto.src = '';
+
+                    popupModelWrap.style.display = 'block';
+                    popupPhotoWrap.style.display = 'none';
+
+                    modelLoadingOverlay.classList.remove('hidden');
+                    modelLoadingText.textContent = '模型加载中 0%';
+                    popupTitle.textContent = '';
+                    popupDesc.textContent = '';
+                }, 500);
+            });
+
+            mask.addEventListener('click', function(e) {
+                if (e.target === mask) {
+                    closeBtn.click();
+                }
+            });
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && mask.classList.contains('active')) {
+                    closeBtn.click();
+                }
+            });
+
+            popupModel.addEventListener('progress', function(event) {
+                const progress = event.detail.totalProgress || 0;
+                const percent = Math.min(100, Math.round(progress * 100));
+                modelLoadingText.textContent = '模型加载中 ' + percent + '%';
+                if (percent >= 100) {
+                    setTimeout(() => {
+                        modelLoadingOverlay.classList.add('hidden');
+                    }, 180);
+                }
+            });
+
+            popupModel.addEventListener('load', function() {
+                modelLoadingText.textContent = '模型加载中 100%';
+                setTimeout(() => {
+                    modelLoadingOverlay.classList.add('hidden');
+                }, 180);
+            });
+
+            popupModel.addEventListener('error', function() {
+                if (popupModelWrap.style.display !== 'none') {
+                    modelLoadingOverlay.classList.remove('hidden');
+                    modelLoadingText.textContent = '模型加载失败，请检查 glb 文件路径';
+                }
+            });
+
+            // 游戏逻辑
+            const gameBtn = document.getElementById('gameBtn');
+            const gameContainer = document.getElementById('gameContainer');
+            const gameBackBtn = document.getElementById('gameBackBtn');
+            const spotMarkersContainer = document.getElementById('spotMarkers');
+            const correctPopup = document.getElementById('correctPopup');
+            const spotTags = document.querySelectorAll('.spot-tag');
+            const matchContainers = document.querySelectorAll('.match-container');
+
+            gameBtn.addEventListener('click', function() {
+                spotMarkersContainer.classList.add('hide');
+                gameContainer.classList.add('show');
+                document.body.style.overflow = 'hidden';
+                pageTitle.textContent = gameTitle;
+                document.title = gameTitle;
+            });
+
+            gameBackBtn.addEventListener('click', function() {
+                gameContainer.classList.remove('show');
+                setTimeout(() => {
+                    spotMarkersContainer.classList.remove('hide');
+                    document.body.style.overflow = 'auto';
+                    pageTitle.textContent = defaultTitle;
+                    document.title = defaultTitle;
+                }, 500);
+            });
+
+            const gameRuleBtn = document.getElementById('gameRuleBtn');
+            const gameRuleContent = document.getElementById('gameRuleContent');
+
+            gameRuleBtn.addEventListener('click', function() {
+                gameRuleContent.classList.toggle('show');
+                this.textContent = gameRuleContent.classList.contains('show') ? '收起规则' : '游戏规则';
+            });
+
+            let draggedTag = null;
+
+            spotTags.forEach(tag => {
+                tag.addEventListener('dragstart', function(e) {
+                    if (this.parentElement.classList.contains('match-container')) {
+                        e.preventDefault();
+                        return;
+                    }
+
+                    draggedTag = this;
+                    e.dataTransfer.setData('text/plain', this.getAttribute('data-name'));
+                    setTimeout(() => {
+                        this.style.opacity = '0.5';
+                    }, 0);
+                });
+
+                tag.addEventListener('dragend', function() {
+                    this.style.opacity = '1';
+                    draggedTag = null;
+                });
+            });
+
+            matchContainers.forEach(container => {
+                container.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                    this.style.borderColor = '#2ed573';
+                });
+
+                container.addEventListener('dragleave', function() {
+                    this.style.borderColor = '#733900';
+                });
+
+                container.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    this.style.borderColor = '#733900';
+
+                    if (this.children.length > 0) return;
+
+                    const draggedName = e.dataTransfer.getData('text/plain');
+                    const targetName = this.getAttribute('data-target');
+
+                    if (draggedName === targetName && draggedTag) {
+                        const tagClone = draggedTag.cloneNode(true);
+                        tagClone.removeAttribute('draggable');
+                        tagClone.style.cursor = 'default';
+
+                        this.appendChild(tagClone);
+                        draggedTag.remove();
+
+                        correctPopup.classList.add('show');
+                        setTimeout(() => {
+                            correctPopup.classList.remove('show');
+                        }, 1500);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>建筑成就——斗拱结构</title>
+    <style type="text/css">
+        /* 全局样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "agency fb","隶书",sans-serif;
+        }
+
+        /* 页面背景 */
+        body {
+            background-image: url("img/a明故宫内页5.png");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+            background-color: #f8f9fa;
+            color: #333;
+            min-height: 100vh;
+            /* 清除默认边距导致的滚动 */
+            overflow-x: hidden;
+        }
+
+        /* 标题容器：宽度100%，高度占比20% */
+        .title-container {
+            width: 100%;
+            height: 10vh;
+            display: flex;
+            align-items: center; /* 垂直居中 */
+			padding-top: 3rem;
+            padding-left: 33rem; /* 左侧内边距 */
+        }
+		.title-container h1{
+			font-size: 80px;
+			font-weight: 400;
+			margin-bottom: 1px;
+			font-family: "agency fb","隶书";
+		}
+
+        /* 主容器：宽度100%，高度占比80% */
+        .main-container {
+            width: 100%;
+            height: 90vh;
+            padding: 1rem;
+            position: relative; /* 为子元素定位做准备 */
+        }
+
+         /* 图片容器区域：占主容器上60%高度 */
+        .img-box-area {
+            /* width: 100%; */
+            height: 60%;
+            display: flex;
+			margin-right: 5px;
+            /* 取消默认的space-around，改为relative，方便子元素绝对定位 */
+            position: relative;
+            margin-bottom: 1rem;
+            /* border: 1px dashed #999; */ /* 辅助线，可删除 */
+			background: url("img/素材47.png") no-repeat center center;
+			background-size: 100% 100%; /* 图片适配按钮大小，拉伸无空白 */
+			border: none; /* 去掉默认边框 */
+        }
+
+        /* 单个图片容器 基础样式 */
+        .img-box {
+            border-radius: 8px;
+            /* overflow: hidden; */ /* 裁剪超出部分 */
+            position: absolute; /* 绝对定位，方便单独调整每个容器位置 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* box-shadow: 0 2px 8px rgba(0,0,0,0.1); */
+            transition: transform 0.3s ease;
+        }
+        /* 鼠标悬浮图片容器的动效 */
+        .img-box:hover {
+            transform: scale(1.02);
+        }
+        /* 图片容器内的图片样式 */
+        .img-box img {
+            position: absolute;
+            pointer-events: auto; /* 如需点击图片可保留，否则设为none */
+            /* 基础样式，可根据图片调整 */
+            width: 180px; /* 初始宽度，按需修改 */
+            height: auto; /* 保持宽高比 */
+            opacity: 1; /* 透明度，可选 */
+            transition: all 0.3s ease; /* 调整时平滑过渡，可选 */
+        }
+
+        /* ========== 单独设置每个图片容器的位置和参数 ========== */
+        /* 第一个图片容器：左上角位置，宽20%，高70% */
+        #img-box-1 {
+            width: 25%;
+            height: 100%;
+            left: 2%;   /* 距离左侧5% */
+            top: 2%;   /* 距离顶部10% */
+        }
+		#img-box-1 img{
+			width: 300px;
+			height: auto;
+		}
+        /* 第二个图片容器：中左位置，宽25%，高80% */
+        #img-box-2 {
+            width: 25%;
+            height: 100%;
+            left: 25%;  /* 距离左侧30% */
+            top: 4%;    /* 距离顶部5% */
+        }
+		#img-box-2 img{
+			width: 300px;
+			height: auto;
+		}
+        /* 第三个图片容器：中右位置，宽18%，高75% */
+        #img-box-3 {
+            width: 25%;
+            height: 100%;
+            left: 50%;  /* 距离左侧60% */
+            top: 2%;   /* 距离顶部15% */
+        }
+		#img-box-3 img{
+			width: 380px;
+			height: auto;
+		}
+        /* 第四个图片容器：右上角位置，宽22%，高70% */
+        #img-box-4 {
+            width: 25%;
+            height: 100%;
+            left: 75%;  /* 距离左侧75% */
+            top: 4%;   /* 距离顶部10% */
+        }
+		#img-box-4 img{
+			width: 380px;
+			height: auto;
+		}
+
+        /* 分割线+图标容器：高度80px，宽度100% */
+        .line-icon-container {
+            width: 100%;
+            height: 50px;
+            position: relative; /* 图标绝对定位 */
+            margin-bottom: 1rem;
+			/* border: 1px dashed #999; */
+        }
+
+        /* 分割线样式 */
+        .split-line {
+            width: 85%;
+			left: 7%;
+            height: 2px;
+            background-color: #333;
+            position: absolute;
+            top: 65%; /* 垂直居中 */
+            transform: translateY(-50%);
+        }
+
+        /* 移动图标样式 */
+        .move-icon {
+            width: 40px;
+            height: 40px;
+            position: absolute;
+            top: 30%;
+            left: 190px; /* 默认在最左侧，JS控制移动 */
+            transform: translate(-50%, -50%); /* 居中对齐分割线 */
+            transition: left 0.3s ease; /* 平滑移动过渡 */
+            border-radius: 50%;
+            
+            overflow: hidden;
+        }
+
+        /* 图标内图片填充 */
+        .move-icon img {
+			background: url("img/资源 5.png") no-repeat center center;
+			background-size: 100% 100%;
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* 覆盖填充 */
+        }
+
+        /* 按钮+介绍容器区域：高度200px，宽度100% */
+        .btn-desc-container {
+            width: 100%;
+            height: 100px;
+            position: relative;
+        }
+
+        /* 按钮容器 */
+        .btn-group {
+            width: 100%;
+            height: 40px;
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 0.5rem;
+        }
+
+        /* 功能按钮样式 */
+        .func-btn {
+            padding: 0.5rem 2rem;
+            border: none;
+            border-radius: 4px;
+            background: url("img/1 (21).png") no-repeat center center; /* 替换为你的按钮背景图 */
+            background-size: 100% 100%;
+            color: #fff;
+            font-size: 1.125rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .func-btn:hover {
+            color: #c0392b;
+        }
+		
+		.func-btn.active {
+		    color: #c0392b; 
+		    font-weight: bold;
+		}
+
+        /* 介绍文字容器：默认隐藏 */
+        .desc-box {
+            width: 70%;
+			margin-left: 190px;
+            height: 150px;
+            /* border: 1px solid #ccc; */
+            border-radius: 8px;
+            /* 格式：padding: 上边距 右边距 下边距 左边距;（顺时针） */
+            padding: 1rem 8rem 1rem 8rem; /* 上下1rem，左右3rem */
+            background: url("img/1 (21).png") no-repeat center center; /* 替换为你的按钮背景图 */
+            background-size: 100% 100%;
+            display: none; 
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: #333;
+			text-indent: 2em;
+        }
+
+        /* 高亮图层：层级高于主容器，flex定位 */
+        .highlight-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* 不阻挡下层元素点击 */
+            z-index: 999; /* 保证层级最高 */
+            display: flex;
+            justify-content: space-between; /* 示例分布，可自行调整 */
+            align-items: center;
+            padding: 0 5rem;
+        }
+
+        /* 单个亮点外层（无变化） */
+        .highlight-dot {
+            width: 10px;
+            height: 10px;
+            position: relative;
+            pointer-events: auto;
+            cursor: pointer;
+        }
+		
+		/* 批竹琴面昂 */
+		#dot-1 {
+		    position: absolute;
+		    top: 29%; 
+		    left: 32%;
+		}
+		/* 泥道栱 */
+		#dot-2 {
+		    position: absolute;
+		    top: 38%; 
+		    left: 21.5%;
+		}
+		/* 交互斗 */
+		#dot-3 {
+		    position: absolute;
+		    top: 22%; 
+		    left: 39%;
+		}
+        /* 昂形耍头 */
+		#dot-4 {
+		    position: absolute;
+		    top: 24.2%;
+		    left: 30.5%;
+		}
+		/* 令栱 */
+		#dot-5 {
+		    position: absolute;
+		    top: 20%;
+		    left: 41%;
+		}
+		/* 阑额 */
+		#dot-6 {
+		    position: absolute;
+		    top: 41%;
+		    left: 35%;
+		}
+		/* 华栱 */
+		#dot-7 {
+		    position: absolute;
+		    top: 35%;
+		    left: 33.5%;
+		}
+		/* 平伸昂 */
+		#dot-8 {
+		    position: absolute;
+		    top: 30%;
+		    left: 40%;
+		}
+		/* 隐刻慢栱 */
+		#dot-9 {
+		    position: absolute;
+		    top: 28%;
+		    left: 46%;
+		}
+		/* 栌斗 */
+		#dot-10 {
+		    position: absolute;
+		    top: 40.5%;
+		    left: 19.5%;
+		}
+		/* 翼型栱 */
+		#dot-11 {
+		    position: absolute;
+		    top: 34%;
+		    left: 11%;
+		}
+		/* 罗汉枋 */
+		#dot-12 {
+		    position: absolute;
+		    top: 21%;
+		    left: 45%;
+		}
+		/* 柱头卷杀 */
+		#dot-13 {
+		    position: absolute;
+		    top: 40%;
+		    left: 42%;
+		}
+		/* 撩檐榑 */
+		#dot-14 {
+		    position: absolute;
+		    top: 16%;
+		    left: 20%;
+		}
+		/* 替木 */
+		#dot-15 {
+		    position: absolute;
+		    top: 23%;
+		    left: 11%;
+		}
+		/* 散斗 */
+		#dot-16 {
+		    position: absolute;
+		    top: 21%;
+		    left: 16.3%;
+		}
+		/* 耍头 */
+		#dot-17 {
+		    position: absolute;
+		    top: 23.5%;
+		    left: 14%;
+		}
+		/* 慢栱 */
+		#dot-18 {
+		    position: absolute;
+		    top: 25%;
+		    left: 21%;
+		}
+		/* 遮椽板 */
+		#dot-19 {
+		    position: absolute;
+		    top: 18.5%;
+		    left: 22%;
+		}
+		/* 瓜子栱 */
+		#dot-20 {
+		    position: absolute;
+		    top: 29%;
+		    left: 18.5%;
+		}
+		/* 昂 */
+		#dot-21 {
+		    position: absolute;
+		    top: 27.5%;
+		    left: 14.2%;
+		}
+		/* 平板枋 */
+		#dot-22 {
+		    position: absolute;
+		    top: 38.5%;
+		    right: 10%;
+		}
+		/* 大额枋 */
+		#dot-23 {
+		    position: absolute;
+		    top: 42%;
+		    right: 12%;
+		}
+		/* 挑檐桁 */
+		#dot-24 {
+		    position: absolute;
+		    top: 26.5%;
+		    right: 17%;
+		}
+		/* 挑檐枋 */
+		#dot-25 {
+		    position: absolute;
+		    top: 27.5%;
+		    right: 13%;
+		}
+		/* 厢栱 */
+		#dot-26 {
+		    position: absolute;
+		    top: 28%;
+		    right: 8%;
+		}
+		/* 角昂 */
+		#dot-27 {
+		    position: absolute;
+		    top: 34%;
+		    right: 21%;
+		}
+		/* 头昂后带正心万栱 */
+		#dot-28 {
+		    position: absolute;
+		    top: 34%;
+		    right: 17%;
+		}
+		/* 正心万栱带头翘 */
+		#dot-29 {
+		    position: absolute;
+		    top: 34%;
+		    right: 12%;
+		}
+		/* 翘 */
+		#dot-30 {
+		    position: absolute;
+		    top: 34.7%;
+		    right: 7.8%;
+		}
+		/* 栌斗 */
+		#dot-31 {
+		    position: absolute;
+		    top: 43%;
+		    right: 38.3%;
+		}
+		/* 升 */
+		#dot-32 {
+		    position: absolute;
+		    top: 34.7%;
+		    right: 28.7%;
+		}
+		/* 昂 */
+		#dot-33 {
+		    position: absolute;
+		    top: 32%;
+		    right: 47%;
+		}
+		/* 耍头 */
+		#dot-34 {
+		    position: absolute;
+		    top: 21.7%;
+		    right: 40.5%;
+		}
+		/* 檐枋 */
+		#dot-35 {
+		    position: absolute;
+		    top: 20%;
+		    right: 47%;
+		}
+		/* 正心枋 */
+		#dot-36 {
+		    position: absolute;
+		    top: 25%;
+		    right: 28%;
+		}
+		/* 泥道栱 */
+		#dot-37 {
+		    position: absolute;
+		    top: 37%;
+		    right: 36%;
+		}
+		/* 瓜子栱 */
+		#dot-38 {
+		    position: absolute;
+		    top: 35%;
+		    right: 45%;
+		}
+        /* 内层亮点（承载点击浮动动画） */
+        .highlight-dot .dot-inner {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: #fab209; /* 亮点基础色 */
+            /* 点击浮动动画：2秒循环，交替反向，缓动效果 */
+            animation: pulse-click 0.5s infinite alternate ease-in-out;
+        }
+        
+        /* 点击浮动+闪烁复合动画 */
+        @keyframes pulse-click {
+            from {
+                opacity: 1;
+                transform: scale(1);
+                box-shadow: 0 0 15px #fab209, 0 0 30px #fab209, 0 0 5px #fab209;
+            }
+            to {
+                opacity: 0.7;
+                transform: scale(1.2);
+                box-shadow: 0 0 5px #fab209, 0 0 15px #fab209;
+            }
+        }
+        
+        .dot-tip {
+            position: absolute;
+            top: 50%; /* 与亮点垂直居中对齐 */
+            left: calc(100% + 10px); /* 定位到亮点右侧，10px是卡片与亮点的间距，可调整 */
+            transform: translateY(-50%); /* 配合top:50%实现垂直居中 */
+            width: 50px;
+            padding: 5px;
+            background: rgba(40, 40, 40, 0.6); /* 灰黑色半透明，最后一个0.8是透明度，可调整 */
+            color: #fff; /* 文字白色，对比更清晰 */
+			text-align: center;
+            border-radius: 4px;
+            font-size: 1.2rem;
+            display: none;
+            z-index: 1000;
+            pointer-events: none;
+            opacity: 1 !important; /* 强制不透明，不继承亮点动画 */
+            /* 可选：加轻微阴影，让卡片更立体 */
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+			}
+			#dot-tip-13{
+				width: 60px;
+			}
+		#dot-tip-15{
+			width: 120px;
+		}
+        
+        /* hover显示卡片（逻辑不变） */
+        .highlight-dot:hover .dot-tip {
+            display: block;
+        }
+		
+		/* ========== 核心优化：最高层级指示图层（重点看） ========== */
+        /* 指示图层：最高层级，不阻挡下层交互 */
+        .indicator-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 900; /* 最高层级 */
+        }
+        /* 单个指示容器：绝对定位，可单独调整页面位置 */
+        .indicator-item {
+            position: absolute;
+            width: 200px;
+            /* background: rgba(255, 255, 255, 0.95); */
+            /* border: 2px solid #333; */
+			
+            border-radius: 8px;
+            padding: 0.8rem;
+            display: flex;
+            flex-direction: column; /* 图片+文字上下排列 */
+            align-items: center;
+            gap: 0.2rem; /* 图片文字间距 */
+            /* box-shadow: 0 3px 10px rgba(0,0,0,0.2); */
+        }
+        /* 容器内图片+文字样式 */
+        .indicator-item img {
+			width: 100%;
+			height: 150px;
+			border-radius: 4px;
+			object-fit: contain;
+			
+			/* border: 1px solid #ccc; */
+			margin: 1px 1px; /* 核心修改这一行 */
+        }
+        .indicator-text {
+			
+            font-size: 0.9rem;
+            color: #333;
+            text-align: center;
+            line-height: 1.4;
+			margin: 5px;
+        }
+
+        /* 指示线基础样式：每个容器仅1条，通过ID控制起点/样式 */
+        .indicator-item::after {
+            content: '';
+            position: absolute;
+            pointer-events: none;
+            background: #8c4600; /* 线的颜色，可单独改 */
+            z-index: -1; /* 线在容器下方，不遮挡内容 */
+            transition: all 0.3s ease;
+			/* 新增：斜线基础设置（宽度设长一点，旋转后更易调整） */
+			    width: 90px; /* 线的基础长度，旋转后实际视觉长度会变化 */
+			    height: 2px; /* 线的粗细，不变 */
+			    transform-origin: 0 50%; /* 旋转原点：线的**起点**（关键！保证绕起点旋转成斜线） */
+        }
+
+        /* ========== 关键：单独调整每个容器的【指示线起点】+ 容器页面位置 ========== */
+        /* 容器1：页面右上角 + 指示线起点【上边框左20%】 */
+        #indicator-1 {
+            top: 10%;
+            right: 20%; /* 容器在页面的位置，可改top/right/bottom/left */
+        }
+        #indicator-1::after {
+            /* 起点：上边框 + 左20%位置（0%-100%可调） */
+            top: 50%;
+            left: 95%; 
+            /* 线样式：水平向左，长80px，粗2px（可改） */
+            /* 终点偏移：向左50px+向上10px（可选，translate(X,Y)） */
+            
+			transform: rotate(20deg) translate(-25px, 5px); /* rotate(30deg)=顺时针30° */
+        }
+
+        /* 容器2：页面中左 + 指示线起点【右边框下70%】 */
+        #indicator-2 {
+            top: 3%;
+            left: 43%;
+        }
+        #indicator-2::after {
+            /* 起点：右边框 + 下70%位置（0%-100%可调） */
+            top: 30%;
+            right: 0;
+            transform: rotate(20deg) translate(47px, -25px);
+        }
+
+        /* 容器3：页面中右 + 指示线起点【下边框正中间（50%）】 */
+        #indicator-3 {
+            top: 35%;
+            left: 43%;
+        }
+        #indicator-3::after {
+            /* 起点：下边框 + 正中间50%位置（0%-100%可调） */
+            bottom: 70%;
+            right: 80%;
+            transform: rotate(-20deg) translate(-5px,70px);
+        }
+
+        /* 容器4：页面左下角 + 指示线起点【左边框上30%】 */
+        #indicator-4 {
+            top: 10%;
+            left: 20%;
+        }
+        #indicator-4::after {
+            /* 起点：左边框 + 上30%位置（0%-100%可调） */
+            top: 30%;
+            right: 50%;
+            transform: rotate(-20deg) translate(-70px,70px);
+        }
+		/* ========== 新增：返回首页按钮样式 ========== */
+		    .back-home-btn {
+		      position: absolute;
+		      top: 40px;
+		      right: 120px;
+		      z-index: 999; /* 确保按钮在最上层 */
+		      width: 180px;
+		      height: 60px;
+		      border: none;
+		      /* border-radius: 8px; */
+		      cursor: pointer;
+		      /* 核心：背景图片与文字分层 */
+		      display: flex;
+		      align-items: center;
+		      justify-content: center;
+		      font-size: 20px;
+		      font-weight: bold;
+		      color: #733900;
+		      text-decoration: none; /* 去掉a标签默认下划线 */
+		      overflow: hidden;
+		    }
+		
+		    /* 背景图层（单独用于旋转） */
+		    .btn-bg {
+		      position: absolute;
+		      top: 0;
+		      left: 0;
+		      width: 100%;
+		      height: 100%;
+		      background: url("img/017.png") no-repeat center center; /* 替换为你的按钮背景图 */
+		      background-size: cover;
+		     
+		      z-index: 1; /* 背景在文字下方 */
+		    }
+			
+    
+    </style>
+</head>
+<body>
+    <!-- 标题容器 -->
+    <div class="title-container">
+       <h1>斗拱历代演变</h1>
+    </div>
+	
+	<!-- ========== 新增：返回首页按钮 ========== -->
+	    <a href="华章.html" class="back-home-btn"> <!-- 替换index.html为你的首页地址 -->
+	      <div class="btn-bg"></div> <!-- 背景图层（旋转） -->
+	      <span class="btn-text">返回</span> <!-- 文字层（静止） -->
+	    </a>
+
+    <!-- 主容器 -->
+    <div class="main-container">
+         <!-- 图片容器区域 -->
+        <div class="img-box-area">
+            <!-- 第一个图片容器：自定义位置+图片 -->
+            <div class="img-box" id="img-box-1">
+                <img src="img/g唐斗拱.png" alt="唐斗拱">
+            </div>
+            <!-- 第二个图片容器：自定义位置+图片 -->
+            <div class="img-box" id="img-box-2">
+                <img src="img/g宋斗拱.png" alt="宋斗拱">
+            </div>
+            <!-- 第三个图片容器：自定义位置+图片 -->
+            <div class="img-box" id="img-box-3">
+                <img src="img/g明斗拱.png" alt="明斗拱">
+            </div>
+            <!-- 第四个图片容器：自定义位置+图片 -->
+            <div class="img-box" id="img-box-4">
+                <img src="img/g清斗拱.png" alt="清斗拱">
+            </div>
+        </div>
+
+        <!-- 分割线+图标容器 -->
+        <div class="line-icon-container">
+            <div class="split-line"></div>
+            <!-- 移动图标：替换src为你的图标路径 -->
+            <div class="move-icon">
+                <img >
+            </div>
+        </div>
+
+        <!-- 按钮+介绍容器 -->
+        <div class="btn-desc-container">
+            <div class="btn-group">
+                <button class="func-btn" data-index="1" data-text="唐代斗拱以佛光寺东大殿为代表，体量雄大、出檐深远，结构作用十分突出。其七铺作斗拱层次简洁而气势厚重，体现出唐代木构尚雄浑、重承重的特点。此时斗拱仍以支撑屋檐、传递荷载为主，装饰意味较少，是中国斗拱走向成熟的重要阶段。">唐代（铺作）</button>
+                <button class="func-btn" data-index="2" data-text="宋代斗拱在唐代基础上进一步精细化、制度化。晋祠圣母殿上下两层檐下均施斗拱，上檐与下檐形制有别，层次更丰富，组合更灵活，既有较强承重功能，也显现出明显的装饰美感。它反映出宋代斗拱由雄健朴实转向精巧繁缛的演变趋势。">宋代（铺作）</button>
+                <button class="func-btn" data-index="3" data-text="明代斗拱发展到更加成熟稳健的阶段。玉皇观灵霄宝殿前檐使用极为罕见的十三踩斗拱，出跳密集，层层叠起，形制华丽，显示出高超的营造技艺。与宋代相比，明代斗拱在延续结构功能的同时，更强调等级秩序与视觉效果，装饰性进一步增强。">明代（枓栱）</button>
+                <button class="func-btn" data-index="4" data-text="清代斗拱的突出特点是高度标准化与模数化。《工程做法则例》以“斗口”为基本尺度，对大式建筑斗拱的等级、尺寸和构件关系作出明确规定，使斗拱从前代的灵活演变转入规范统一的官式体系。此时斗拱仍具结构作用，但礼制化、程式化和装饰化特征更为鲜明。">清代（枓栱）</button>
+            </div>
+            <div class="desc-box" id="descBox"></div>
+        </div>
+
+        <!-- 高亮图层HTML结构（新增内层） -->
+        <div class="highlight-layer">
+            <div class="highlight-dot" id="dot-1">
+                <div class="dot-inner"></div>
+                <div class="dot-tip" id="dot-tip-15">批竹琴面昂</div>
+            </div>
+            <div class="highlight-dot" id="dot-2">
+                <div class="dot-inner"></div>
+                <div class="dot-tip" id="dot-tip-15">泥道栱</div>
+            </div>
+            <div class="highlight-dot" id="dot-3">
+                <div class="dot-inner"></div>
+                <div class="dot-tip" id="dot-tip-15">交互斗</div>
+            </div>
+            <div class="highlight-dot" id="dot-4">
+                <div class="dot-inner"></div>
+                <div class="dot-tip" id="dot-tip-15">昂形耍头</div>
+            </div>
+            <div class="highlight-dot" id="dot-5">
+                <div class="dot-inner" ></div>
+                <div class="dot-tip">令栱</div>
+            </div>
+			<div class="highlight-dot" id="dot-6">
+			    <div class="dot-inner" ></div>
+			    <div class="dot-tip">阑额</div>
+			</div>
+			<div class="highlight-dot" id="dot-7">
+			    <div class="dot-inner" ></div>
+			    <div class="dot-tip">华栱</div>
+			</div>
+			<div class="highlight-dot" id="dot-8">
+			    <div class="dot-inner" ></div>
+			    <div class="dot-tip" id="dot-tip-15">平伸昂</div>
+			</div>
+			<div class="highlight-dot" id="dot-9">
+			    <div class="dot-inner" ></div>
+			    <div class="dot-tip" id="dot-tip-15">隐刻慢栱</div>
+			</div>
+			<div class="highlight-dot" id="dot-10">
+			    <div class="dot-inner" ></div>
+			    <div class="dot-tip">栌斗</div>
+			</div>
+			<div class="highlight-dot" id="dot-11">
+			    <div class="dot-inner" ></div>
+			    <div class="dot-tip" id="dot-tip-15">翼型栱</div>
+			</div>
+			<div class="highlight-dot" id="dot-12">
+			    <div class="dot-inner" ></div>
+			    <div class="dot-tip" id="dot-tip-15">罗汉枋</div>
+			</div>
+			<div class="highlight-dot" id="dot-13">
+			    <div class="dot-inner" ></div>
+			    <div class="dot-tip" id="dot-tip-15">柱头卷杀</div>
+			</div>
+			<div class="highlight-dot" id="dot-14">
+			    <div class="dot-inner" ></div>
+			    <div class="dot-tip" id="dot-tip-15">撩檐榑</div>
+			</div>
+			<div class="highlight-dot" id="dot-15">
+			    <div class="dot-inner" ></div>
+			    <div class="dot-tip">替木</div>
+			</div>
+			<div class="highlight-dot" id="dot-16">
+			    <div class="dot-inner" ></div>
+			    <div class="dot-tip">散斗</div>
+			</div>
+			<div class="highlight-dot" id="dot-17">
+			    <div class="dot-inner" ></div>
+			    <div class="dot-tip">耍头</div>
+			</div>
+			<div class="highlight-dot" id="dot-18">
+			    <div class="dot-inner" ></div>
+			    <div class="dot-tip">慢栱</div>
+			</div>
+			<div class="highlight-dot" id="dot-19">
+			    <div class="dot-inner" ></div>
+			    <div class="dot-tip" id="dot-tip-15">遮椽板</div>
+			</div>
+			<div class="highlight-dot" id="dot-20">
+			    <div class="dot-inner" ></div>
+			    <div class="dot-tip" id="dot-tip-15">瓜子栱</div>
+			</div>
+			<div class="highlight-dot" id="dot-21">
+			    <div class="dot-inner" ></div>
+			    <div class="dot-tip">昂</div>
+			</div>
+			<div class="highlight-dot" id="dot-22">
+			    <div class="dot-inner" ></div>
+			    <div class="dot-tip" id="dot-tip-15">平板枋</div>
+			</div>
+			<div class="highlight-dot" id="dot-23">
+			    <div class="dot-inner" ></div>
+			    <div class="dot-tip" id="dot-tip-15">大额枋</div>
+			</div>
+			<div class="highlight-dot" id="dot-24">
+			    <div class="dot-inner" ></div>
+			    <div class="dot-tip" id="dot-tip-15">挑檐桁</div>
+			</div>
+			<div class="highlight-dot" id="dot-25">
+			    <div class="dot-inner" ></div>
+			    <div class="dot-tip" id="dot-tip-15">挑檐枋</div>
+			</div>
+			<div class="highlight-dot" id="dot-26">
+			    <div class="dot-inner" ></div>
+			    <div class="dot-tip">厢栱</div>
+			</div>
+			<div class="highlight-dot" id="dot-27">
+			    <div class="dot-inner" ></div>
+			    <div class="dot-tip">角昂</div>
+			</div>
+			<div class="highlight-dot" id="dot-28">
+			    <div class="dot-inner" ></div>
+			    <div class="dot-tip" id="dot-tip-15">头昂后带正心万栱</div>
+			</div>
+			<div class="highlight-dot" id="dot-29">
+			    <div class="dot-inner" ></div>
+			    <div class="dot-tip" id="dot-tip-15">正心万栱带头翘</div>
+			</div>
+			<div class="highlight-dot" id="dot-30">
+			    <div class="dot-inner" ></div>
+			    <div class="dot-tip">翘</div>
+			</div>
+			<div class="highlight-dot" id="dot-31">
+			    <div class="dot-inner" ></div>
+			    <div class="dot-tip">栌斗</div>
+			</div>
+			<div class="highlight-dot" id="dot-32">
+			    <div class="dot-inner" ></div>
+			    <div class="dot-tip">升</div>
+			</div>
+			<div class="highlight-dot" id="dot-33">
+			    <div class="dot-inner" ></div>
+			    <div class="dot-tip">昂</div>
+			</div>
+			<div class="highlight-dot" id="dot-34">
+			    <div class="dot-inner" ></div>
+			    <div class="dot-tip">耍头</div>
+			</div>
+			<div class="highlight-dot" id="dot-35">
+			    <div class="dot-inner" ></div>
+			    <div class="dot-tip">檐枋</div>
+			</div>
+			<div class="highlight-dot" id="dot-36">
+			    <div class="dot-inner" ></div>
+			    <div class="dot-tip"id="dot-tip-15">正心枋</div>
+			</div>
+			<div class="highlight-dot" id="dot-37">
+			    <div class="dot-inner"></div>
+			    <div class="dot-tip" id="dot-tip-15">泥道栱</div>
+			</div>
+			<div class="highlight-dot" id="dot-38">
+			    <div class="dot-inner" ></div>
+			    <div class="dot-tip" id="dot-tip-15">瓜子栱</div>
+			</div>
+        </div>
+		
+		 <!-- 新增：最高层级指示图层 -->
+       <!-- <div class="indicator-layer">
+            
+            <div class="indicator-item" id="indicator-1">
+                <img src="img/宝相花团花纹样.png" alt="指示图1">
+                <div class="indicator-text">宝相花团花纹样，搭配下方的卷草纹装饰，是明初高等级甲胄的典型标识。</div>
+            </div>
+            
+            <div class="indicator-item" id="indicator-2">
+                <img src="img/小独科花纹.png" alt="指示图2">
+                <div class="indicator-text">明孝陵石翁仲披肩小独科花为单朵团花，是明代官服礼制的石刻体现。</div>
+            </div>
+            
+            <div class="indicator-item" id="indicator-3">
+                <img src="img/云头履.png" alt="指示图3">
+                <div class="indicator-text">明孝陵石翁仲云头履为礼制鞋履，鞋头翘呈云状，象征等级。</div>
+            </div>
+            
+            <div class="indicator-item" id="indicator-4">
+                <img src="img/浅浮雕云鹤纹样.png" alt="指示图4">
+                <div class="indicator-text">后腰部覆大绶，绶带丝织图案为浅浮雕云鹤纹样。</div>
+            </div>
+        </div> -->
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // 获取核心元素
+            const moveIcon = document.querySelector('.move-icon');
+            const funcBtns = document.querySelectorAll('.func-btn');
+            const descBox = document.getElementById('descBox');
+            const lineIconContainer = document.querySelector('.line-icon-container');
+            const btnGroup = document.querySelector('.btn-group'); // 新增：获取按钮容器
+        
+            // 封装图标定位函数（核心：基于按钮实际位置计算）
+            function positionIconToBtn(btn) {
+                // 获取按钮的实际位置信息
+                const btnRect = btn.getBoundingClientRect();
+                // 获取分割线容器的实际位置信息
+                const lineContainerRect = lineIconContainer.getBoundingClientRect();
+                
+                // 计算按钮水平中点（相对于分割线容器）
+                // 按钮中点的绝对坐标 - 分割线容器左侧的绝对坐标 = 相对位置
+                const btnCenterX = btnRect.left + btnRect.width / 2 - lineContainerRect.left;
+                
+                // 设置图标位置（transform: translate(-50%) 确保图标自身中点对齐按钮中点）
+                moveIcon.style.left = `${btnCenterX}px`;
+            }
+        
+            // 按钮点击核心逻辑
+            function handleBtnClick(btn) {
+                // 显示并赋值文字
+                const descText = btn.getAttribute('data-text');
+                descBox.style.display = 'flex';
+                descBox.textContent = descText;
+        
+                // 精准定位图标到按钮正中间
+                positionIconToBtn(btn);
+        
+                // 按钮激活样式
+                funcBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            }
+        
+            // 给所有按钮绑定点击事件
+            funcBtns.forEach((btn) => {
+                btn.addEventListener('click', () => handleBtnClick(btn));
+            });
+        
+            // 初始化：默认触发第一个按钮逻辑（文字+图标）
+            if (funcBtns.length > 0) {
+                handleBtnClick(funcBtns[0]);
+                
+                // 兜底：窗口大小变化时重新定位（防止响应式错位）
+                window.addEventListener('resize', () => {
+                    // 找到当前激活的按钮，重新定位图标
+                    const activeBtn = document.querySelector('.func-btn.active') || funcBtns[0];
+                    positionIconToBtn(activeBtn);
+                });
+            }
+        });
+    </script>
+</body>
+</html>

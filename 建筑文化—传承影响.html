@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>横向交互时间轴</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      font-family: "agency fb","隶书",sans-serif;
+       background-image: url("img/a明故宫内页.png");
+       background-size: cover;
+       background-position: center;
+       color: #733900;
+      overflow: hidden;
+    }
+
+    .page {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      padding: 4vh 5vw 0;
+    }
+
+    /* 上方展示容器 */
+    .content-stage {
+      position: absolute;
+      left: 50%;
+      top: 22%;
+      transform: translateX(-50%);
+      width: 90vw;
+      height: 44vh;
+      pointer-events: none;
+    }
+
+    .panel {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: stretch;
+      opacity: 0;
+      transform: scale(0.88);
+      filter: blur(10px);
+      transition: opacity 0.5s ease, transform 0.5s ease, filter 0.5s ease;
+      pointer-events: none;
+    }
+
+    .panel.active {
+      opacity: 1;
+      transform: scale(1);
+      filter: blur(0);
+      pointer-events: auto;
+      z-index: 2;
+    }
+
+    .panel.leaving {
+      opacity: 0;
+      transform: scale(0.82);
+      filter: blur(12px);
+      z-index: 1;
+    }
+
+    .image-box,
+    .text-box {
+      height: 100%;
+      /* border-radius: 10px; */
+      overflow: hidden;
+      /* background: rgba(255,255,255,0.05); */
+      border: 1px solid rgba(255,255,255,0.08);
+     /* box-shadow: 0 20px 60px rgba(0,0,0,0.35); */
+      backdrop-filter: blur(8px);
+    }
+    
+    .image-box {
+    	background: url(img/043.png);
+    	background-size: 100% 100%;
+    	padding: 15px;
+      margin-left: 170px;
+      width: 40%;
+      position: relative;
+    }
+
+    .image-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .image-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(15,23,42,0.15), rgba(2,6,23,0.45));
+    }
+
+    .text-box {
+    	margin-right: 140px;
+      background: url("img/037.png") no-repeat center center;
+      background-size: 100% 100%;
+      width: 30%;
+      padding: 30px 10px 10px 20px;
+      display: flex;
+      flex-direction: column;
+      /* justify-content: center; */
+    }
+    .tag {
+      display: inline-flex;
+      align-self: flex-start;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: rgba(96,165,250,0.16);
+      color: #733900;
+      font-size: 12px;
+      letter-spacing: 1px;
+      margin-bottom: 40px;
+      margin-left: 10px;
+    }
+
+    .text-box h2 {
+      text-align: center;
+      margin: 0 0 14px;
+      font-size: 32px;
+      line-height: 1.2;
+    }
+    
+    .text-box .time-line {
+    	text-align: center;
+      color: #733900;
+      font-size: 18px;
+      margin-bottom: 6px;
+    }
+    
+    .text-box p {
+    	text-indent: 2em;
+      margin: 0;
+      color: #733900;
+      font-size: 17px;
+      line-height: 1.9;
+    }
+
+    /* 底部时间轴 */
+    .timeline-section {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 10%;
+      height: 180px;
+      overflow: hidden;
+    }
+
+    .timeline-rail {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 84px;
+      height: 3px;
+      background: rgba(115, 57, 0, 0.45)
+    }
+
+    .timeline-window {
+      position: absolute;
+      inset: 0 5vw;
+      overflow: hidden;
+    }
+
+    .timeline-track {
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+      will-change: transform;
+    }
+
+    .timeline-item {
+      position: relative;
+      width: 220px;
+      flex: 0 0 220px;
+      height: 180px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .timeline-item.active::after {
+      /* background: #60a5fa;
+      box-shadow: 0 0 0 10px rgba(96,165,250,0.16); */
+      transform: translate(-50%, -50%) scale(1.25);
+    }
+
+    .time-label {
+      position: absolute;
+      left: 50%;
+      top: 84px;
+      font-size: 18px;
+      font-weight: 600;
+      color: #733900;
+      letter-spacing: 1px;
+      padding: 6px 14px;
+      
+      background-image: url(img/24.png);
+      background-size: 100% 100%;
+      background-position: center;
+      transform: translate(-50%, -50%);
+      z-index: 3;
+      transition: all 0.4s ease;
+    }
+
+    .place-label {
+		width: 150px;
+      position: absolute;
+      left:50%;
+      top: 108px;
+      font-size: 18px;
+      color: #733900;
+      transform-origin: center;
+      transform: translateX(-50%) rotate(-30deg);
+      transition: all 0.4s ease;
+    }
+
+    .time-label {
+      top: 84px;
+      font-size: 18px;
+      font-weight: 600;
+      color: #733900;
+      letter-spacing: 1px;
+      padding: 6px 14px;
+      border-radius: 12px;
+      background-image: url(img/24.png);
+      background-size: 100% 100%;
+      background-position: center;
+      transform: translate(-50%, -50%);
+      z-index: 3;
+      transition: all 0.4s ease;
+    }
+
+    .place-label {
+      top: 118px;
+      font-size: 18px;
+      color: #733900;
+    }
+
+    .timeline-item.active .time-label {
+      color: #7f0000;
+      background-image: url(img/25.png);
+      transform: translate(-50%, calc(-50% - 25px)) scale(1.25); /* 整体容器轻微上移 */
+      /* box-shadow: 0 8px 20px rgba(56,189,248,0.35); */
+      background-size: 100% 100%;
+    }
+
+    .timeline-item.active .place-label {
+		  text-align: center;
+      top: 1px;
+      color: #a62525;
+      font-weight: 600;
+      transform: translateX(-50%) rotate(0deg);
+    }
+
+    
+
+    .hint {
+      position: absolute;
+      left: 5vw;
+      bottom: calc(30% - 56px);
+      font-size: 13px;
+      color: rgba(255,255,255,0.48);
+      letter-spacing: 0.5px;
+    }
+
+    @media (max-width: 1200px) {
+      .panel { gap: 16px; }
+      .image-box { width: 58%; }
+      .text-box { width: 36%; }
+      .timeline-item { width: 200px; flex-basis: 200px; }
+    }
+
+    @media (max-width: 900px) {
+      html, body { overflow: auto; }
+      .page { min-height: 100vh; height: auto; padding-bottom: 80px; }
+      .content-stage {
+        position: relative;
+        top: auto;
+        left: auto;
+        transform: none;
+        width: 100%;
+        height: auto;
+      }
+      .panel,
+      .panel.active,
+      .panel.leaving {
+        position: relative;
+        opacity: 1;
+        transform: none;
+        filter: none;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 16px;
+        margin-bottom: 20px;
+      }
+      .image-box,
+      .text-box {
+        width: 100%;
+        min-height: 240px;
+      }
+      .timeline-section {
+        position: relative;
+        bottom: auto;
+        margin-top: 24px;
+      }
+      .hint {
+        position: relative;
+        left: auto;
+        bottom: auto;
+        margin: 12px 5vw 0;
+      }
+    }
+	.header{
+	    width: 100%;
+	    text-align: center;
+	    margin-bottom: 80px;
+	    position: relative;
+	}
+	.title{
+	    color: #333;
+	    font-size: 80px;
+	    font-weight: 400;
+	    margin: 0;
+	}
+	/* ========== 新增：返回首页按钮样式 ========== */
+	    .back-home-btn {
+	      position: fixed;
+	      top: 52px;
+	      right: 57px;
+	      z-index: 999; /* 确保按钮在最上层 */
+	      width: 120px;
+	      height: 120px;
+	      border: none;
+	      border-radius: 8px;
+	      cursor: pointer;
+	      /* 核心：背景图片与文字分层 */
+	      display: flex;
+	      align-items: center;
+	      justify-content: center;
+	      font-size: 20px;
+	      font-weight: bold;
+	      color: #733900;
+	      text-decoration: none; /* 去掉a标签默认下划线 */
+	      overflow: hidden;
+	    }
+	
+	    /* 背景图层（单独用于旋转） */
+	    .btn-bg {
+	      position: absolute;
+	      top: 0;
+	      left: 0;
+	      width: 100%;
+	      height: 100%;
+	      background: url("img/027.png") no-repeat center center; /* 替换为你的按钮背景图 */
+	      background-size: cover;
+	      transition: transform 0.5s ease; /* 旋转过渡动画 */
+	      z-index: 1; /* 背景在文字下方 */
+	    }
+	
+	    /* 文字层（静止） */
+	    .btn-text {
+	      position: relative;
+	      z-index: 2; /* 文字在背景上方 */
+	    }
+	
+	    /* hover时背景旋转，文字不动 */
+	    .back-home-btn:hover .btn-bg {
+	      transform: rotate(360deg); /* 360度旋转，可改为180deg */
+	    }
+  </style>
+</head>
+<body>
+	<!-- ========== 新增：返回首页按钮 ========== -->
+	    <a href="导航.html" class="back-home-btn"> <!-- 替换index.html为你的首页地址 -->
+	      <div class="btn-bg"></div> <!-- 背景图层（旋转） -->
+	      <span class="btn-text">返回首页</span> <!-- 文字层（静止） -->
+	    </a>
+  <div class="page">
+	  <div class="header">
+	      <h2 class="title">古制流芳—宫城典范</h2>
+	  </div>
+    <div class="content-stage" id="contentStage"></div>
+
+    <div class="timeline-section">
+      <div class="timeline-window" id="timelineWindow">
+        <div class="timeline-rail"></div>
+        <div class="timeline-track" id="timelineTrack"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const timelineData = [
+      {
+        time: '1366',
+        location: '南京明故宫',
+        title: '明故宫（原型）',
+        subtitle: '1366 · 南京明故宫',
+        tag: '起源',
+        desc: '1366年，朱元璋下令在南京营建明故宫，历时四年正式建成。这座宫殿严格依照《周礼·考工记》规划，确立中轴对称、前朝后寝、左祖右社的完整格局，清晰划分理政与居住区域，完全遵循皇家礼制。作为明代第一座皇家宫殿，它不仅为北京故宫提供了直接蓝本，更成为明代各地王府与官式建筑的规制标准，影响深远。',
+        image: 'img/c南京明故宫遗址.png'
+      },
+      {
+        time: '1420',
+        location: '北京紫禁城太和殿',
+        title: '北京故宫太和殿',
+        subtitle: '1420 · 太和殿',
+        tag: '核心传承',
+        desc: '1420年北京紫禁城建成，太和殿直接承袭南京明故宫奉天殿形制，坐落于中轴线核心位置，面阔十一间，采用最高等级重檐庑殿顶，是中国现存规模最大的木结构宫殿。其建筑尺度、台基层级、空间布局均以明故宫为范本，虽历经多次焚毁重建，核心规制始终不变，是明清两代皇权最核心的象征与建筑典范。',
+        image: 'img/c北京故宫太和殿.png'
+      },
+      {
+        time: '1465',
+        location: '西安秦王府',
+        title: '西安秦王府',
+        subtitle: '1465 · 秦王府',
+        tag: '西北扩散',
+        desc: '1465年西安秦王府顺利建成，作为明代“天下第一藩封”的核心府邸，它按亲王等级缩减建筑规模，却完整复刻明故宫前朝后寝的格局与双重城垣防御结构。王府以钟楼为中心构建规整中轴线，标志着明故宫确立的宫廷建筑秩序正式向西北地区扩散，成为陕甘地区王府与官式建筑遵循的核心范本。',
+        image: 'img/c西安秦王府遗址.png'
+      },
+      {
+        time: '1506',
+        location: '太原晋王府',
+        title: '太原晋王府',
+        subtitle: '1506 · 晋王府',
+        tag: '华北扩散',
+        desc: '1506年太原晋王府完成重修扩建，全面参照明故宫建筑逻辑，打造前府后园的规整格局，前区理政、后区居住，院落层级严格遵循皇家空间等级制度。建筑开间数量、台基高度均按规制递减，将明故宫确立的空间范式完整植入华北地区，深刻影响晋冀一带王府与官署建筑的整体形制与布局风格。',
+        image: 'img/c太原晋王府复原图.png'
+      },
+      {
+        time: '1573',
+        location: '成都蜀王府',
+        title: '成都蜀王府',
+        subtitle: '1573 · 蜀王府',
+        tag: '西南扩散',
+        desc: '1573年成都蜀王府修缮定型，完整复刻明故宫三重城垣结构，中轴线贯穿府门、承运殿、寝宫，形成层层递进的院落布局。承运殿直接仿照奉天殿形制建造，宫门命名体系、装饰彩绘纹样均溯源明故宫规制，成为四川乃至整个西南地区官式建筑最权威、最核心的设计参照标准。',
+        image: 'img/c成都蜀王府遗址.png'
+      },
+      {
+        time: '1636',
+        location: '开封周王府',
+        title: '开封周王府',
+        subtitle: '1636 · 周王府',
+        tag: '中原扩散',
+        desc: '1636年开封周王府完成全面修缮，完整移植明故宫左祖右社的礼制布局，府内东侧设宗庙、西侧设社稷坛，核心建筑居中而立，两翼附属建筑对称排布。这座王府将明故宫礼制文化深度植入中原地区，成为豫鲁地区王府建筑的标杆，也为清代开封城市布局与建筑风格奠定重要基础。',
+        image: 'img/c开封周王府复原图.png'
+      },
+      {
+        time: '1683',
+        location: '北京恭王府',
+        title: '北京恭王府',
+        subtitle: '1683 · 恭王府',
+        tag: '清代承袭',
+        desc: '1683年北京恭王府前身开工营建，虽为清代顶级王府，却完整延续明故宫前朝后寝的布局精髓，前区银安殿专用于理政，后区锡晋斋作为居住空间，中轴线贯穿南北，次要建筑对称分布。建筑虽融入清代装饰特色，但核心空间逻辑与礼制规范仍完整保留明式宫廷体系。',
+        image: 'img/c北京恭王府.png'
+      },
+      {
+        time: '1725',
+        location: '沈阳故宫崇政殿',
+        title: '沈阳故宫崇政殿',
+        subtitle: '1725 · 崇政殿',
+        tag: '关外适配',
+        desc: '1725年沈阳故宫崇政殿完成重修，借鉴明故宫居中对称的核心布局，位居沈阳故宫中路核心位置，两侧配殿对称排列。建筑细节融合满族地域特色，如硬山墙、火炕结构、简化斗拱，但整体礼制规范与空间秩序严格遵循明故宫标准，是关外建筑传承与创新结合的典型代表。',
+        image: 'img/c沈阳故宫崇政殿.png'
+      },
+      {
+        time: '1790',
+        location: '曲阜孔府大成殿',
+        title: '曲阜孔府大成殿',
+        subtitle: '1790 · 大成殿',
+        tag: '礼制延伸',
+        desc: '1790年曲阜孔府大成殿完成重修，全面仿照明故宫太和殿规制建造，采用重檐歇山顶、九五开间、三层须弥座，配以黄色琉璃瓦与金龙和玺彩绘。作为祭祀孔子的最高等级建筑，它将宫廷礼制延伸至儒家祭祀体系，充分体现明清时期家国同构的核心礼制思想。',
+        image: 'img/c曲阜孔府大成殿.png'
+      },
+      {
+        time: '1850',
+        location: '台北延平郡王祠',
+        title: '台北延平郡王祠',
+        subtitle: '1850 · 延平郡王祠',
+        tag: '海峡传承',
+        desc: '1850年台北延平郡王祠建成完工，仿照明故宫中轴对称与三进院落格局，依次设置山门、仪门、正殿、后殿，东西两侧对称布置庑房与碑亭。正殿采用重檐歇山顶，完整保留明式装饰纹样，有力见证明故宫建筑文化跨越海峡、在台湾落地传承的重要历史进程。',
+        image: 'img/c台北延平郡王祠.png'
+      },
+      {
+        time: '1910',
+        location: '南京总统府',
+        title: '南京总统府',
+        subtitle: '1910 · 总统府',
+        tag: '近代沿用',
+        desc: '1910年南京总统府完成改建，基址位于明故宫西华门核心区域，保留五进院落与中轴线布局，三百米中轴线依次排布大门、仪门、大堂等核心建筑。虽融入部分西式建筑元素，但整体空间结构与规制逻辑未发生改变，是明故宫建筑范式在近代社会的重要延续与实用化改造。',
+        image: 'img/c南京总统府.png'
+      },
+      {
+        time: '1956',
+        location: '江苏文保',
+        title: '明故宫列入省文保',
+        subtitle: '1956 · 省级文保',
+        tag: '首次保护',
+        desc: '1956年明故宫遗址被列入江苏省首批省级文物保护单位，保护范围覆盖午朝门、西华门等核心遗迹区域，总面积达五十万平方米。文物部门开展首次系统考古勘察，完整记录大量建筑遗迹数据，标志明故宫从废弃遗址正式转为重要文化遗产，开启现代化科学保护的全新阶段。',
+        image: 'img/c省文保.png'
+      },
+      {
+        time: '2006',
+        location: '全国文保',
+        title: '明故宫升格国保',
+        subtitle: '2006 · 全国重点文保',
+        tag: '国家认可',
+        desc: '2006年明故宫遗址正式升格为全国重点文物保护单位，保护范围扩大至一百万平米，新增东华门、西安门等重要遗迹区域，确立其明清皇家建筑源头的核心历史地位。国家批复专项保护规划，保护工作走向专业化、系统化，其珍贵的历史文化价值获得国家层面正式认可。',
+        image: 'img/c古建筑保护.png'
+      }          
+    ];
+
+    const contentStage = document.getElementById('contentStage');
+    const timelineTrack = document.getElementById('timelineTrack');
+    const timelineWindow = document.getElementById('timelineWindow');
+
+    const ITEM_WIDTH = 220;
+    const VISIBLE_COUNT = 4;
+    let activeIndex = 0;
+    let previousIndex = null;
+
+    function createPanels() {
+      timelineData.forEach((item, index) => {
+        const panel = document.createElement('div');
+        panel.className = index === 0 ? 'panel active' : 'panel';
+        panel.dataset.index = index;
+        panel.innerHTML = `
+          <div class="image-box">
+            <img src="${item.image}" alt="${item.title}">
+            <div class="image-overlay"></div>
+          </div>
+          <div class="text-box">
+            
+            <h2>${item.title}</h2>
+            <div class="time-line">${item.subtitle}</div>
+            <p>${item.desc}</p>
+          </div>
+        `;
+        contentStage.appendChild(panel);
+      });
+    }
+
+    function createTimeline() {
+      timelineData.forEach((item, index) => {
+        const node = document.createElement('div');
+        node.className = index === 0 ? 'timeline-item active' : 'timeline-item';
+        node.dataset.index = index;
+        node.innerHTML = `
+          <div class="time-label ${index === 0 ? 'move-down' : ''}">${item.time}</div>
+          <div class="place-label">${item.location}</div>
+        `;
+        node.addEventListener('click', () => activateNode(index));
+        timelineTrack.appendChild(node);
+      });
+    }
+
+    function getStartIndex(index) {
+      if (index <= 1) return 0;
+      const maxStart = Math.max(0, timelineData.length - VISIBLE_COUNT);
+      return Math.min(index - 1, maxStart);
+    }
+
+    function updateTrackPosition() {
+      const startIndex = getStartIndex(activeIndex);
+      timelineTrack.style.transform = `translateX(${-startIndex * ITEM_WIDTH}px)`;
+    }
+
+    function updateActiveNode() {
+      const items = [...document.querySelectorAll('.timeline-item')];
+      items.forEach((item, idx) => {
+        const timeLabel = item.querySelector('.time-label');
+        item.classList.toggle('active', idx === activeIndex);
+        if (idx === activeIndex) {
+          timeLabel.classList.add('move-down');
+        } else {
+          timeLabel.classList.remove('move-down');
+        }
+      });
+    }
+
+    function switchPanel(nextIndex) {
+      const panels = [...document.querySelectorAll('.panel')];
+      const nextPanel = panels[nextIndex];
+      const currentPanel = panels[previousIndex];
+
+      if (currentPanel && currentPanel !== nextPanel) {
+        currentPanel.classList.remove('active');
+        currentPanel.classList.add('leaving');
+      }
+
+      nextPanel.classList.add('active');
+      nextPanel.classList.remove('leaving');
+
+      panels.forEach((panel, idx) => {
+        if (idx !== nextIndex && idx !== previousIndex) {
+          panel.classList.remove('active', 'leaving');
+        }
+      });
+
+      if (currentPanel) {
+        setTimeout(() => {
+          currentPanel.classList.remove('leaving');
+        }, 520);
+      }
+    }
+
+    function activateNode(index) {
+      if (index === activeIndex) return;
+      previousIndex = activeIndex;
+      activeIndex = index;
+      updateActiveNode();
+      updateTrackPosition();
+      switchPanel(index);
+    }
+
+    // 新增：点击空白区域实现左右回看
+    timelineWindow.addEventListener('click', (e) => {
+      // 如果点的是节点本身，不处理（节点已有 click）
+      if (e.target.closest('.timeline-item')) return;
+
+      const rect = timelineWindow.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const width = rect.width;
+
+      // 左侧区域：向前
+      if (x < width * 0.3) {
+        const newIndex = Math.max(0, activeIndex - 1);
+        activateNode(newIndex);
+      }
+
+      // 右侧区域：向后
+      else if (x > width * 0.7) {
+        const newIndex = Math.min(timelineData.length - 1, activeIndex + 1);
+        activateNode(newIndex);
+      }
+    });
+
+    function initTrackWidth() {
+      timelineTrack.style.width = `${timelineData.length * ITEM_WIDTH}px`;
+    }
+
+    createPanels();
+    createTimeline();
+    initTrackWidth();
+    updateTrackPosition();
+
+    window.addEventListener('resize', updateTrackPosition);
+  </script>
+</body>
+</html>

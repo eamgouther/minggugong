@@ -1,0 +1,1629 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>文物展示网页</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "agency fb", "隶书", sans-serif;
+    }
+
+    :root {
+      --brown: #7a3e1d;
+      --brown-deep: #5d2f16;
+      --brown-light: #aa5500;
+      --cream: rgba(255, 248, 239, 0.92);
+      --card-shadow: 0 12px 28px rgba(76, 44, 20, 0.12);
+      --border: 1px solid rgba(122, 62, 29, 0.16);
+    }
+
+    body {
+      background-image: url("img/a明故宫内页6.png");
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      color: #3b2f2f;
+      height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .page {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 28px;
+    }
+
+    .header {
+      margin-bottom: 24px;
+      text-align: center;
+    }
+
+    .header h1 {
+      letter-spacing: 3px;
+      color: var(--brown);
+      font-size: 80px;
+      font-weight: 400;
+      margin-bottom: 1px;
+      font-family: "agency fb", "隶书";
+    }
+
+    .main {
+      margin-bottom: 100px;
+      display: flex;
+      gap: 4px;
+      align-items: flex-start;
+    }
+
+    .left-panel {
+      margin-top: -30px;
+      width: 60%;
+      border-radius: 24px;
+      padding: 24px;
+    }
+
+    .post-card {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .arrow-btn {
+      width: 42px;
+      height: 42px;
+      border: none;
+      border-radius: 50%;
+      background: #fff4e6;
+      color: var(--brown);
+      font-size: 20px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    .arrow-btn:hover {
+      transform: translateY(-1px);
+      background: #fde7cb;
+    }
+
+    .artifact-copy {
+      width: 102%;
+      padding: 20px;
+      line-height: 1.9;
+      font-size: 17px;
+      height: 120px;
+    }
+
+    .artifact-image-wrap {
+      border-radius: 22px;
+      background: #f7ecda;
+      border: 1px solid #eadcc8;
+      width: 60%;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .artifact-image-wrap img {
+      width: 100%;
+      height: 300px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 16px 8px 4px;
+      font-size: 18px;
+      color: #765841;
+    }
+
+    .action-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: transparent;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+      color: #765841;
+      transition: transform 0.2s ease, color 0.2s ease;
+    }
+
+    .action-btn:hover {
+      transform: translateY(-1px);
+      color: #8d4d22;
+    }
+
+    .heart {
+      font-size: 24px;
+      color: #ffffff;
+      text-shadow:
+        -1px -1px 0 #9b6c53,
+         1px -1px 0 #9b6c53,
+        -1px  1px 0 #9b6c53,
+         1px  1px 0 #9b6c53;
+      transition: color 0.2s ease, text-shadow 0.2s ease;
+    }
+
+    .heart.liked {
+      color: #e63946;
+      text-shadow: none;
+    }
+
+    .divider {
+      color: #c6ab90;
+    }
+
+    .comment-box {
+      display: block;
+      margin-top: 6px;
+      background: #fff8ef;
+      border-left: 4px solid #c48346;
+      padding: 14px 16px;
+      border-radius: 14px;
+      color: #6e4b34;
+      min-height: 96px;
+    }
+
+    .comment-empty {
+      color: #9b7e64;
+      font-size: 15px;
+    }
+
+    .comment-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px dashed #eadcc8;
+    }
+
+    .comment-item:last-child {
+      border-bottom: none;
+    }
+
+    .comment-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      object-fit: cover;
+    }
+
+    .comment-content {
+      flex: 1;
+    }
+
+    .comment-name {
+      font-size: 14px;
+      color: #8b5c3a;
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+
+    .comment-text {
+      line-height: 1.7;
+      font-size: 15px;
+    }
+
+    .comment-input-row {
+      display: flex;
+      margin-top: 10px;
+      gap: 10px;
+    }
+
+    .comment-input-row input {
+      flex: 1;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid #d8c2aa;
+      outline: none;
+      font-size: 14px;
+      background: #fffdf9;
+    }
+
+    .send-btn {
+      padding: 10px 16px;
+      border: none;
+      border-radius: 10px;
+      background: var(--brown);
+      color: #fff;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .right-panel {
+      margin-top: -40px;
+      width: 50%;
+      color: var(--brown-light);
+      border-radius: 24px;
+      padding: 22px 50px 30px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: stretch;
+      position: relative;
+    }
+
+    .interactive-card {
+      background: var(--cream);
+      border: var(--border);
+      border-radius: 24px;
+      box-shadow: var(--card-shadow);
+      padding: 12px;
+      backdrop-filter: blur(4px);
+    }
+
+    .panel-title {
+      font-size: 28px;
+      color: var(--brown);
+      margin-bottom: 1px;
+      text-align: center;
+    }
+
+    .panel-desc {
+      text-align: center;
+      line-height: 1.8;
+      color: #8a5a39;
+      font-size: 15px;
+      margin-bottom: 5px;
+    }
+
+    /* 明信片 + 盲盒模块 */
+    .creation-switch {
+      position: absolute;
+      top: 50%;
+      right: -110px;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      justify-content: center;
+      align-items: stretch;
+      z-index: 5;
+    }
+    
+    .creation-switch .mode-btn {
+      min-width: 96px;
+      padding: 12px 14px;
+      writing-mode: horizontal-tb;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .mode-btn,
+    .secondary-btn,
+    .primary-btn {
+      border: none;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .mode-btn {
+      background: #f6e3cf;
+      color: var(--brown);
+      border: 1px solid #d5b28e;
+      padding: 10px 18px;
+      font-size: 15px;
+    }
+
+    .mode-btn.active,
+    .mode-btn:hover {
+      background: var(--brown);
+      color: #fff;
+    }
+
+    .creation-view {
+      display: none;
+    }
+
+    .creation-view.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .postcard-layout {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .postcard-canvas-wrap {
+      background: #f7ecda;
+      border-radius: 18px;
+      padding: 12px;
+      border: 1px solid #eadcc8;
+    }
+
+    .postcard-canvas {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 3 / 2;
+      overflow: hidden;
+      border-radius: 14px;
+      border: 1px dashed #c8a882;
+      background: #fff;
+    }
+
+    .postcard-template {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      user-select: none;
+      pointer-events: none;
+    }
+
+    .postcard-text {
+      position: absolute;
+      right: 10px;
+      bottom: 120px;
+      width: 45%;
+      min-height: 82px;
+      border: 1px dashed rgba(122, 62, 29, 0.4);
+      border-radius: 12px;
+      background: rgba(255,255,255,0.68);
+      padding: 10px 12px;
+      resize: none;
+      outline: none;
+      color: #5c3920;
+      font-size: 16px;
+      line-height: 1.6;
+      font-family: "KaiTi", "STKaiti", serif;
+      overflow: hidden;
+    }
+
+    .sticker-item {
+      position: absolute;
+      width: 96px;
+      cursor: move;
+      user-select: none;
+      touch-action: none;
+    }
+
+    .sticker-item img {
+      width: 100%;
+      height: auto;
+      display: block;
+      pointer-events: none;
+    }
+	
+	.sticker-resize-handle {
+	  position: absolute;
+	  right: -8px;
+	  bottom: -8px;
+	  width: 18px;
+	  height: 18px;
+	  border-radius: 50%;
+	  background: var(--brown);
+	  border: 2px solid #fff;
+	  box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+	  cursor: nwse-resize;
+	  z-index: 2;
+	  display: none;
+	}
+	
+	.sticker-item.active .sticker-resize-handle {
+	  display: block;
+	}
+	
+	/* 导出明信片时，强制隐藏所有编辑控件 */
+	.postcard-canvas.exporting .sticker-resize-handle {
+	  display: none !important;
+	}
+	
+	.postcard-canvas.exporting .sticker-item {
+	  outline: none !important;
+	}
+	
+	.sticker-resize-handle::before {
+	  content: "";
+	  position: absolute;
+	  inset: 4px;
+	  border-right: 2px solid #fff;
+	  border-bottom: 2px solid #fff;
+	}
+
+    .sticker-item.active {
+      outline: 2px dashed rgba(122, 62, 29, 0.55);
+      outline-offset: 4px;
+      border-radius: 6px;
+    }
+
+    .palette-panel {
+      background: #fff8ef;
+      border-radius: 16px;
+      border: 1px solid #ead9c6;
+      padding: 12px;
+    }
+
+    .palette-title {
+      font-size: 17px;
+      color: var(--brown);
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    .sticker-palette {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .palette-sticker {
+      background: #fff;
+      border: 1px solid #ecd9bf;
+      border-radius: 12px;
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: grab;
+      padding: 8px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .palette-sticker:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(92, 55, 27, 0.12);
+    }
+
+    .palette-sticker img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .postcard-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 4px;
+    }
+
+    .primary-btn {
+      background: var(--brown);
+      color: #fff;
+      padding: 12px 22px;
+      font-size: 15px;
+      box-shadow: 0 8px 18px rgba(122, 62, 29, 0.18);
+    }
+
+    .primary-btn:hover {
+      transform: translateY(-2px);
+      background: var(--brown-deep);
+    }
+
+    .secondary-btn {
+      background: #fff2dc;
+      color: var(--brown);
+      border: 1px solid #e1c39e;
+      padding: 12px 22px;
+      font-size: 15px;
+    }
+
+    .secondary-btn:hover {
+      transform: translateY(-2px);
+      background: #fde7cb;
+    }
+
+    /* 盲盒 */
+    .blindbox-title {
+      font-size: 28px;
+      margin-bottom: 12px;
+      text-align: center;
+      color: var(--brown);
+    }
+
+    .blindbox-desc {
+      text-align: center;
+      line-height: 1.8;
+      margin-bottom: 5px;
+      color: #aa5500;
+    }
+
+    .machine {
+      width: 260px;
+      height: 340px;
+      background: linear-gradient(180deg, #fcefd7, #dfb07c);
+      border-radius: 28px;
+      border: 8px solid #f6d2a9;
+      position: relative;
+      box-shadow: inset 0 0 0 4px #c27d44, 0 16px 28px rgba(0,0,0,0.2);
+      margin: 0 auto 15px;
+      transform-origin: center bottom;
+    }
+
+    .machine.shaking {
+      animation: shake 0.8s ease-in-out;
+    }
+
+    .machine-top {
+      width: 170px;
+      height: 110px;
+      border-radius: 90px 90px 24px 24px;
+      background: rgba(255,255,255,0.45);
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 5px solid rgba(255,255,255,0.65);
+      overflow: hidden;
+    }
+
+    .capsules {
+      position: absolute;
+      inset: 12px;
+    }
+
+    .capsule {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      position: absolute;
+      box-shadow: inset -5px -5px 0 rgba(0,0,0,0.08);
+    }
+
+    .capsule:nth-child(1) { top: 18px; left: 20px; background: #f9a826; }
+    .capsule:nth-child(2) { top: 24px; right: 18px; background: #ef476f; }
+    .capsule:nth-child(3) { bottom: 18px; left: 38px; background: #06d6a0; }
+    .capsule:nth-child(4) { bottom: 20px; right: 34px; background: #118ab2; }
+    .capsule:nth-child(5) { top: 40px; left: 78px; background: #ffd166; }
+
+    .slot {
+      width: 90px;
+      height: 18px;
+      background: #7a3e1d;
+      border-radius: 10px;
+      position: absolute;
+      bottom: 78px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .handle-box {
+      position: absolute;
+      right: 18px;
+      top: 140px;
+      width: 18px;
+      height: 90px;
+      background: #f3c89a;
+      border-radius: 12px;
+    }
+
+    .draw-btn {
+      display: block;
+      margin: 0 auto;
+      background: #fff2dc;
+      color: var(--brown);
+      border: none;
+      border-radius: 999px;
+      padding: 14px 28px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.12);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .draw-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 24px rgba(0,0,0,0.16);
+    }
+
+    .draw-btn:disabled {
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+
+    .module-jump {
+      display: flex;
+      justify-content: center;
+      margin-top: 16px;
+    }
+	
+	.collection-panel {
+	  margin-top: 10px;
+	  background: #fff8ef;
+	  border: 1px solid #ead9c6;
+	  border-radius: 18px;
+	  padding: 16px 14px;
+	}
+	
+	.collection-title {
+	  text-align: center;
+	  font-size: 18px;
+	  color: var(--brown);
+	  margin-bottom: 12px;
+	}
+	
+	.collection-grid {
+	  display: grid;
+	  grid-template-columns: repeat(4, 1fr);
+	  gap: 12px;
+	}
+	
+	.collection-slot {
+	  aspect-ratio: 1 / 1;
+	  border-radius: 14px;
+	  border: 1px dashed #d9b893;
+	  background: rgba(255,255,255,0.72);
+	  display: flex;
+	  align-items: center;
+	  justify-content: center;
+	  overflow: hidden;
+	  position: relative;
+	  transition: all 0.25s ease;
+	}
+	
+	.collection-slot img {
+	  width: 78%;
+	  height: 78%;
+	  object-fit: contain;
+	  opacity: 0.2;
+	  filter: grayscale(1);
+	  transition: all 0.25s ease;
+	}
+	
+	.collection-slot.collected {
+	  background: #fff3df;
+	  border-style: solid;
+	  border-color: #c48346;
+	  box-shadow: 0 8px 18px rgba(122, 62, 29, 0.12);
+	}
+	
+	.collection-slot.collected img {
+	  opacity: 1;
+	  filter: grayscale(0);
+	}
+	
+	.collection-slot::after {
+	  content: "未收集";
+	  position: absolute;
+	  bottom: 6px;
+	  left: 50%;
+	  transform: translateX(-50%);
+	  font-size: 12px;
+	  color: #9b7e64;
+	  white-space: nowrap;
+	}
+	
+	.collection-slot.collected::after {
+	  content: "已收集";
+	  color: #8b3f19;
+	}
+
+    /* 模态框 */
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 99;
+    }
+
+    .modal.show {
+      display: flex;
+      animation: fadeIn 0.25s ease;
+    }
+
+    .modal-content {
+      width: min(460px, 100%);
+      background: #fffaf4;
+      border-radius: 24px;
+      padding: 30px 28px;
+      text-align: center;
+      box-shadow: 0 24px 48px rgba(0,0,0,0.2);
+      border: 1px solid #efdcc6;
+    }
+
+    .modal-content h3 {
+      font-size: 28px;
+      color: #8b3f19;
+      margin-bottom: 14px;
+    }
+
+    .modal-content p {
+      font-size: 18px;
+      line-height: 1.8;
+      color: #5e4433;
+      margin-bottom: 20px;
+    }
+
+    .close-btn {
+      background: #8b3f19;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    /* 返回首页按钮 */
+    /* ========== 新增：返回首页按钮样式 ========== */
+        .back-home-btn {
+          position: absolute;
+          top: 40px;
+          left: 120px;
+          z-index: 999; /* 确保按钮在最上层 */
+          width: 180px;
+          height: 60px;
+          border: none;
+          /* border-radius: 8px; */
+          cursor: pointer;
+          /* 核心：背景图片与文字分层 */
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 20px;
+          font-weight: bold;
+          color: #733900;
+          text-decoration: none; /* 去掉a标签默认下划线 */
+          overflow: hidden;
+        }
+    
+        /* 背景图层（单独用于旋转） */
+        .btn-bg {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: url("img/017.png") no-repeat center center; /* 替换为你的按钮背景图 */
+          background-size: cover;
+         
+          z-index: 1; /* 背景在文字下方 */
+        }
+
+    .images-layer {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .layer-image {
+      position: absolute;
+      pointer-events: auto;
+      width: 40px;
+      height: auto;
+      opacity: 1;
+      transition: all 0.3s ease;
+    }
+
+    .img-1 {
+      top: 18%;
+      left: 5%;
+      z-index: 3;
+    }
+
+    @keyframes shake {
+      0% { transform: rotate(0deg); }
+      20% { transform: rotate(-3deg); }
+      40% { transform: rotate(3deg); }
+      60% { transform: rotate(-2deg); }
+      80% { transform: rotate(2deg); }
+      100% { transform: rotate(0deg); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 1180px) {
+      .main {
+        flex-direction: column;
+      }
+
+      .left-panel,
+      .right-panel {
+        width: 100%;
+      }
+
+      .artifact-image-wrap img {
+        height: 380px;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .header h1 {
+        font-size: 48px;
+      }
+
+      .artifact-image-wrap {
+        width: 100%;
+      }
+
+      .sticker-palette {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .postcard-text {
+        width: calc(100% - 40px);
+      }
+
+      .back-home-btn {
+        width: 88px;
+        height: 88px;
+        right: 16px;
+        top: 20px;
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="images-layer">
+    <img src="img/头像3.png" alt="装饰图片1" class="layer-image img-1">
+  </div>
+
+  <a href="导航.html" class="back-home-btn">
+    <div class="btn-bg"></div>
+    <span class="btn-text">返回首页</span>
+  </a>
+
+  <div class="page">
+    <header class="header">
+      <h1>古物证史—笺寄风华</h1>
+    </header>
+
+    <main class="main">
+      <!-- 左侧保持原交互不变 -->
+      <section class="left-panel">
+        <div class="post-card">
+          <div class="artifact-copy" id="artifactText"></div>
+
+          <div class="artifact-image-wrap">
+            <button class="arrow-btn" id="prev" style="position:absolute;left:-60px;top:50%;transform:translateY(-50%)">⬅</button>
+            <img id="artifactImg" alt="文物展示图" />
+            <button class="arrow-btn" id="next" style="position:absolute;right:-60px;top:50%;transform:translateY(-50%)">➡</button>
+          </div>
+
+          <div class="toolbar">
+            <button class="action-btn" id="likeBtn" type="button">
+              <span class="heart" id="heartIcon">❤</span>
+              <span>点赞</span>
+            </button>
+            <span class="divider">|</span>
+            <button class="action-btn" id="commentBtn" type="button">
+              <span>💬</span>
+              <span>评论</span>
+            </button>
+          </div>
+
+          <div class="comment-box" id="commentBox">
+            <div class="comment-empty">点击“评论”可随机查看该文物的趣味评论，也可以发布自己的评论。</div>
+          </div>
+
+          <div class="comment-input-row">
+            <input id="commentInput" placeholder="写评论..." />
+            <button class="send-btn" id="sendBtn" type="button">发布</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 右侧改为：明信片 / 盲盒 -->
+      <aside class="right-panel">
+        <section class="interactive-card">
+           <div class="creation-switch">
+              <button class="mode-btn active" id="postcardModeBtn" type="button">明信片制作</button>
+              <button class="mode-btn" id="blindboxModeBtn" type="button">盲盒体验</button>
+            </div>
+          
+            <div class="creation-view active" id="postcardView">
+            <h2 class="panel-title">明信片制作</h2>
+            <p class="panel-desc">
+              点击图案自由装饰，可输入留念文字；完成后点击保存按钮，即可导出为图片。
+            </p>
+
+            <div class="postcard-layout">
+              <div class="postcard-canvas-wrap">
+                <div class="postcard-canvas" id="postcardCanvas">
+                  <!-- 这里替换成你提供的明信片模板 -->
+                  <img class="postcard-template" id="postcardTemplate" src="img/postcard-template.png" alt="明信片模板">
+                  <textarea
+                    id="postcardText"
+                    class="postcard-text"
+                    placeholder="在这里输入你的祝福或纪念文字..."
+                  ></textarea>
+                </div>
+              </div>
+
+              <div class="palette-panel">
+                <div class="palette-title">可拖拽纹样素材</div>
+                <div class="sticker-palette" id="stickerPalette"></div>
+              </div>
+
+              <div class="postcard-actions">
+                <button class="secondary-btn" id="changeTemplateBtn" type="button">切换明信片模板</button>
+                <button class="secondary-btn" id="clearPostcardBtn" type="button">清空装饰</button>
+                <button class="primary-btn" id="savePostcardBtn" type="button">保存明信片</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="creation-view" id="blindboxView">
+            <h2 class="blindbox-title">宫廷文创盲盒机</h2>
+            <p class="blindbox-desc">
+              点击按钮摇动盲盒机，
+              随机解锁一份与你的文物之旅相配的明风文创。
+            </p>
+
+            <div class="machine" id="machine">
+              <div class="machine-top">
+                <div class="capsules">
+                  <span class="capsule"></span>
+                  <span class="capsule"></span>
+                  <span class="capsule"></span>
+                  <span class="capsule"></span>
+                  <span class="capsule"></span>
+                </div>
+              </div>
+              <div class="handle-box"></div>
+              <div class="slot"></div>
+            </div>
+
+            <button class="draw-btn" id="drawBtn" type="button">点击抽取文创盲盒</button>
+			<div class="collection-panel">
+			  <div class="collection-title">文创收集进度</div>
+			  <div class="collection-grid" id="collectionGrid">
+			    <div class="collection-slot" data-reward="明白玉卧兽镇纸">
+			      <img src="img/文创1.png" alt="明白玉卧兽镇纸">
+			    </div>
+			    <div class="collection-slot" data-reward="玉组配挂件">
+			      <img src="img/文创2.png" alt="玉组配挂件">
+			    </div>
+			    <div class="collection-slot" data-reward="荡寇将军印摆件">
+			      <img src="img/文创3.png" alt="荡寇将军印摆件">
+			    </div>
+			    <div class="collection-slot" data-reward="黄釉龙纹滴水徽章">
+			      <img src="img/文创4.png" alt="黄釉龙纹滴水徽章">
+			    </div>
+			  </div>
+			</div>
+          </div>
+        </section>
+      </aside>
+    </main>
+  </div>
+
+  <div class="modal" id="modal">
+    <div class="modal-content">
+      <h3>🎉 恭喜你！</h3>
+      <img id="rewardImg" style="width:120px;height:120px;object-fit:cover;margin-bottom:10px;border-radius:12px" />
+      <p id="rewardText">你获得了：宫廷纹样书签</p>
+      <button class="close-btn" id="closeBtn" type="button">我知道啦</button>
+    </div>
+  </div>
+
+  <!-- 保存明信片为图片依赖 -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+  <script>
+    // ========== 左侧原有功能 ==========
+    const likeBtn = document.getElementById('likeBtn');
+    const heartIcon = document.getElementById('heartIcon');
+    const commentBtn = document.getElementById('commentBtn');
+    const commentBox = document.getElementById('commentBox');
+    const drawBtn = document.getElementById('drawBtn');
+    const machine = document.getElementById('machine');
+    const modal = document.getElementById('modal');
+    const rewardText = document.getElementById('rewardText');
+    const rewardImg = document.getElementById('rewardImg');
+    const closeBtn = document.getElementById('closeBtn');
+
+    const artifactText = document.getElementById('artifactText');
+    const artifactImg = document.getElementById('artifactImg');
+    const prev = document.getElementById('prev');
+    const next = document.getElementById('next');
+
+    const commentInput = document.getElementById('commentInput');
+    const sendBtn = document.getElementById('sendBtn');
+
+    let liked = false;
+    let current = 0;
+
+    const artifacts = [
+      {
+        name: '明黄釉龙纹滴水',
+        text: '【明黄釉龙纹滴水】 明洪武黄釉龙纹滴水瓦，南京明故宫遗址出土，现藏南京博物院。黄釉为明代皇家专属，高浮雕五爪龙纹矫健灵动，是明初皇城建筑规制与工艺水准的直接见证，承载着明故宫作为明初都城的皇家气象。',
+        img: 'img/文物1.png',
+        comments: [
+          '明故宫考古队：明故宫皇城建筑的核心构件，洪武官窑琉璃的标准器！',
+          '南京博物院藏：明初皇家建筑等级制度的实物标本，龙纹雕刻堪称典范～',
+          '古建筑研究员：黄釉龙纹彰显帝王专属，是明故宫作为明初都城的建筑名片！'
+        ],
+        userComments: []
+      },
+      {
+        name: '明赏赐梅瓶',
+        text: '【明赏赐梅瓶】明洪武白釉“赏赐”梅瓶，1995年南京明故宫社稷坛遗址古井出土，现藏南京博物院。肩部铁红楷书“赏赐”二字，是明初朱元璋开国时赏赐功臣的官窑重器，既是盛酒、插花的日常用器，也是等级身份的象征。',
+        img: 'img/文物2.png',
+        comments: [
+          '明故宫考古队：明故宫遗址出土的一级文物，洪武官窑孤品！',
+          '南京博物院藏：明初赏赐制度的实物铁证，太珍贵了！',
+          '明史研究员：白釉素雅却藏着帝王威严，明故宫的镇馆级宝贝！'
+        ],
+        userComments: []
+      },
+      {
+        name: '明洪武绿釉龙纹瓦当',
+        text: '【明绿釉龙纹瓦当】 明洪武绿釉龙纹瓦当，南京明故宫遗址出土，现藏南京博物院。绿釉莹润，高浮雕龙纹栩栩如生，是明代皇家建筑琉璃构件的精品，见证了明故宫作为明初都城的建筑规制与工艺。',
+        img: 'img/文物3.png',
+        comments: [
+          '明故宫考古队：明故宫皇城建筑的核心构件，洪武官窑绿釉琉璃的标准器！',
+          '南京博物院藏：明初皇家建筑琉璃工艺的典范，龙纹雕刻极具艺术价值～',
+          '古建筑研究员：绿釉龙纹彰显皇家威仪，是明故宫建筑美学的实物见证！'
+        ],
+        userComments: []
+      },
+      {
+		  name: '明洪武青花云纹暗刻龙纹盘',
+		  text: '【明青花云纹暗刻龙盘】 明洪武青花云纹暗刻龙纹盘，南京明故宫遗址出土残片，同类标本现藏故宫博物馆。青花晕染自然，盘壁暗刻龙纹隐现，是洪武官窑 “青花 + 暗刻” 工艺的创新之作，体现了明初皇家瓷器的审美与工艺。',
+		  img: 'img/文物8.png',
+		  comments: [
+		    '明故宫考古队：明故宫遗址出土的洪武官窑精品，青花暗刻工艺的典范！',
+		    '南京博物院藏：明初青花瓷器的代表性器物，暗刻龙纹尽显皇家气派～',
+		    '陶瓷研究员：青花云纹雅致灵动，暗刻龙纹暗藏威仪，洪武官窑的匠心之作！'
+		  ],
+		  userComments: []
+      },
+      {
+        name: '明洪武白釉红彩龙纹盘',
+        text: '【明白釉红彩龙纹盘】 明洪武白釉红彩龙纹盘，南京明故宫遗址出土残片，现藏南京博物院。白釉莹润，红彩龙纹矫健，五爪龙纹彰显皇家御用身份，是洪武官窑瓷器的典型代表，填补了明初官窑瓷器的研究空白。',
+        img: 'img/文物5.png',
+        comments: [
+          '明故宫考古队：明故宫遗址出土的洪武官窑重器，明初御窑瓷器的标准器！',
+          '南京博物院藏：洪武官窑红彩龙纹的传世孤品，明初瓷器工艺的巅峰之作～',
+          '陶瓷爱好者：白釉红彩承元启明，是明故宫出土的明代官窑瓷器标杆！'
+        ],
+        userComments: []
+      },
+      {
+        name: '明崇祯 “荡寇将军印” 银印',
+        text: '【明荡寇将军银印】 明崇祯十六年 “荡寇将军印” 银印，南京明故宫玉带河遗址出土，现藏南京博物院。虎钮造型威严，印台刻款清晰，是明末军事制度与皇权信物的珍贵遗存，见证了明王朝末年的历史风云。',
+        img: 'img/文物6.png',
+        comments: [
+          '明故宫考古队：明故宫遗址出土的一级文物，明末军事史的核心物证！',
+          '南京博物院藏：明代将军印制度的实物铁证，印文镌刻极具史料价值～',
+          '明史研究员：虎钮银印承载明末军政风云，是明故宫出土的重量级官印瑰宝！'
+        ],
+        userComments: []
+      },
+      {
+        name: '大明通行宝钞壹贯铜印版',
+        text: '【明宝钞铜印版】 明代 “大明通行宝钞” 壹贯铜印版，南京明故宫遗址出土，现藏中国国家博物馆。印版雕刻精细，龙纹边框繁复精美，是明代纸币制度与印刷工艺的实物见证，承载着明初的经济制度与社会风貌。',
+        img: 'img/文物7.png',
+        comments: [
+          '明故宫考古队：明故宫遗址出土的明代金融史核心文物，宝钞制度的实物铁证！',
+          '南京博物院藏：明代纸币印刷工艺的巅峰之作，明初经济制度的珍贵遗存～',
+          '经济史研究员：铜版镌刻尽显明初工艺水准，是明代货币制度的活化石！'
+        ],
+        userComments: []
+      },
+      {
+        name: '明洪武釉里红松竹梅纹玉壶春瓶',
+        text: '【明洪武釉里红松竹梅纹玉壶春瓶】宫廷御用瓷器，现藏故宫博物院。瓶身绘松、竹、梅“岁寒三友”，釉里红发色纯正，是明初釉里红工艺的巅峰之作，兼具陈设与实用价值。',
+        img: 'img/文物4.png',
+        comments: [
+          '文房御物：洪武朝宫廷文房标准器，文人风骨拉满！',
+          '御窑记事：釉里红为明初官窑高档品种，非民间可使用！',
+          '书法爱好者：用它插花，书房氛围感直接拉满，太有格调了！'
+        ],
+        userComments: []
+      },
+      {
+        name: '明白玉卧兽镇纸',
+        text: '【明白玉卧兽镇纸】和田白玉质，玉质温润细腻，雕工简练传神，卧兽造型憨态可掬。置于案头既可压纸，又是精致文房陈设雅玩，是明代内廷御用工匠的经典之作。',
+        img: 'img/文物9.png',
+        comments: [
+          '宫廷玉器录：内廷御用文房镇纸，玉料上乘，工艺精湛！',
+          '明宫造办处：皇家书房专属，案头必备“颜值担当”。',
+          '古风设计师：小巧精致，放在桌上太治愈了，文气瞬间拉满！'
+        ],
+        userComments: []
+      }
+    ];
+
+    function getCurrentArtifact() {
+      return artifacts[current];
+    }
+
+    function clearCommentsDisplay() {
+      commentBox.innerHTML = '<div class="comment-empty">点击“评论”可随机查看该文物的趣味评论，也可以发布自己的评论。</div>';
+    }
+
+    function createCommentElement(name, text, avatarUrl) {
+      const item = document.createElement('div');
+      item.className = 'comment-item';
+
+      const avatar = document.createElement('img');
+      avatar.className = 'comment-avatar';
+      avatar.src = avatarUrl;
+      avatar.alt = name;
+
+      const content = document.createElement('div');
+      content.className = 'comment-content';
+
+      const title = document.createElement('div');
+      title.className = 'comment-name';
+      title.textContent = name;
+
+      const body = document.createElement('div');
+      body.className = 'comment-text';
+      body.textContent = text;
+
+      content.appendChild(title);
+      content.appendChild(body);
+      item.appendChild(avatar);
+      item.appendChild(content);
+
+      return item;
+    }
+
+    function renderComments() {
+      const artifact = getCurrentArtifact();
+      const officialComments = artifact.officialShownComments || [];
+      const userComments = artifact.userComments || [];
+      commentBox.innerHTML = '';
+
+      const allComments = [...officialComments, ...userComments];
+      if (allComments.length === 0) {
+        clearCommentsDisplay();
+        return;
+      }
+
+      allComments.forEach((comment) => {
+        const el = createCommentElement(comment.name, comment.text, comment.avatar);
+        commentBox.appendChild(el);
+      });
+    }
+
+    function renderArtifact() {
+      const artifact = getCurrentArtifact();
+      artifactText.innerText = artifact.text;
+      artifactImg.src = artifact.img;
+      artifactImg.alt = artifact.name;
+
+      liked = false;
+      heartIcon.classList.remove('liked');
+      clearCommentsDisplay();
+      commentInput.value = '';
+    }
+
+    function addOfficialComment() {
+      const artifact = getCurrentArtifact();
+      if (!artifact.officialShownComments) {
+        artifact.officialShownComments = [];
+      }
+
+      const randomIndex = Math.floor(Math.random() * artifact.comments.length);
+      const text = artifact.comments[randomIndex];
+
+      artifact.officialShownComments.push({
+        name: '趣味评论',
+        text,
+        avatar: 'img/头像1.png'
+      });
+
+      renderComments();
+    }
+
+    function addUserComment(text) {
+      const artifact = getCurrentArtifact();
+      artifact.userComments.push({
+        name: '游客2333',
+        text,
+        avatar: 'img/头像2.png'
+      });
+      renderComments();
+    }
+
+    prev.addEventListener('click', () => {
+      current = (current - 1 + artifacts.length) % artifacts.length;
+      renderArtifact();
+    });
+
+    next.addEventListener('click', () => {
+      current = (current + 1) % artifacts.length;
+      renderArtifact();
+    });
+
+    likeBtn.addEventListener('click', () => {
+      liked = !liked;
+      heartIcon.classList.toggle('liked', liked);
+    });
+
+    commentBtn.addEventListener('click', () => {
+      addOfficialComment();
+    });
+
+    sendBtn.addEventListener('click', () => {
+      const text = commentInput.value.trim();
+      if (!text) return;
+      addUserComment(text);
+      commentInput.value = '';
+    });
+
+    commentInput.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        sendBtn.click();
+      }
+    });
+
+    // ========== 右下：明信片 / 盲盒切换 ==========
+    const postcardModeBtn = document.getElementById('postcardModeBtn');
+    const blindboxModeBtn = document.getElementById('blindboxModeBtn');
+    const postcardView = document.getElementById('postcardView');
+    const blindboxView = document.getElementById('blindboxView');
+    
+
+    function switchCreationMode(mode) {
+      const isPostcard = mode === 'postcard';
+      postcardView.classList.toggle('active', isPostcard);
+      blindboxView.classList.toggle('active', !isPostcard);
+      postcardModeBtn.classList.toggle('active', isPostcard);
+      blindboxModeBtn.classList.toggle('active', !isPostcard);
+    }
+
+    postcardModeBtn.addEventListener('click', () => switchCreationMode('postcard'));
+    blindboxModeBtn.addEventListener('click', () => switchCreationMode('blindbox'));
+    
+
+    // ========== 明信片拖拽装饰 ==========
+    const stickerPalette = document.getElementById('stickerPalette');
+    const postcardCanvas = document.getElementById('postcardCanvas');
+    const postcardText = document.getElementById('postcardText');
+    const clearPostcardBtn = document.getElementById('clearPostcardBtn');
+    const savePostcardBtn = document.getElementById('savePostcardBtn');
+    const changeTemplateBtn = document.getElementById('changeTemplateBtn');
+    const postcardTemplate = document.getElementById('postcardTemplate');
+
+    const postcardTemplates = [
+      // 按你后续提供的图片顺序依次填写，点击按钮后会严格按照这里的顺序切换
+      'img/f明信片1.png',
+      'img/f明信片2.png',
+      'img/f明信片3.png'
+    ];
+
+    let currentTemplateIndex = 0;
+
+    function applyPostcardTemplate(index) {
+      if (!postcardTemplates.length) return;
+      currentTemplateIndex = ((index % postcardTemplates.length) + postcardTemplates.length) % postcardTemplates.length;
+      postcardTemplate.src = postcardTemplates[currentTemplateIndex];
+      postcardTemplate.alt = `明信片模板${currentTemplateIndex + 1}`;
+    }
+
+    function switchPostcardTemplate() {
+      applyPostcardTemplate(currentTemplateIndex + 1);
+    }
+
+    changeTemplateBtn.addEventListener('click', switchPostcardTemplate);
+
+    // 这里替换成你提供的文物纹样素材
+    const stickerAssets = [
+      'img/图案1.png',
+      'img/图案2.png',
+      'img/图案3.png',
+      'img/图案4.png'
+    ];
+
+    let stickerSeed = 0;
+    let activeSticker = null;
+    let dragOffsetX = 0;
+    let dragOffsetY = 0;
+
+    function renderStickerPalette() {
+      stickerPalette.innerHTML = '';
+      stickerAssets.forEach((src) => {
+        const item = document.createElement('div');
+        item.className = 'palette-sticker';
+        item.innerHTML = `<img src="${src}" alt="纹样素材">`;
+        item.addEventListener('click', () => addStickerToCanvas(src));
+        stickerPalette.appendChild(item);
+      });
+    }
+
+    function addStickerToCanvas(src) {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'sticker-item';
+      wrapper.style.left = `${20 + (stickerSeed % 4) * 26}px`;
+      wrapper.style.top = `${20 + (stickerSeed % 4) * 22}px`;
+      wrapper.style.width = '96px';
+      wrapper.dataset.id = `sticker-${Date.now()}-${stickerSeed++}`;
+      wrapper.innerHTML = `
+        <img src="${src}" alt="纹样装饰">
+        <span class="sticker-resize-handle"></span>
+      `;
+      postcardCanvas.appendChild(wrapper);
+      makeStickerInteractive(wrapper);
+      setActiveSticker(wrapper);
+    }
+
+    function setActiveSticker(sticker) {
+      document.querySelectorAll('.sticker-item').forEach(item => item.classList.remove('active'));
+      if (sticker) {
+        sticker.classList.add('active');
+      }
+      activeSticker = sticker;
+    }
+
+    function makeStickerInteractive(sticker) {
+      const resizeHandle = sticker.querySelector('.sticker-resize-handle');
+      let isResizing = false;
+      let startX = 0;
+      let startY = 0;
+      let startWidth = 0;
+      let startHeight = 0;
+      let aspectRatio = 1;
+    
+      sticker.addEventListener('pointerdown', (event) => {
+        if (event.target === resizeHandle) return;
+    
+        setActiveSticker(sticker);
+        const rect = sticker.getBoundingClientRect();
+        dragOffsetX = event.clientX - rect.left;
+        dragOffsetY = event.clientY - rect.top;
+        sticker.setPointerCapture(event.pointerId);
+    
+        const moveHandler = (moveEvent) => {
+          if (isResizing) return;
+    
+          const canvasRect = postcardCanvas.getBoundingClientRect();
+          let left = moveEvent.clientX - canvasRect.left - dragOffsetX;
+          let top = moveEvent.clientY - canvasRect.top - dragOffsetY;
+    
+          const maxLeft = postcardCanvas.clientWidth - sticker.offsetWidth;
+          const maxTop = postcardCanvas.clientHeight - sticker.offsetHeight;
+    
+          left = Math.max(0, Math.min(left, maxLeft));
+          top = Math.max(0, Math.min(top, maxTop));
+    
+          sticker.style.left = `${left}px`;
+          sticker.style.top = `${top}px`;
+        };
+    
+        const upHandler = () => {
+          window.removeEventListener('pointermove', moveHandler);
+          window.removeEventListener('pointerup', upHandler);
+        };
+    
+        window.addEventListener('pointermove', moveHandler);
+        window.addEventListener('pointerup', upHandler);
+      });
+    
+      resizeHandle.addEventListener('pointerdown', (event) => {
+        event.stopPropagation();
+        setActiveSticker(sticker);
+        isResizing = true;
+    
+        const rect = sticker.getBoundingClientRect();
+        startX = event.clientX;
+        startY = event.clientY;
+        startWidth = rect.width;
+        startHeight = rect.height;
+        aspectRatio = rect.width / rect.height;
+    
+        resizeHandle.setPointerCapture(event.pointerId);
+    
+        const resizeMoveHandler = (moveEvent) => {
+          const canvasRect = postcardCanvas.getBoundingClientRect();
+          const stickerLeft = parseFloat(sticker.style.left) || 0;
+          const stickerTop = parseFloat(sticker.style.top) || 0;
+    
+          let newWidth = startWidth + (moveEvent.clientX - startX);
+          newWidth = Math.max(40, newWidth);
+    
+          const maxWidth = postcardCanvas.clientWidth - stickerLeft;
+          const maxHeight = postcardCanvas.clientHeight - stickerTop;
+    
+          newWidth = Math.min(newWidth, maxWidth);
+          let newHeight = newWidth / aspectRatio;
+    
+          if (newHeight > maxHeight) {
+            newHeight = maxHeight;
+            newWidth = newHeight * aspectRatio;
+          }
+    
+          sticker.style.width = `${newWidth}px`;
+        };
+    
+        const resizeUpHandler = () => {
+          isResizing = false;
+          window.removeEventListener('pointermove', resizeMoveHandler);
+          window.removeEventListener('pointerup', resizeUpHandler);
+        };
+    
+        window.addEventListener('pointermove', resizeMoveHandler);
+        window.addEventListener('pointerup', resizeUpHandler);
+      });
+    
+      sticker.addEventListener('dblclick', () => {
+        sticker.remove();
+        activeSticker = null;
+      });
+    }
+
+    postcardCanvas.addEventListener('pointerdown', (event) => {
+      if (!event.target.closest('.sticker-item')) {
+        setActiveSticker(null);
+      }
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if ((event.key === 'Delete' || event.key === 'Backspace') && activeSticker) {
+        if (document.activeElement !== postcardText) {
+          activeSticker.remove();
+          activeSticker = null;
+        }
+      }
+    });
+
+    clearPostcardBtn.addEventListener('click', () => {
+      postcardCanvas.querySelectorAll('.sticker-item').forEach(item => item.remove());
+      postcardText.value = '';
+      activeSticker = null;
+    });
+
+    savePostcardBtn.addEventListener('click', async () => {
+      try {
+        const oldBorder = postcardText.style.border;
+        const oldBg = postcardText.style.background;
+        const oldOutline = postcardText.style.outline;
+        const oldPlaceholder = postcardText.getAttribute('placeholder');
+        const oldActiveSticker = activeSticker;
+    
+        postcardText.style.border = 'none';
+        postcardText.style.background = 'rgba(255,255,255,0.01)';
+        postcardText.style.outline = 'none';
+        postcardText.setAttribute('placeholder', '');
+    
+        document.querySelectorAll('.sticker-item').forEach(item => item.classList.remove('active'));
+        activeSticker = null;
+    
+        postcardCanvas.classList.add('exporting');
+    
+        const canvas = await html2canvas(postcardCanvas, {
+          backgroundColor: null,
+          useCORS: true,
+          scale: 2
+        });
+    
+        postcardCanvas.classList.remove('exporting');
+    
+        postcardText.style.border = oldBorder;
+        postcardText.style.background = oldBg;
+        postcardText.style.outline = oldOutline;
+        postcardText.setAttribute('placeholder', oldPlaceholder);
+    
+        if (oldActiveSticker && document.body.contains(oldActiveSticker)) {
+          oldActiveSticker.classList.add('active');
+          activeSticker = oldActiveSticker;
+        }
+    
+        const link = document.createElement('a');
+        link.download = `明故宫明信片-${Date.now()}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      } catch (error) {
+        postcardCanvas.classList.remove('exporting');
+        console.error(error);
+        alert('保存失败，请检查图片路径是否可访问，或确认 html2canvas 已成功加载。');
+      }
+    });
+
+    // ========== 盲盒逻辑 ==========
+    const rewards = [
+      { name:'明白玉卧兽镇纸', img:'img/文创1.png' },
+      { name:'玉组配挂件', img:'img/文创2.png' },
+      { name:'荡寇将军印摆件', img:'img/文创3.png' },
+      { name:'黄釉龙纹滴水徽章', img:'img/文创4.png' }
+    ];
+	
+	const collectionSlots = document.querySelectorAll('.collection-slot');
+	const collectedRewards = new Set();
+	let hasShownCollectionComplete = false;
+	
+	function updateCollectionUI() {
+	  collectionSlots.forEach(slot => {
+	    const rewardName = slot.dataset.reward;
+	    slot.classList.toggle('collected', collectedRewards.has(rewardName));
+	  });
+	}
+	
+	function collectReward(reward) {
+	  collectedRewards.add(reward.name);
+	  updateCollectionUI();
+	
+	  if (collectedRewards.size === rewards.length && !hasShownCollectionComplete) {
+	    hasShownCollectionComplete = true;
+	
+	    setTimeout(() => {
+	      rewardText.textContent = '恭喜用户集齐全部 4 款明故宫文创！';
+	      rewardImg.src = 'img/恭喜.png';
+	      modal.classList.add('show');
+	    }, 250);
+	  }
+	}
+
+    drawBtn.addEventListener('click', () => {
+      drawBtn.disabled = true;
+      machine.classList.add('shaking');
+    
+      setTimeout(() => {
+        machine.classList.remove('shaking');
+        const reward = rewards[Math.floor(Math.random() * rewards.length)];
+    
+        rewardText.textContent = '恭喜用户获得：' + reward.name;
+        rewardImg.src = reward.img;
+        modal.classList.add('show');
+    
+        const isNewReward = !collectedRewards.has(reward.name);
+        collectReward(reward);
+    
+        if (!isNewReward && collectedRewards.size < rewards.length) {
+          console.log('该文创已收集：' + reward.name);
+        }
+    
+        drawBtn.disabled = false;
+      }, 900);
+    });
+
+    closeBtn.addEventListener('click', () => {
+      modal.classList.remove('show');
+    });
+
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.classList.remove('show');
+      }
+    });
+
+    // ========== 初始化 ==========
+    function runTests() {
+      console.assert(Array.isArray(artifacts), 'artifacts 应为数组');
+      console.assert(artifacts.length === 9, '应有 9 件文物');
+      console.assert(artifacts.every(item => item.comments.length === 3), '每件文物应有 3 条评论');
+      console.assert(Array.isArray(stickerAssets), 'stickerAssets 应为数组');
+      console.assert(Array.isArray(postcardTemplates), 'postcardTemplates 应为数组');
+      console.assert(postcardTemplates.length >= 1, '至少应有 1 张明信片模板');
+      console.assert(typeof switchCreationMode === 'function', 'switchCreationMode 应存在');
+      console.assert(typeof applyPostcardTemplate === 'function', 'applyPostcardTemplate 应存在');
+      console.assert(typeof switchPostcardTemplate === 'function', 'switchPostcardTemplate 应存在');
+      console.assert(postcardTemplates[0] === 'img/f明信片1.png', '模板数组第 1 项应为首张模板');
+      console.assert(postcardModeBtn && blindboxModeBtn, '明信片与盲盒切换按钮应存在');
+      console.assert(!document.getElementById('addTextBtn'), '聚焦文字按钮应已移除');
+      console.assert(!document.getElementById('jumpBlindboxBtn'), '明信片页底部盲盒体验按钮应已移除');
+      console.assert(!document.getElementById('backPostcardBtn'), '盲盒页返回明信片按钮应已移除');
+      console.assert(changeTemplateBtn && postcardTemplate, '模板切换按钮与模板图片应存在');
+      console.assert(postcardView.classList.contains('active'), '初始化后应默认显示明信片页面');
+      console.assert(!blindboxView.classList.contains('active'), '初始化后盲盒页面应隐藏');
+    }
+
+    runTests();
+    renderArtifact();
+    renderStickerPalette();
+    applyPostcardTemplate(0);
+    updateCollectionUI();
+    switchCreationMode('postcard');
+  </script>
+</body>
+</html>

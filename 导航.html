@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>明故宫导航页</title>
+    <!-- 引入 ECharts 核心库 -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        /* 全局样式重置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            list-style: none;
+            text-decoration: none;
+            font-family: "agency fb", "隶书", sans-serif;
+        }
+
+        /* 页面背景：保持原图 */
+        body {
+            background-image: url("img/a明故宫导航页.png");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        /* 右上角导航容器 */
+        .nav-box {
+            position: fixed;
+            top: 45px;
+			left: 250px;
+            /* right: 150px; */
+            display: flex;
+            gap: 60px;
+            z-index: 999;
+        }
+
+        .dropdown-item {
+            position: relative;
+        }
+
+        .nav-btn {
+            padding: 10px 20px;
+            background: url("img/018.png") no-repeat center center;
+			backdrop-filter: blur(16px);
+            background-size: 100% 100%;
+            border: none;
+            cursor: pointer;
+            font-size: 30px;
+            font-weight: 600;
+            color: #333;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+        }
+
+        .nav-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            display: none;
+            background: url("") no-repeat center center;
+            background-size: 100% 100%;
+            padding: 10px 15px 15px;
+            border-radius: 4px;
+            white-space: nowrap;
+            background-color: transparent;
+        }
+
+        .dropdown-item:hover .dropdown,
+        .dropdown:hover {
+            display: block;
+        }
+
+        .dropdown-list {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-start;
+        }
+
+        .dropdown-list a {
+            color: #333;
+            font-size: 25px;
+            padding: 8px 12px;
+            display: inline-block;
+            transition: color 0.2s ease;
+        }
+
+        .dropdown-list a:hover {
+            color: #c0392b;
+        }
+
+        /* 页面标题 */
+        .page-title {
+            position: fixed;
+            top: 160px;
+            right: 560px;
+            text-align: center;
+            font-size: 70px;
+            color: #733900;
+            font-weight: 700;
+            z-index: 2;
+            text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.5);
+        }
+
+        /* 简介板块 */
+        .intro-section {
+            position: fixed;
+            top: 250px;
+            right: 370px;
+            width: 80%;
+            max-width: 750px;
+            padding: 35px 30px;
+            background: url("img/038.png") no-repeat center center;
+            background-size: 100% 100%;
+            background-attachment: local;
+            color: #222;
+            line-height: 1.8;
+            font-size: 25px;
+            border-radius: 8px;
+            /* box-shadow: 0 2px 10px rgba(0,0,0,0.2); */
+            z-index: 9;
+        }
+
+        .intro-section p {
+            text-indent: 2em;
+            margin-bottom: 15px;
+        }
+        .intro-section p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* 地图容器：修改为视口占比，取消固定像素限制 */
+        .map-container {
+            position: fixed;
+            top: 110px;          /* 上移，腾出更多空间 */
+            /* right: 10px; */
+			left: 1100px;
+            /* 改用视口百分比，适配不同屏幕 */
+            width: 50vw;         /* 占视口宽度85%，可改90vw/100vw */
+            height: 60vh;        /* 占视口高度80%，可改90vh */
+            max-width: 500px;   /* 最大宽度，防止过大 */
+            max-height: 700px;   /* 最大高度 */
+            /* background: rgba(255, 248, 235, 0.8); */
+            border-radius: 24px;
+            /* box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4); */
+            padding: 2px;
+            /* backdrop-filter: blur(4px); */
+            /* border: 3px solid #b28b5c; */
+            z-index: 10;
+            /* 临时关闭overflow，确认地图是否超出容器 */
+            overflow: visible;
+        }
+        
+        /* 确保ECharts容器100%继承父容器尺寸 */
+        #nanjingMap {
+            width: 100%;
+            height: 100%;
+            border-radius: 16px;
+            /* 强制继承尺寸 */
+            min-width: 100%;
+            min-height: 100%;
+        }
+
+        /* 闪烁图例 */
+        .map-legend {
+            position: fixed;
+            bottom: 20px;
+            right: 200px;
+            color: #a33329;
+            font-size: 18px;
+            background: rgba(255,255,240,0.8);
+            padding: 6px 18px;
+            border-radius: 40px;
+            border-left: 5px solid #c0392b;
+            font-weight: 500;
+            z-index: 11;
+            pointer-events: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+            backdrop-filter: blur(2px);
+        }
+        .map-legend span {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            background: #ff4d4d;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: blink 1.2s infinite;
+            box-shadow: 0 0 10px #ff4d4d;
+            vertical-align: middle;
+        }
+        /* @keyframes blink {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.3; transform: scale(1.3); background: #ff9999; }
+            100% { opacity: 1; transform: scale(1); }
+        } */
+
+        /* 小屏适应 */
+        /* @media (max-width: 1600px) {
+            .map-container { width: 480px; height: 480px; right: 15px; top: 200px; }
+            .page-title { right: 550px; font-size: 60px; }
+            .intro-section { right: 400px; max-width: 550px; }
+        } */
+    </style>
+</head>
+<body>
+    <!-- 导航 (不变) -->
+    <div class="nav-box">
+		<div class="dropdown-item">
+		        <a href="大地图.html" class="nav-btn" style="display: inline-block;">总览地图</a>
+		</div>
+        <div class="dropdown-item">
+            <button class="nav-btn">建筑成就</button>
+            <div class="dropdown">
+                <ul class="dropdown-list">
+                    <li><a href="中轴线.html">皇宫营制范式</a></li>
+                    <li><a href="华章.html">宫檐华构神韵</a></li>
+                    <li><a href="建筑成就—糯米灰浆.html">糯米灰浆工艺</a></li>
+                    <li><a href="建筑成就—砖石拱券.html">砖石拱券结构</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="dropdown-item">
+            <button class="nav-btn">人物·著作</button>
+            <div class="dropdown">
+                <ul class="dropdown-list">
+                    <li><a href="人物著作—人物图谱.html">人物图谱</a></li>
+                    <li><a href="人物著作—翻页书籍.html">关联著作</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="dropdown-item">
+            <button class="nav-btn">建筑文化</button>
+            <div class="dropdown">
+                <ul class="dropdown-list">
+                    <li><a href="文物.html">古物证史</a></li>
+                    <li><a href="建筑文化—宸居日常.html">帝居日常</a></li>
+                    <li><a href="建筑文化—符号象征.html">古纹藏韵</a></li>
+                    <li><a href="建筑文化—传承影响.html">古制流芳</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="dropdown-item">
+            <button class="nav-btn">古今脉络</button>
+            <div class="dropdown">
+                <ul class="dropdown-list">
+                    <li><a href="手势交互.html">探寻古今</a></li>
+                    <li><a href="传承地图1.html">皇宫传承</a></li>
+                </ul>
+            </div>
+        </div>
+		<div class="dropdown-item">
+		        <a href="http://121.41.102.201:8080/Ming_Palace/ai/guide" class="nav-btn" style="display: inline-block;">智能导游</a>
+		</div>
+    </div>
+
+    <h1 class="page-title">明故宫简介</h1>
+
+    <div class="intro-section">
+        <p>明故宫，坐落于金陵主城东部钟山之阳，东接中山门，南临御道街，乃明太祖朱元璋定鼎金陵的皇宫，明初洪武、建文、永乐三朝帝王理政起居之所。因地处故都南京，后世称 “明故宫”，亦为北京故宫营建之直接蓝本。其皇城占地逾 653 万平方米，宫城 116 万平方米，是中世纪世界规模最大的宫殿建筑群之一。</p>
+        <p>宫殿始建于元至正二十六年（1366 年），至明洪武二十五年（1392 年）基本告成，历时二十六载，荟萃天下能工巧匠。它承周礼 “左祖右社、三朝五门” 之古制，创中轴对称、宫城与都城轴线合一的新局，将皇家威仪与金陵山水形胜融为一体，堪称中国古代宫殿建筑礼制与营造艺术的巅峰之作。</p>
+    </div>
+
+    <!-- 地图容器 -->
+    <div class="map-container">
+        <div id="nanjingMap"></div>
+    </div>
+    <!-- <div class="map-legend">
+        <span></span> 明故宫（闪烁）· 各区已标注
+    </div> -->
+
+    <script>
+        (function() {
+            const chartDom = document.getElementById('nanjingMap');
+            if (!chartDom) return;
+            const myChart = echarts.init(chartDom);
+
+            // 明故宫坐标 (近似)
+            const mingGongCoord = [118.805, 32.028];
+
+            // 南京市行政区划名称及大致中心坐标 (用于显示区名)
+            // 这些坐标是近似值，展示时基本对应各区中心，仅供参考
+            const districts = [
+                { name: '玄武区', coord: [118.80, 32.05] },
+                { name: '秦淮区', coord: [118.80, 32.02] },
+                { name: '建邺区', coord: [118.74, 32.03] },
+                { name: '鼓楼区', coord: [118.77, 32.07] },
+                { name: '浦口区', coord: [118.63, 32.06] },
+                { name: '栖霞区', coord: [118.91, 32.12] },
+                { name: '雨花台区', coord: [118.78, 31.99] },
+                { name: '江宁区', coord: [118.85, 31.95] },
+                { name: '六合区', coord: [118.85, 32.35] },
+                { name: '溧水区', coord: [119.03, 31.65] },
+                { name: '高淳区', coord: [118.89, 31.33] }
+            ];
+
+            // 地图文件路径 (请根据实际情况调整)
+            const mapUrl = 'map/南京市_县.geojson';
+
+            // 尝试加载GeoJSON
+            fetch(mapUrl)
+                .then(response => {
+                    if (!response.ok) throw new Error('地图文件加载失败，使用模拟地图');
+                    return response.json();
+                })
+                .then(geoJson => {
+                    echarts.registerMap('南京', geoJson);
+                    renderMap('南京');
+                })
+                .catch(error => {
+                    console.warn(error);
+                    // 模拟一个包含多边形的南京轮廓 (至少能看到各区标注)
+                    const fakeGeoJson = {
+                        type: 'FeatureCollection',
+                        features: [
+                            {
+                                type: 'Feature',
+                                properties: { name: '南京市' },
+                                geometry: {
+                                    type: 'Polygon',
+                                    coordinates: [[
+                                        [118.4, 31.2],
+                                        [119.3, 31.2],
+                                        [119.3, 32.6],
+                                        [118.4, 32.6],
+                                        [118.4, 31.2]
+                                    ]]
+                                }
+                            }
+                        ]
+                    };
+                    echarts.registerMap('南京', fakeGeoJson);
+                    renderMap('南京');
+                });
+
+            function renderMap(mapName) {
+                // 构建散点系列：明故宫红点（涟漪+底点）+ 行政区名称（使用scatter标签显示）
+                // 行政区名称用散点图的label展示，不显示散点本身
+                const districtData = districts.map(d => ({
+                    name: d.name,
+                    value: d.coord,
+                }));
+
+                const option = {
+                    geo: {
+                        map: mapName,
+                        roam: true,
+                        zoom: 1.1,
+                        center: [118.85, 31.95],
+                        itemStyle: {
+                            areaColor: '#e3dac9',
+                            borderColor: '#8b6e4b',
+                            borderWidth: 1.5,
+                            shadowBlur: 10,
+                            shadowColor: 'rgba(0,0,0,0.2)'
+                        },
+                        emphasis: {
+                            itemStyle: {
+                                areaColor: '#cfb997'
+                            }
+                        },
+                        label: {
+                            show: false,   // 不显示地图自带标签（我们手动用散点标）
+                        },
+                        silent: false,
+                        regions: []       // 可以高亮特定区，但暂时不用
+                    },
+                    series: [
+                        // 1. 明故宫闪烁涟漪 (effectScatter)
+                        {
+                            name: '明故宫涟漪',
+                            type: 'effectScatter',
+                            coordinateSystem: 'geo',
+                            data: [mingGongCoord],
+                            symbol: 'circle',
+                            symbolSize: 12,
+                            showEffectOn: 'render',
+                            rippleEffect: {
+                                brushType: 'fill',
+                                scale: 3.2,
+                                period: 3,
+                                color: '#ff6666'
+                            },
+                            itemStyle: {
+                                color: '#cc2222',
+                                borderColor: '#aa5500',
+                                borderWidth: 2
+                            },
+                            zlevel: 3
+                        },
+                        // 2. 明孝陵稳定底点
+                        {
+                            name: '明故宫底点',
+                            type: 'scatter',
+                            coordinateSystem: 'geo',
+                            data: [mingGongCoord],
+                            symbol: 'circle',
+                            symbolSize: 14,
+                            itemStyle: {
+                                color: '#b30000',
+                                borderColor: '#ffffff',
+                                borderWidth: 2
+                            },
+                            zlevel: 2
+                        },
+                        // 3. 行政区名称标注 (用scatter只显示label，不显示点)
+                        {
+                            name: '行政区名称',
+                            type: 'scatter',
+                            coordinateSystem: 'geo',
+                            data: districtData,
+                            symbol: 'none',        // 不显示散点图标
+                            label: {
+                                show: true,
+                                position: 'center',   // 坐标点中心直接显示文字
+                                offset: [0, 0],
+                                formatter: '{b}',     // 显示名称
+                                fontSize: 16,
+                                fontWeight: 'bold',
+                                color: '#2c3e50',
+                                textShadowColor: '#ffffff',
+                                textShadowBlur: 6,
+                                textShadowOffsetX: 1,
+                                textShadowOffsetY: 1,
+                                backgroundColor: 'rgba(255, 245, 220, 0.7)',
+                                padding: [4, 8, 4, 8],
+                                borderRadius: 20,
+                                borderColor: '#a67c4f',
+                                borderWidth: 1.5,
+                            },
+                            emphasis: {
+                                label: {
+                                    show: true,
+                                    color: '#8b4513',
+                                    backgroundColor: 'rgba(255, 235, 200, 0.9)',
+                                    borderColor: '#8b4513',
+                                    borderWidth: 2
+                                }
+                            },
+                            tooltip: {
+                                show: true,
+                                formatter: '{b}'
+                            },
+                            zlevel: 4
+                        }
+                    ],
+                    tooltip: {
+                        trigger: 'item',
+                        formatter: function(params) {
+                            if (params.seriesName === '行政区名称') return params.name;
+                            if (params.seriesName === '明故宫底点' || params.seriesName === '明故宫涟漪') return '明故宫';
+                            return params.name;
+                        }
+                    }
+                };
+
+                myChart.setOption(option);
+
+                // 调整地图缩放以让各区名称位置更合理 (可依据实际json微调)
+                // 监听resize
+                window.addEventListener('resize', () => myChart.resize());
+            }
+
+            // 超时fallback (3秒后如果未渲染则强制渲染模拟地图)
+            setTimeout(() => {
+                if (!myChart.getOption() || !myChart.getOption().series) {
+                    if (!window._fakeRendered) {
+                        window._fakeRendered = true;
+                        const fallbackGeo = {
+                            type: 'FeatureCollection',
+                            features: [{
+                                type: 'Feature',
+                                properties: { name: '南京市' },
+                                geometry: {
+                                    type: 'Polygon',
+                                    coordinates: [[
+                                        [118.4, 31.2],
+                                        [119.3, 31.2],
+                                        [119.3, 32.6],
+                                        [118.4, 32.6],
+                                        [118.4, 31.2]
+                                    ]]
+                                }
+                            }]
+                        };
+                        echarts.registerMap('南京', fallbackGeo);
+                        renderMap('南京');
+                    }
+                }
+            }, 2500);
+        })();
+    </script>
+</body>
+</html>

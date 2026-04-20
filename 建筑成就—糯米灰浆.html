@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>建筑成就——糯米灰浆</title>
+		<style type="text/css">
+			/* 全局样式 */
+			* {
+			  margin: 0;
+			  padding: 0;
+			  box-sizing: border-box;
+			  font-family: "agency fb","隶书",sans-serif;
+			}
+			/* 页面背景 */
+			body {
+			  background-image: url("img/a明故宫内页3.png");
+			  background-size: cover;
+			  background-position: center;
+			  background-attachment: fixed;
+			  min-height: 100vh;
+			  background-color: #f8f9fa;
+			  color: #333;
+			  min-height: 100vh;
+			}
+			/* 标题容器：宽度100%，高度占比20% */
+			.title-container {
+			    width: 100%;
+			    height: 10vh;
+			    display: flex;
+			    align-items: center; /* 垂直居中 */
+			    padding-left: 2rem; /* 左侧内边距 */
+			}
+			.title-container h1{
+				font-size: 80px;
+				font-weight: 400;
+				margin-bottom: 1px;
+				font-family: "agency fb","隶书";
+			}
+			.module {
+				position: fixed;
+				top: 5%;
+				right: 76%;
+				
+				width:400px;
+				/* border: #000000 solid; */
+			    /* background: white; */
+			    border-radius: 12px;
+			    /* box-shadow: 0 4px 20px rgba(0,0,0,0.08); */
+			    padding-top: 80px;
+			    margin-bottom: 10px;
+				
+			}
+			.module1 {
+				position: fixed;
+				top: 10%;
+				left: 18%;
+				
+				width:400px;
+			    /* background: white; */
+			    border-radius: 12px;
+			    /* box-shadow: 0 4px 20px rgba(0,0,0,0.08); */
+			    padding: 10px;
+			    margin-bottom: 10px;
+			}
+			.module2 {
+				position: fixed;
+				top: 8%;
+				left: 45%;
+				width:480px;
+				height: 480px;
+			    background: url("img/a介绍.png") no-repeat center center;
+			    background-size: 100% 100%;
+			    border-radius: 12px;
+			    /* box-shadow: 0 4px 20px rgba(0,0,0,0.08); */
+			    padding-top: 50px;
+			    margin-bottom: 10px;
+				font-size: 16px;
+				line-height: 1.0;
+			}
+			.module2-title {
+			  height: 10px;
+			  font-size: 24px;
+			  color: #733900;
+			  margin-top: 20px;
+			  padding-bottom: 10px;
+			  /* border-bottom: 2px solid #733900; */
+			  text-align: center;
+			}
+				
+			.module2-content {
+			  font-size: 17px;
+			  line-height: 1.8;
+			  color: #333;
+			  margin-left: 70px;
+			  margin-right: 70px;
+			  margin-top: 30px;
+			}
+			
+			/* 简介板块首行缩进2字符（中文排版规范） */
+			.module2 p {;
+			    text-indent: 2em;
+			    margin-bottom: 15px;
+			}
+			.module3 {
+				position: fixed;
+				top: 82%;
+				left: 25%;
+				width:150px;
+				height: 150px;
+				background: url(img/明故宫二维码.png) no-repeat center center;
+                background-size: 100% 100%;;
+			    /* background: white; */
+			    border-radius: 12px;
+			    /* box-shadow: 0 4px 20px rgba(0,0,0,0.08); */
+			    padding: 10px;
+			    margin-bottom: 10px;
+			}
+			.module4 {
+				position: fixed;
+				top: 90%;
+				left: 35%;
+				width:200px;
+				height: 500px;
+			    /* background: white; */
+			    border-radius: 12px;
+			    /* box-shadow: 0 4px 20px rgba(0,0,0,0.08); */
+			    padding: 10px;
+			    margin-bottom: 10px;
+			}
+			.module4-content {
+			  font-size: 0.9rem;
+			  line-height: 1.8;
+			  color: #333;
+			  /* margin-left: 10px;
+			  margin-right: 10px;
+			  margin-top: 10px; */
+			}
+			.module5 {
+				position: fixed;
+				bottom: 77.6%;
+				right: 77%;
+				width:290px;
+				height: 100px;
+			    /* background: white; */
+			    border-radius: 12px;
+			    /* box-shadow: 0 4px 20px rgba(0,0,0,0.08); */
+			    padding: 10px;
+			    margin-bottom: 10px;
+			}
+			.module5-content {
+			  font-family: "agency fb","隶书",sans-serif;
+			  color: '#333';
+			  font-size: 1.1rem;
+			  font-weight: 600;
+			}
+			/* 1. 成分占比模块（双图表） */
+			.composition-grid {
+				width: 100%;
+			    /* display: grid;
+			    grid-template-columns: 1fr 1fr; */
+			}
+			.chart-box {
+				/* border: 1px dashed #999; */  /* 辅助线，可删除 */
+			    width: 100%;
+			    height: 300px;
+			    position: relative;
+			}
+			/* 指示图层：最高层级，不阻挡下层交互 */
+			.indicator-layer {
+			    position: absolute;
+			    top: 0;
+			    left: 0;
+			    width: 100%;
+			    height: 100%;
+			    pointer-events: none;
+			    z-index: 1000; /* 最高层级 */
+			}
+			/* 单个指示容器：绝对定位，可单独调整页面位置 */
+			.indicator-item {
+			    position: absolute;
+			    width: 250px;
+			    /* background: rgba(255, 255, 255, 0.95); */
+			    /* border: 2px solid #333; */
+				z-index: 200;
+			    border-radius: 8px;
+			    padding: 0.8rem;
+			    display: flex;
+			    flex-direction: column; /* 图片+文字上下排列 */
+			    align-items: center;
+			    gap: 1px; /* 图片文字间距 */
+				pointer-events: auto; /* 子元素恢复交互 */
+			    /* box-shadow: 0 3px 10px rgba(0,0,0,0.2); */
+			}
+			
+			/* 容器内图片+文字样式 */
+			.indicator-item img {
+				width: 100%;
+				height: 200px;
+				border-radius: 4px;
+				object-fit: contain;
+				transition: all 0.3s ease;
+				/* border: 1px solid #ccc; */
+				margin: 1px 1px; /* 核心修改这一行 */
+				transform: scale(1); /* 初始缩放 */
+			}
+			/* 鼠标hover图片放大效果 */
+			.indicator-item img:hover {
+			    transform: scale(1.1); /* 放大比例，1.1=110%，可改1.05/1.2等 */
+			    cursor: pointer; /* 手型光标 */
+			}
+			.indicator-text {
+				
+			    font-size: 0.9rem;
+			    color: #333;
+			    text-align: center;
+			    line-height: 1.4;
+				margin: 5px;
+			}
+			/* ========== 关键：单独调整每个容器的页面位置 ========== */
+			/* 容器1 */
+			#indicator-1 {
+			    top: 45%;
+			    left: 2%; /* 容器在页面的位置，可改top/right/bottom/left */
+			}
+			/* 容器2 */
+			#indicator-2 {
+			    top: 40%;
+			    left: 20%;
+			}
+			/* 容器3 */
+			#indicator-3 {
+			    top: 53%;
+			    left: 37%;
+			}
+			/* 容器4 */
+			#indicator-4 {
+			    top: 63%;
+			    left: 52%;
+			}
+			/* 容器5 */
+			#indicator-5 {
+			    top: 55%;
+			    right: 17%;
+			}
+			/* 容器6 */
+			#indicator-6 {
+			    top: 38%;
+			    right: 2%;
+			}
+			
+			/* 图片图层容器 - 独立层级，不影响其他元素 */
+			.images-layer {
+			    position: fixed; /* 和主容器一致的固定定位 */
+			    top: 0;
+			    left: 0;
+			    width: 100vw;
+			    height: 100vh;
+			    z-index: 2; /* 低于信息卡片(10)、指示线(5)，高于背景(0) */
+			    pointer-events: none; /* 不阻挡鼠标交互（图表/卡片点击） */
+			}
+			
+			/* 单个图片样式 - 可独立调整位置/大小/层级 */
+			.layer-image {
+			    position: absolute;
+			    pointer-events: auto; /* 如需点击图片可保留，否则设为none */
+			    /* 基础样式，可根据图片调整 */
+			    width: 30px; /* 初始宽度，按需修改 */
+			    height: auto; /* 保持宽高比 */
+			    opacity: 1; /* 透明度，可选 */
+			    transition: all 0.3s ease; /* 调整时平滑过渡，可选 */
+			}
+			
+			/* 示例：给不同图片加类名，方便单独调整 */
+			.img-1 {
+			    top: 45%; /* 距离顶部百分比/像素 */
+			    left: 7%; /* 距离左侧百分比/像素 */
+			    z-index: 3; /* 可单独调整层级 */
+			}
+			
+			.img-2 {
+			    top: 40%;
+			    left: 20%;
+			    z-index: 3;
+			}
+			
+			.img-3 {
+			    bottom: 43%; /* 距离底部 */
+			    left: 38%;
+			    z-index: 3;
+			}
+			
+			.img-4 {
+			    bottom: 30%; /* 距离底部 */
+			    left: 53%;
+			    z-index: 3;
+			}
+			
+			.img-5 {
+			    bottom: 30%; /* 距离底部 */
+			    right: 33%;
+			    z-index: 3;
+			}
+			.img-6 {
+			    bottom: 53%; /* 距离底部 */
+			    right: 16%;
+			    z-index: 3;
+			}
+			.img-7 {
+			    bottom: 12%; /* 距离底部 */
+			    right: 27%;
+			    z-index: 2;
+				width: 500px;
+			}
+			.img-8 {
+			    bottom: 7%; /* 距离底部 */
+			    left: 10%;
+			    z-index: 2;
+				width: 500px;
+			}
+			.img-9 {
+			    bottom: 35%; /* 距离底部 */
+			    right: 1px;
+			    z-index: 2;
+				width: 400px;
+			}
+			/* ========== 新增：返回首页按钮样式 ========== */
+			    .back-home-btn {
+			      position: absolute;
+			      top: 52px;
+			      right: 57px;
+			      z-index: 999; /* 确保按钮在最上层 */
+			      width: 120px;
+			      height: 120px;
+			      border: none;
+			      border-radius: 8px;
+			      cursor: pointer;
+			      /* 核心：背景图片与文字分层 */
+			      display: flex;
+			      align-items: center;
+			      justify-content: center;
+			      font-size: 20px;
+			      font-weight: bold;
+			      color: #733900;
+			      text-decoration: none; /* 去掉a标签默认下划线 */
+			      overflow: hidden;
+			    }
+			
+			    /* 背景图层（单独用于旋转） */
+			    .btn-bg {
+			      position: absolute;
+			      top: 0;
+			      left: 0;
+			      width: 100%;
+			      height: 100%;
+			      background: url("img/027.png") no-repeat center center; /* 替换为你的按钮背景图 */
+			      background-size: cover;
+			      transition: transform 0.5s ease; /* 旋转过渡动画 */
+			      z-index: 1; /* 背景在文字下方 */
+			    }
+			
+			    /* 文字层（静止） */
+			    .btn-text {
+			      position: relative;
+			      z-index: 2; /* 文字在背景上方 */
+			    }
+			
+			    /* hover时背景旋转，文字不动 */
+			    .back-home-btn:hover .btn-bg {
+			      transform: rotate(360deg); /* 360度旋转，可改为180deg */
+			    }
+		</style>
+	</head>
+	<body>
+		<!-- 标题容器 -->
+		<div class="title-container">
+		   <h1>皇城秘料—糯米灰浆</h1>
+		</div>
+		<!-- ========== 新增：返回首页按钮 ========== -->
+		    <a href="导航.html" class="back-home-btn"> <!-- 替换index.html为你的首页地址 -->
+		      <div class="btn-bg"></div> <!-- 背景图层（旋转） -->
+		      <span class="btn-text">返回首页</span> <!-- 文字层（静止） -->
+		    </a>
+		<!-- 1. 成分占比可视化模块 -->
+		<div class="module">
+		    <div class="composition-grid">
+		        <div class="chart-box" id="pieChart"></div>
+		    </div>
+		</div>
+		<div class="module1">
+		    <div class="composition-grid">
+		        <div class="chart-box" id="radarChart"></div>
+		    </div>
+		</div>
+		<div class="module2">
+			<div class="module2-title">
+				糯米灰浆技术
+			</div>
+			<div class="module2-content">
+				<p>明故宫作为明代开国都城的核心宫城建筑群，其城台、殿基、墙体等砖石结构砌筑所用灰浆，经现代文物保护部门对午门、东华门等遗址取样检测，证实含有糯米成分，属于中国古代经典的糯米灰浆工艺。该技术以石灰为基，掺入熬制的糯米浆混合而成，黏结强度高、耐久性强、抗渗耐腐，是明初皇家大型建筑普遍采用的营造技艺。</p>
+			</div>
+		</div>
+		<div class="module3">
+		    
+		</div>
+		<div class="module4">
+			<div class="module4-content">
+				<p>扫描二维码查看ar场景</p>
+			</div>
+		</div>
+		<div class="module5">
+			<div class="module5-content">
+				<p>材料成分占比（横向条形图）</p>
+			</div>
+		</div>
+		<div class="indicator-layer">
+		    <!-- 容器1 -->
+		    <div class="indicator-item" id="indicator-1">
+		        <img src="img/第1步.png" alt="指示图1">
+		        <div class="indicator-text">将精选糯米经高温熬煮，制成黏稠均匀的糯米浆。</div>
+		    </div>
+		    <!-- 容器2 -->
+		    <div class="indicator-item" id="indicator-2">
+		        <img src="img/第2步.png" alt="指示图2">
+		        <div class="indicator-text">把块状生石灰粉碎后过筛，去除杂质得到细腻石灰粉。</div>
+		    </div>
+		    <!-- 容器3 -->
+		    <div class="indicator-item" id="indicator-3">
+		        <img src="img/第3步.png" alt="指示图3">
+		        <div class="indicator-text">按比例将石灰粉与细砂、黏土等混合，充分搅拌均匀。</div>
+		    </div>
+		    <!-- 容器4 -->
+		    <div class="indicator-item" id="indicator-4">
+		        <img src="img/第4步.png" alt="指示图4">
+		        <div class="indicator-text">把熬好的糯米浆倒入混合料中，反复揉合增强黏性。</div>
+		    </div>
+			<!-- 容器5 -->
+			<div class="indicator-item" id="indicator-5">
+			    <img src="img/第5步.png" alt="指示图5">
+			    <div class="indicator-text">将揉合后的灰浆静置发酵，使其充分熟化达到理想黏度。</div>
+			</div>
+			<!-- 容器6 -->
+			<div class="indicator-item" id="indicator-6">
+			    <img src="img/第6步.png" alt="指示图6">
+			    <div class="indicator-text">将发酵好的灰浆现场涂抹，用于城墙砖石间的砌筑与勾缝。</div>
+			</div>
+		</div>
+		
+		<!-- 图片图层容器 - 独立于原有结构 -->
+		<div class="images-layer">
+		    <!-- 示例图片1：替换src为你的图片路径，调整类名对应CSS -->
+		    <img src="img/a熬浆.png" alt="装饰图片1" class="layer-image img-1">
+		    <!-- 示例图片2 -->
+		    <img src="img/a碎灰.png" alt="装饰图片2" class="layer-image img-2">
+		    <!-- 示例图片3 -->
+		    <img src="img/a拌砂.png" alt="装饰图片3" class="layer-image img-3">
+		    <!-- 可无限添加图片，新增后在CSS里加对应的.img-4、.img-5类名即可 -->
+		    <img src="img/a加浆.png" alt="装饰图片4" class="layer-image img-4">
+			<img src="img/a静置.png" alt="装饰图片5" class="layer-image img-5">
+			<img src="img/a筑墙.png" alt="装饰图片6" class="layer-image img-6">
+			<img src="img/烟云1.png" alt="装饰图片7" class="layer-image img-7">
+			<img src="img/烟云2.png" alt="装饰图片8" class="layer-image img-8">
+			<img src="img/烟云3.png" alt="装饰图片9" class="layer-image img-9">
+		</div>
+		
+		<!-- 引入ECharts -->
+		<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+		<script>
+		    // ===================== 1. 初始化所有图表 =====================
+		    // 1.1 成分占比横向条形图（带剩余部分填充装饰）
+		    const pieChart = echarts.init(document.getElementById('pieChart'));
+		    
+		    // 原始数据
+		    const originalData = [
+		        { name: '砂石', value: 58, desc: '增加体积与稳定性', color: '#d48265B3' },
+		        { name: '石灰', value: 18, desc: '提供基础强度与防水性', color: '#61a0a8B3' },
+		        { name: '水', value: 18, desc: '调节施工稠度', color: '#CD853FB3' },
+		        { name: '糯米浆', value: 6, desc: '增强黏结力与耐久性', color: '#FFC107B3' }
+		    ];
+		    
+		    // 计算剩余部分的值（100% - 实际占比）
+		    const remainingData = originalData.map(item => ({
+		        name: item.name,
+		        value: 100 - item.value,
+		        desc: item.desc
+		    }));
+		    
+		    const barOption = {
+		        // title: {
+		        //     text: '材料成分占比（横向条形图）',
+		        //     left: 'center',
+		        //     bottom: 280,
+		        //     textStyle: { 
+		        //         fontFamily: '隶书, sans-serif',
+		        //         color: '#333', 
+		        //         fontSize: 18 
+		        //     }
+		        // },
+				
+		        tooltip: {
+		            trigger: 'axis',
+		            axisPointer: { type: 'shadow' },
+		            textStyle: { 
+		                fontFamily: '隶书, sans-serif',
+		                fontSize: 14 
+		            },
+		            // 自定义tooltip显示，只显示实际占比部分
+		            formatter: function(params) {
+		                // 只显示第一个系列（实际占比）的tooltip
+		                const actualSeries = params.find(p => p.seriesName === '实际占比');
+		                if (actualSeries) {
+		                    const data = actualSeries.data;
+		                    return `${data.name}<br/>占比: ${data.value}%<br/>核心作用: ${data.desc}`;
+		                }
+		                return '';
+		            }
+		        },
+		        legend: {
+		            show: false // 隐藏图例，因为剩余部分不需要显示在图例中
+		        },
+		        // X轴：数值轴（占比0-100%）
+		        xAxis: {
+		            type: 'value',
+		            max: 100,
+		            axisLabel: {
+		                formatter: '{value}%',
+		                fontFamily: '隶书, sans-serif'
+		            },
+		            splitLine: { show: false }
+		        },
+		        // Y轴：类目轴（按占比从高到低排列成分）
+		        yAxis: {
+		            type: 'category',
+		            data: ['砂石', '石灰', '水', '糯米浆'],
+		            axisLabel: {
+		                fontFamily: '隶书, sans-serif',
+		                fontSize: 16
+		            },
+		            axisLine: { show: false },
+		            axisTick: { show: false }
+		        },
+		        series: [
+		            {
+		                // 第一个系列：实际占比（带颜色的部分）
+		                name: '实际占比',
+		                type: 'bar',
+		                stack: 'total', // 堆叠组名称，与剩余部分使用相同stack名称
+		                barWidth: '60%',
+		                label: {
+		                    show: true,
+		                    position: 'right',
+		                    formatter: '{c}%',
+		                    fontFamily: '隶书, sans-serif',
+		                    fontSize: 14,
+							color: '#333333'
+		                },
+		                data: originalData.map(item => ({
+		                    value: item.value,
+		                    name: item.name,
+		                    desc: item.desc,
+		                    itemStyle: { color: item.color }
+		                }))
+		            },
+		            {
+		                // 第二个系列：剩余部分（浅灰色填充）
+		                name: '剩余部分',
+		                type: 'bar',
+		                stack: 'total', // 与第一个系列使用相同stack名称，形成堆叠
+		                barWidth: '60%',
+		                label: {
+		                    show: false // 剩余部分不显示数值标签
+		                },
+		                // 统一使用浅灰色，透明度0.3，营造背景效果
+		                itemStyle: {
+		                    color: '#d8c6a7', // 浅灰色
+		                    // 或者可以使用更淡的颜色：#F5F5F5
+		                    opacity: 0.8
+		                },
+		                // 数据按Y轴类目顺序排列
+		                data: remainingData.map(item => ({
+		                    value: item.value,
+		                    name: item.name,
+		                    // 剩余部分不显示tooltip，所以desc可以省略
+		                    itemStyle: { color: '#d8c6a7' } // 再次确保颜色一致
+		                }))
+		            }
+		        ],
+		        grid: {
+		            left: '10%',
+		            right: '15%',
+		            bottom: '30%',
+		            top: '10%',
+		            containLabel: true
+		        }
+		    };
+		    
+		    pieChart.setOption(barOption);
+		
+		    // 1.2 成分特性雷达图
+		    const radarChart = echarts.init(document.getElementById('radarChart'));
+		    const radarOption = {
+		        title: {
+		            text: '各成分核心作用（雷达图）',
+		            left: 'center',
+		            bottom: 280,
+		            textStyle: { fontFamily: '隶书, sans-serif',color: '#333', fontSize: 18 }
+		        },
+		        tooltip: {
+		            trigger: 'item',
+		            textStyle: { 
+						fontFamily: '隶书, sans-serif',
+						fontSize: 14 }
+		        },
+		        legend: {
+		            orient: 'vertical',
+		            left:'right',
+					bottom:80,
+		            textStyle: { 
+						fontFamily: '隶书, sans-serif',
+						fontSize: 14 }
+		        },
+		        radar: {
+					radius: '70%',
+		            indicator: [
+		                { name: '黏结力', max: 100 },
+		                { name: '强度', max: 100 },
+		                { name: '耐久性', max: 100 },
+		                { name: '防水性', max: 100 },
+		                { name: '施工性', max: 100 }
+		            ],
+		            shape: 'circle',
+		            splitNumber: 5,
+		            name: {
+		                textStyle: { 
+							fontFamily: '隶书, sans-serif',
+							fontSize:14,
+							color: '#666' }
+		            },
+		            splitLine: {
+		               show: false
+		            },
+		            splitArea: {
+		                areaStyle: { color: ['#c7b185B3', '#b07624B3'] }
+		            },
+		            axisLine: {
+		               show: false 
+		            }
+		        },
+		        series: [
+		            {
+		                name: '成分作用',
+		                type: 'radar',
+		                data: [
+		                    {
+		                        value: [95, 20, 90, 10, 60],
+		                        name: '糯米浆',
+		                        areaStyle: { color: 'rgba(255, 193, 7, 0.2)' },
+		                        lineStyle: { color: '#FFC107', width: 2 },
+		                        itemStyle: { color: '#FFC107B3' }
+		                    },
+		                    {
+		                        value: [30, 85, 70, 90, 75],
+		                        name: '石灰',
+		                        areaStyle: { color: 'rgba(22, 93, 255, 0.2)' },
+		                        lineStyle: { color: '#61a0a8', width: 2 },
+		                        itemStyle: { color: '#61a0a8B3' }
+		                    },
+		                    {
+		                        value: [10, 75, 60, 20, 85],
+		                        name: '砂石',
+		                        areaStyle: { color: 'rgba(123, 97, 255, 0.2)' },
+		                        lineStyle: { color: '#d48265', width: 2 },
+		                        itemStyle: { color: '#d48265B3' }
+		                    }
+		                ]
+		            }
+		        ]
+		    };
+		    radarChart.setOption(radarOption);
+		
+		</script>
+	</body>
+</html>

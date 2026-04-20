@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>明故宫古今对比｜柔光手势交互</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
+      color: #e1c583;
+      font-family: "agency fb","隶书",sans-serif;
+    }
+
+    #app {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      background: #000;
+    }
+
+    #mainCanvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      background: #000;
+    }
+
+    #previewWrap {
+      position: absolute;
+      right: 20px;
+      bottom: 20px;
+      width: min(24vw, 280px);
+      aspect-ratio: 4 / 3;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(0,0,0,0.42);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.15);
+      backdrop-filter: blur(8px);
+      z-index: 5;
+    }
+
+    #previewCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    #hud {
+      position: absolute;
+      left: 20px;
+      top: 20px;
+      z-index: 5;
+      padding: 14px 18px;
+      border-radius: 14px;
+      background: rgba(0,0,0,0.32);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.12);
+      max-width: min(620px, calc(100vw - 40px));
+      line-height: 1.55;
+      transition: opacity 0.22s ease, transform 0.22s ease;
+    }
+
+    #hudHeader {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    #hud h1 {
+      margin: 0;
+      font-size: 30px;
+      font-weight: 500;
+    }
+
+    #hudToggleBtn {
+      border: 1px solid rgba(255,255,255,0.16);
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 15px;
+	  font-family: "agency fb","隶书",sans-serif;
+      line-height: 1;
+      cursor: pointer;
+      color: #e1c583;
+      background: rgba(255,255,255,0.08);
+      backdrop-filter: blur(8px);
+      transition: background 0.18s ease, transform 0.18s ease, opacity 0.18s ease;
+    }
+
+    #hudToggleBtn:hover {
+      background: rgba(255,255,255,0.14);
+      transform: translateY(-1px);
+    }
+
+    #hudToggleBtn.is-floating {
+      position: absolute;
+      left: 20px;
+      top: 20px;
+      z-index: 6;
+      display: none;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.24);
+    }
+
+    #hud.hidden-panel {
+      opacity: 0;
+      transform: translateY(-8px);
+      pointer-events: none;
+    }
+
+    #hud p {
+      margin: 6px 0;
+      font-size: 20px;
+      color: #e1c583;
+    }
+
+    #status {
+      margin-top: 10px;
+      font-size: 13px;
+      color: #ffdca8;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    #permissionBtn {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 6;
+      border: 0;
+      border-radius: 999px;
+      padding: 14px 22px;
+      font-size: 20px;
+	  font-family: "agency fb","隶书",sans-serif;
+      font-weight: 500;
+      cursor: pointer;
+      background: rgba(239, 199, 133, 0.9);
+      color: #592c00;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.35);
+      transition: transform 0.18s ease, opacity 0.18s ease;
+    }
+
+    #permissionBtn:hover {
+      transform: translate(-50%, -50%) scale(1.02);
+    }
+
+    @media (max-width: 900px) {
+      #previewWrap {
+        width: min(36vw, 220px);
+        right: 14px;
+        bottom: 14px;
+      }
+
+      #hud {
+        left: 14px;
+        top: 14px;
+        padding: 12px 14px;
+      }
+
+      #hudHeader {
+        gap: 10px;
+      }
+
+      #hud h1 {
+        font-size: 36px;
+      }
+
+      #hudToggleBtn {
+        font-size: 12px;
+        padding: 5px 10px;
+      }
+
+      #hudToggleBtn.is-floating {
+        left: 14px;
+        top: 14px;
+      }
+
+      #hud p,
+      #status {
+        font-size: 12px;
+      }
+    }
+	/* ========== 新增：返回首页按钮样式 ========== */
+	    .back-home-btn {
+	      position: fixed;
+	      top: 52px;
+	      right: 57px;
+	      z-index: 999; /* 确保按钮在最上层 */
+	      width: 120px;
+	      height: 120px;
+	      border: none;
+	      border-radius: 8px;
+	      cursor: pointer;
+	      /* 核心：背景图片与文字分层 */
+	      display: flex;
+	      align-items: center;
+	      justify-content: center;
+	      font-size: 20px;
+	      font-weight: bold;
+	      color: #733900;
+	      text-decoration: none; /* 去掉a标签默认下划线 */
+	      overflow: hidden;
+	    }
+	
+	    /* 背景图层（单独用于旋转） */
+	    .btn-bg {
+	      position: absolute;
+	      top: 0;
+	      left: 0;
+	      width: 100%;
+	      height: 100%;
+	      background: url("img/027.png") no-repeat center center; /* 替换为你的按钮背景图 */
+	      background-size: cover;
+	      transition: transform 0.5s ease; /* 旋转过渡动画 */
+	      z-index: 1; /* 背景在文字下方 */
+	    }
+	
+	    /* 文字层（静止） */
+	    .btn-text {
+	      position: relative;
+	      z-index: 2; /* 文字在背景上方 */
+	    }
+	
+	    /* hover时背景旋转，文字不动 */
+	    .back-home-btn:hover .btn-bg {
+	      transform: rotate(360deg); /* 360度旋转，可改为180deg */
+	    }
+  </style>
+</head>
+<body>
+	<a href="导航.html" class="back-home-btn"> <!-- 替换index.html为你的首页地址 -->
+	  <div class="btn-bg"></div> <!-- 背景图层（旋转） -->
+	  <span class="btn-text">返回首页</span> <!-- 文字层（静止） -->
+	</a>
+  <div id="app">
+    <canvas id="mainCanvas"></canvas>
+
+    <div id="hud">
+      <div id="hudHeader">
+        <h1>明故宫—探访古今</h1>
+        <button id="hudToggleBtn" type="button" aria-expanded="true" aria-controls="hud">隐藏</button>
+      </div>
+      <p>张开你的手，感受明故宫往日繁华</p>
+      <p>检测到手部后会出现一束柔和的圆形光束。随着手掌张开，光束会逐渐变大；随着手掌合拢，光束会逐渐收紧。右下角窗口显示手部关键点与当前光束范围。</p>
+      <p id="status">正在等待资源加载…</p>
+    </div>
+
+    <div id="previewWrap">
+      <canvas id="previewCanvas"></canvas>
+    </div>
+
+    <button id="permissionBtn">点击开启摄像头与交互</button>
+
+    <video id="webcam" class="hidden" autoplay playsinline muted></video>
+    <video id="historyVideo" class="hidden" autoplay playsinline muted loop crossorigin="anonymous">
+      <source src="./mp4/明故宫.mp4" type="video/mp4" />
+    </video>
+    <img id="currentImage" class="hidden" src="./img/k明故宫现代.png" alt="明故宫现存图片" />
+  </div>
+
+  <script type="module">
+    import {
+      HandLandmarker,
+      FilesetResolver,
+      DrawingUtils
+    } from 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/vision_bundle.mjs';
+
+    const mainCanvas = document.getElementById('mainCanvas');
+    const mainCtx = mainCanvas.getContext('2d');
+    const previewCanvas = document.getElementById('previewCanvas');
+    const previewCtx = previewCanvas.getContext('2d');
+
+    const webcamVideo = document.getElementById('webcam');
+    const historyVideo = document.getElementById('historyVideo');
+    const currentImage = document.getElementById('currentImage');
+    const statusEl = document.getElementById('status');
+    const permissionBtn = document.getElementById('permissionBtn');
+    const hudEl = document.getElementById('hud');
+    const hudToggleBtn = document.getElementById('hudToggleBtn');
+
+    const lightMaskCanvas = document.createElement('canvas');
+    const lightMaskCtx = lightMaskCanvas.getContext('2d');
+
+    let handLandmarker = null;
+    let lastVideoTime = -1;
+    let latestResult = null;
+    let running = false;
+
+    const torch = {
+      active: false,
+      x: window.innerWidth / 2,
+      y: window.innerHeight / 2,
+      radius: Math.min(window.innerWidth, window.innerHeight) * 0.16,
+      targetX: window.innerWidth / 2,
+      targetY: window.innerHeight / 2,
+      targetRadius: Math.min(window.innerWidth, window.innerHeight) * 0.16,
+      positionSmooth: 0.2,
+      radiusSmooth: 0.14,
+      visibleStrength: 0,
+      openness: 0.5,
+      pinch: 1,
+      presenceFrames: 0,
+      lostFrames: 0
+    };
+
+    const config = {
+      maxHands: 1,
+      minHandDetectionConfidence: 0.6,
+      minHandPresenceConfidence: 0.6,
+      minTrackingConfidence: 0.6,
+      previewWidth: 320,
+      previewHeight: 240,
+      minRadiusRatio: 0.11,
+      maxRadiusRatio: 0.27,
+      haloScale: 1.95,
+      activeOnFrames: 2,
+      activeOffFrames: 8
+    };
+
+    function resizeCanvas() {
+      const dpr = window.devicePixelRatio || 1;
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+
+      mainCanvas.width = Math.floor(width * dpr);
+      mainCanvas.height = Math.floor(height * dpr);
+      mainCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      lightMaskCanvas.width = width;
+      lightMaskCanvas.height = height;
+
+      previewCanvas.width = config.previewWidth;
+      previewCanvas.height = config.previewHeight;
+
+      const defaultRadius = Math.min(width, height) * 0.16;
+      torch.radius = defaultRadius;
+      torch.targetRadius = defaultRadius;
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function setStatus(text) {
+      statusEl.textContent = text;
+    }
+
+    function setHudVisible(visible) {
+      hudEl.classList.toggle('hidden-panel', !visible);
+      hudToggleBtn.classList.toggle('is-floating', !visible);
+      hudToggleBtn.textContent = visible ? '隐藏' : '显示提示';
+      hudToggleBtn.setAttribute('aria-expanded', String(visible));
+      if (!visible) {
+        document.getElementById('app').appendChild(hudToggleBtn);
+      } else {
+        document.getElementById('hudHeader').appendChild(hudToggleBtn);
+      }
+      hudToggleBtn.style.display = 'inline-flex';
+      hudToggleBtn.style.alignItems = 'center';
+      hudToggleBtn.style.justifyContent = 'center';
+    }
+
+    function clamp(value, min, max) {
+      return Math.max(min, Math.min(max, value));
+    }
+
+    function lerp(a, b, t) {
+      return a + (b - a) * t;
+    }
+
+    function distance(a, b) {
+      const dx = a.x - b.x;
+      const dy = a.y - b.y;
+      return Math.hypot(dx, dy);
+    }
+
+    function average(values) {
+      return values.reduce((sum, v) => sum + v, 0) / values.length;
+    }
+
+    function coverRectTransform(srcW, srcH, dstW, dstH) {
+      const scale = Math.max(dstW / srcW, dstH / srcH);
+      const drawW = srcW * scale;
+      const drawH = srcH * scale;
+      const dx = (dstW - drawW) / 2;
+      const dy = (dstH - drawH) / 2;
+      return { dx, dy, drawW, drawH };
+    }
+
+    function computeHandMetrics(landmarks) {
+      const wrist = landmarks[0];
+      const thumbTip = landmarks[4];
+      const indexMcp = landmarks[5];
+      const middleMcp = landmarks[9];
+      const pinkyMcp = landmarks[17];
+      const indexTip = landmarks[8];
+      const middleTip = landmarks[12];
+      const ringTip = landmarks[16];
+      const pinkyTip = landmarks[20];
+
+      const palmWidth = distance(indexMcp, pinkyMcp);
+      const palmHeight = distance(wrist, middleMcp);
+      const palmScale = Math.max((palmWidth + palmHeight) * 0.5, 0.055);
+
+      const tipDistances = [
+        distance(indexTip, wrist),
+        distance(middleTip, wrist),
+        distance(ringTip, wrist),
+        distance(pinkyTip, wrist)
+      ];
+
+      const opennessRaw = average(tipDistances) / palmScale;
+      const openness = clamp((opennessRaw - 1.08) / 1.18, 0, 1);
+      const pinch = clamp(distance(thumbTip, indexTip) / palmScale, 0, 1.6);
+
+      return {
+        palmScale,
+        openness,
+        opennessRaw,
+        pinch,
+        grabBias: clamp(1 - openness, 0, 1)
+      };
+    }
+
+    function pickTorchPoint(landmarks) {
+      const thumbTip = landmarks[4];
+      const indexTip = landmarks[8];
+      const middleTip = landmarks[12];
+      const palm = landmarks[9];
+
+      return {
+        x: thumbTip.x * 0.18 + indexTip.x * 0.32 + middleTip.x * 0.32 + palm.x * 0.18,
+        y: thumbTip.y * 0.18 + indexTip.y * 0.26 + middleTip.y * 0.26 + palm.y * 0.30
+      };
+    }
+
+    function drawBackgroundScene() {
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+
+      mainCtx.clearRect(0, 0, width, height);
+
+      if (historyVideo.readyState >= 2) {
+        const bg = coverRectTransform(
+          historyVideo.videoWidth || 1920,
+          historyVideo.videoHeight || 1080,
+          width,
+          height
+        );
+        mainCtx.drawImage(historyVideo, bg.dx, bg.dy, bg.drawW, bg.drawH);
+      } else {
+        mainCtx.fillStyle = '#111';
+        mainCtx.fillRect(0, 0, width, height);
+      }
+
+      if (currentImage.complete && currentImage.naturalWidth > 0) {
+        const fg = coverRectTransform(
+          currentImage.naturalWidth,
+          currentImage.naturalHeight,
+          width,
+          height
+        );
+        mainCtx.save();
+        mainCtx.filter = 'brightness(0.22) saturate(0.88) contrast(1.02)';
+        mainCtx.drawImage(currentImage, fg.dx, fg.dy, fg.drawW, fg.drawH);
+        mainCtx.restore();
+      } else {
+        mainCtx.fillStyle = 'rgba(0,0,0,0.72)';
+        mainCtx.fillRect(0, 0, width, height);
+      }
+    }
+
+    function drawSpotlight() {
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+
+      torch.x += (torch.targetX - torch.x) * torch.positionSmooth;
+      torch.y += (torch.targetY - torch.y) * torch.positionSmooth;
+      torch.radius += (torch.targetRadius - torch.radius) * torch.radiusSmooth;
+      torch.visibleStrength += ((torch.active ? 1 : 0) - torch.visibleStrength) * 0.12;
+
+      if (torch.visibleStrength < 0.02 || historyVideo.readyState < 2) return;
+
+      const bg = coverRectTransform(
+        historyVideo.videoWidth || 1920,
+        historyVideo.videoHeight || 1080,
+        width,
+        height
+      );
+
+      lightMaskCtx.clearRect(0, 0, width, height);
+      lightMaskCtx.globalCompositeOperation = 'source-over';
+      lightMaskCtx.drawImage(historyVideo, bg.dx, bg.dy, bg.drawW, bg.drawH);
+      lightMaskCtx.globalCompositeOperation = 'destination-in';
+
+      const revealRadius = torch.radius;
+      const revealGradient = lightMaskCtx.createRadialGradient(
+        torch.x,
+        torch.y,
+        revealRadius * 0.08,
+        torch.x,
+        torch.y,
+        revealRadius * 1.18
+      );
+      revealGradient.addColorStop(0, `rgba(255,255,255,${0.98 * torch.visibleStrength})`);
+      revealGradient.addColorStop(0.24, `rgba(255,255,255,${0.92 * torch.visibleStrength})`);
+      revealGradient.addColorStop(0.54, `rgba(255,255,255,${0.62 * torch.visibleStrength})`);
+      revealGradient.addColorStop(0.8, `rgba(255,255,255,${0.22 * torch.visibleStrength})`);
+      revealGradient.addColorStop(1, 'rgba(255,255,255,0)');
+
+      lightMaskCtx.fillStyle = revealGradient;
+      lightMaskCtx.fillRect(0, 0, width, height);
+      lightMaskCtx.globalCompositeOperation = 'source-over';
+
+      mainCtx.drawImage(lightMaskCanvas, 0, 0, width, height);
+
+      mainCtx.save();
+      mainCtx.globalCompositeOperation = 'screen';
+
+      const bloomGradient = mainCtx.createRadialGradient(
+        torch.x,
+        torch.y,
+        revealRadius * 0.02,
+        torch.x,
+        torch.y,
+        revealRadius * 0.86
+      );
+      bloomGradient.addColorStop(0, `rgba(255,248,220,${0.26 * torch.visibleStrength})`);
+      bloomGradient.addColorStop(0.4, `rgba(255,236,182,${0.16 * torch.visibleStrength})`);
+      bloomGradient.addColorStop(0.78, `rgba(255,224,156,${0.06 * torch.visibleStrength})`);
+      bloomGradient.addColorStop(1, 'rgba(255,220,140,0)');
+
+      mainCtx.fillStyle = bloomGradient;
+      mainCtx.beginPath();
+      mainCtx.arc(torch.x, torch.y, revealRadius * 0.9, 0, Math.PI * 2);
+      mainCtx.fill();
+
+      const haloGradient = mainCtx.createRadialGradient(
+        torch.x,
+        torch.y,
+        revealRadius * 0.22,
+        torch.x,
+        torch.y,
+        revealRadius * config.haloScale
+      );
+      haloGradient.addColorStop(0, `rgba(255,244,214,${0.11 * torch.visibleStrength})`);
+      haloGradient.addColorStop(0.38, `rgba(255,232,184,${0.08 * torch.visibleStrength})`);
+      haloGradient.addColorStop(0.74, `rgba(255,214,150,${0.035 * torch.visibleStrength})`);
+      haloGradient.addColorStop(1, 'rgba(255,205,140,0)');
+
+      mainCtx.fillStyle = haloGradient;
+      mainCtx.beginPath();
+      mainCtx.arc(torch.x, torch.y, revealRadius * config.haloScale, 0, Math.PI * 2);
+      mainCtx.fill();
+
+      mainCtx.restore();
+    }
+
+    function drawPreview() {
+      previewCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
+      previewCtx.fillStyle = '#050505';
+      previewCtx.fillRect(0, 0, previewCanvas.width, previewCanvas.height);
+
+      previewCtx.save();
+      previewCtx.strokeStyle = 'rgba(255,255,255,0.08)';
+      previewCtx.strokeRect(0.5, 0.5, previewCanvas.width - 1, previewCanvas.height - 1);
+      previewCtx.restore();
+
+      if (!latestResult?.landmarks?.length) {
+        previewCtx.fillStyle = 'rgba(221, 197, 140, 0.4)';
+        previewCtx.font = '14px system-ui, sans-serif';
+        previewCtx.textAlign = 'center';
+        previewCtx.fillText('等待检测手部…', previewCanvas.width / 2, previewCanvas.height / 2);
+        return;
+      }
+
+      const drawingUtils = new DrawingUtils(previewCtx);
+      const landmarks = latestResult.landmarks[0];
+      const mirrored = landmarks.map((point) => ({ ...point, x: 1 - point.x }));
+
+      drawingUtils.drawConnectors(mirrored, HandLandmarker.HAND_CONNECTIONS, {
+        lineWidth: 2,
+        color: '#7dd3fc'
+      });
+
+      drawingUtils.drawLandmarks(mirrored, {
+        radius: 3,
+        color: '#fde68a',
+        fillColor: '#f97316'
+      });
+
+      const previewX = (torch.targetX / window.innerWidth) * previewCanvas.width;
+      const previewY = (torch.targetY / window.innerHeight) * previewCanvas.height;
+      const previewR = (torch.targetRadius / Math.min(window.innerWidth, window.innerHeight)) * Math.min(previewCanvas.width, previewCanvas.height);
+
+      const previewGrad = previewCtx.createRadialGradient(
+        previewX,
+        previewY,
+        previewR * 0.08,
+        previewX,
+        previewY,
+        previewR * 1.08
+      );
+      previewGrad.addColorStop(0, 'rgba(255,244,214,0.28)');
+      previewGrad.addColorStop(0.6, 'rgba(255,228,170,0.12)');
+      previewGrad.addColorStop(1, 'rgba(255,220,140,0)');
+
+      previewCtx.fillStyle = previewGrad;
+      previewCtx.beginPath();
+      previewCtx.arc(previewX, previewY, previewR * 1.08, 0, Math.PI * 2);
+      previewCtx.fill();
+    }
+
+    function render() {
+      drawBackgroundScene();
+      drawSpotlight();
+      drawPreview();
+      requestAnimationFrame(render);
+    }
+
+    function updateTorchByHand(hand) {
+      const metrics = computeHandMetrics(hand);
+      const point = pickTorchPoint(hand);
+
+      torch.presenceFrames += 1;
+      torch.lostFrames = 0;
+
+      if (torch.presenceFrames >= config.activeOnFrames) {
+        torch.active = true;
+      }
+
+      const minRadius = Math.min(window.innerWidth, window.innerHeight) * config.minRadiusRatio;
+      const maxRadius = Math.min(window.innerWidth, window.innerHeight) * config.maxRadiusRatio;
+      const opennessRadius = lerp(minRadius, maxRadius, metrics.openness);
+      const pinchTighten = lerp(1, 0.82, clamp(1 - metrics.pinch, 0, 1));
+
+      torch.targetX = (1 - point.x) * window.innerWidth;
+      torch.targetY = point.y * window.innerHeight;
+      torch.targetRadius = opennessRadius * pinchTighten;
+      torch.openness = metrics.openness;
+      torch.pinch = metrics.pinch;
+
+      const opennessPercent = Math.round(metrics.openness * 100);
+      const beamSize = Math.round(torch.targetRadius);
+      setStatus(`已检测到手部｜张开度 ${opennessPercent}% ｜ 光束半径 ${beamSize}px ｜ 张手更大，合手更聚焦`);
+    }
+
+    function handleNoHand() {
+      torch.presenceFrames = 0;
+      torch.lostFrames += 1;
+      if (torch.lostFrames >= config.activeOffFrames) {
+        torch.active = false;
+      }
+      setStatus('未检测到手部，请将手放入摄像头范围内。');
+    }
+
+    async function detectHands() {
+      if (!running || !handLandmarker || webcamVideo.readyState < 2) {
+        requestAnimationFrame(detectHands);
+        return;
+      }
+
+      const nowInMs = performance.now();
+      if (webcamVideo.currentTime !== lastVideoTime) {
+        lastVideoTime = webcamVideo.currentTime;
+        latestResult = handLandmarker.detectForVideo(webcamVideo, nowInMs);
+
+        const hand = latestResult?.landmarks?.[0];
+        if (hand) {
+          updateTorchByHand(hand);
+        } else {
+          handleNoHand();
+        }
+      }
+
+      requestAnimationFrame(detectHands);
+    }
+
+    async function initHandLandmarker() {
+      setStatus('正在加载 MediaPipe 手部模型…');
+
+      const vision = await FilesetResolver.forVisionTasks(
+        'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm'
+      );
+
+      handLandmarker = await HandLandmarker.createFromOptions(vision, {
+        baseOptions: {
+          modelAssetPath: 'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task'
+        },
+        numHands: config.maxHands,
+        runningMode: 'VIDEO',
+        minHandDetectionConfidence: config.minHandDetectionConfidence,
+        minHandPresenceConfidence: config.minHandPresenceConfidence,
+        minTrackingConfidence: config.minTrackingConfidence
+      });
+
+      setStatus('MediaPipe 已就绪，等待摄像头启动…');
+    }
+
+    async function initMedia() {
+      currentImage.decode?.().catch(() => {});
+
+      if (historyVideo.paused) {
+        historyVideo.muted = true;
+        historyVideo.playsInline = true;
+        await historyVideo.play().catch(() => {});
+      }
+
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+          facingMode: 'user'
+        },
+        audio: false
+      });
+
+      webcamVideo.srcObject = stream;
+      await webcamVideo.play();
+      setStatus('摄像头已启动，正在检测手部…');
+    }
+
+    async function startApp() {
+      permissionBtn.disabled = true;
+      permissionBtn.textContent = '启动中…';
+
+      try {
+        await Promise.all([
+          initHandLandmarker(),
+          initMedia()
+        ]);
+
+        running = true;
+        permissionBtn.remove();
+        detectHands();
+      } catch (error) {
+        console.error(error);
+        setStatus(`启动失败：${error.message}`);
+        permissionBtn.disabled = false;
+        permissionBtn.textContent = '重新尝试开启摄像头与交互';
+      }
+    }
+
+    permissionBtn.addEventListener('click', startApp);
+    hudToggleBtn.addEventListener('click', () => {
+      const willShow = hudEl.classList.contains('hidden-panel');
+      setHudVisible(willShow);
+    });
+    setHudVisible(true);
+
+    currentImage.addEventListener('error', () => {
+      setStatus('现存图片加载失败，请检查 ./img/k明故宫现代.png 是否存在。');
+    });
+
+    historyVideo.addEventListener('error', () => {
+      setStatus('历史视频加载失败，请检查 ./mp4/明故宫.mp4 是否存在。');
+    });
+
+    render();
+  </script>
+</body>
+</html>

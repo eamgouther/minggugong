@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>明故宫对历代宫殿的影响 - 分区域地图可视化</title>
+    <script src="echarts.min.js"></script>
+    <!-- <script src="map/china.js"></script> -->
+    <!-- <script src="map/beijing.js"></script> -->
+    <!-- <script src="map/jiangsu.js"></script> -->
+    <!-- <script src="map/liaoning.js"></script>
+    <script src="map/hebei.js"></script> -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "agency fb","隶书",sans-serif;
+        }
+        body {
+            background-image: url("img/内页6.png");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        .main-container {
+            position: fixed;
+            top: 60px;
+            left: 20px;
+            right: 20px;
+            bottom: 20px;
+            z-index: 999;
+            display: flex;
+            gap: 20px;
+            max-width: 1600px;
+            margin: 0 auto;
+            height: 800px;
+        }
+        /* 核心调整：子地图区域改为两行两列网格 */
+        .map-area {
+            flex: 8;
+            display: grid;
+            /* 全国图占1列，子地图占2列 | 全国图占2行，子地图分2行 */
+            grid-template-columns: 2fr 1fr 1fr; 
+            grid-template-rows: 1fr 1fr;
+            gap: 10px;
+            height: 100%;
+        }
+        .map-total, .map-sub {
+            width: 100%;
+            height: 100%;
+            border-radius: 8px;
+        }
+        /* 全国总览图：占据第1列，跨2行 */
+        .map-total {
+            grid-column: 1/2;
+            grid-row: 1/3;
+        }
+        /* 子地图容器：统一样式 */
+        .map-sub-wrap {
+            position: relative;
+            height: 100%;
+        }
+        /* 子地图标题：半透明背景提升可读性 */
+        .sub-map-title {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+            padding: 4px 8px;
+            border-radius: 4px;
+            z-index: 10;
+            /* background: rgba(255,255,255,0.8); */
+        }
+        /* 移动端适配：堆叠布局 */
+        @media (max-width: 1200px) {
+            .main-container {
+                height: auto;
+                flex-direction: column;
+            }
+            .map-area {
+                grid-template-columns: 1fr 1fr; /* 移动端子地图仍保持两行两列 */
+                grid-template-rows: 400px 250px 250px;
+                height: 900px;
+            }
+            .map-total {
+                grid-column: 1/3; /* 全国图占满宽度 */
+                grid-row: 1/2; /* 仅占第1行 */
+            }
+        }
+        @media (max-width: 768px) {
+            .map-area {
+                grid-template-columns: 1fr; /* 移动端单列 */
+                grid-template-rows: 350px 200px 200px 200px 200px;
+                height: 1150px;
+            }
+            .map-total {
+                grid-column: 1/2;
+                grid-row: 1/2;
+            }
+        }
+        /* 返回首页按钮样式 */
+        .back-home-btn {
+            position: absolute;
+            top: 15px;
+            left: 60px;
+            z-index: 999;
+            width: 180px;
+            height: 60px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+            color: #733900;
+            text-decoration: none;
+            overflow: hidden;
+        }
+        .btn-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url("img/017.png") no-repeat center center;
+            background-size: cover;
+            z-index: 1;
+        }
+        .btn-text {
+            position: relative;
+            z-index: 2;
+        }
+		.module4 {
+			position: fixed;
+			top: 85%;
+			left: 6%;
+			width:200px;
+			height: 500px;
+		    /* background: white; */
+		    border-radius: 12px;
+		    /* box-shadow: 0 4px 20px rgba(0,0,0,0.08); */
+		    padding: 10px;
+		    margin-bottom: 10px;
+		}
+		.module4-content {
+		  font-size: 0.9rem;
+		  line-height: 1.8;
+		  color: #333;
+		  /* margin-left: 10px;
+		  margin-right: 10px;
+		  margin-top: 10px; */
+		}
+    </style>
+</head>
+<body>
+    <a href="导航.html" class="back-home-btn">
+        <div class="btn-bg"></div>
+        <span class="btn-text">返回首页</span>
+    </a>
+    <div class="main-container">
+        <div class="map-area">
+            <!-- 全国总览地图（保留25座标注） -->
+            <div id="map-total" class="map-total"></div>
+            
+            <!-- 子地图：两行两列布局 -->
+            <!-- 第一行：江苏、北京 -->
+            <div class="map-sub-wrap">
+                <div class="sub-map-title">江苏省（南京）</div>
+                <div id="map-jiangsu" class="map-sub"></div>
+            </div>
+            <div class="map-sub-wrap">
+                <div class="sub-map-title">北京市（北京故宫）</div>
+                <div id="map-beijing" class="map-sub"></div>
+            </div>
+            <!-- 第二行：辽宁、河北 -->
+            <div class="map-sub-wrap">
+                <div class="sub-map-title">辽宁省（沈阳）</div>
+                <div id="map-liaoning" class="map-sub"></div>
+            </div>
+            <div class="map-sub-wrap">
+                <div class="sub-map-title">河北省（承德）</div>
+                <div id="map-hebei" class="map-sub"></div>
+            </div>
+        </div>
+    </div>
+	<div class="module4">
+		<div class="module4-content">
+			<p>审图号：GS（2024）0650号</p>
+			<p>地图来源：天地图</p>
+		</div>
+	</div>
+
+    <script>
+        window.onload = async function() {
+            // ========== 25座受明故宫影响的宫殿/王府数据 ==========
+            var palaceData = {
+                ming: [
+                    // 江苏（8座）
+                    {name: "南京明故宫（京师）", value: [118.8072, 32.0415], desc: "明代初期皇宫，首创“前朝后寝、中轴对称”布局范式，为明清宫殿奠定核心规制。"},
+                    {name: "南京明故宫西华门", value: [118.8018, 32.0428], desc: "明故宫西入口，明代皇城城门规制典范，影响北京故宫西华门设计。"},
+                    {name: "南京明故宫午门", value: [118.8095, 32.0408], desc: "明故宫正南门，首创“凹”字形午门形制，被北京故宫完全承袭。"},
+                    {name: "南京明故宫东华门", value: [118.8125, 32.0418], desc: "明故宫东入口，三门道规制成为明清皇城东门范本。"},
+                    {name: "南京明故宫奉天殿", value: [118.8085, 32.0405], desc: "明故宫核心殿宇，北京故宫太和殿的原型。"},
+                    {name: "南京明故宫乾清殿", value: [118.8078, 32.0398], desc: "明代皇帝寝宫，北京故宫乾清宫规制原型。"},
+                    {name: "南京瞻园（王府）", value: [118.7825, 32.0358], desc: "明代王府典范，承袭明故宫“中轴对称”园林布局逻辑。"},
+                    {name: "南京煦园（王府）", value: [118.7918, 32.0468], desc: "明代汉王朱高煦王府，沿用明故宫建筑规制与尺度。"},
+                    // 安徽（2座，仅总览图显示）
+                    {name: "凤阳明中都故宫", value: [117.3828, 32.8558], desc: "朱元璋时期营建的都城宫殿，早于南京明故宫，是明故宫规制的雏形。"},
+                    {name: "凤阳鼓楼（中都配套）", value: [117.3858, 32.8628], desc: "明中都核心建筑，承袭明故宫“中轴线对称”设计理念。"},
+                    // 北京（5座）
+                    {name: "北京故宫太和殿", value: [116.3972, 39.9078], desc: "北京故宫核心建筑，完全承袭南京明故宫“奉天殿”规制，明清宫殿最高形制代表。"},
+                    {name: "北京故宫乾清宫", value: [116.3985, 39.9066], desc: "明代皇帝寝宫，延续南京明故宫“乾清殿”中轴对称、前朝后寝布局逻辑。"},
+                    {name: "北京故宫午门", value: [116.3908, 39.9085], desc: "直接复刻南京明故宫午门“凹”字形形制，仅尺度略作放大。"},
+                    {name: "北京故宫东华门", value: [116.4025, 39.9078], desc: "承袭南京明故宫东华门“三门道”规制，明清皇城东门范本。"},
+                    {name: "北京明皇极殿", value: [116.3968, 39.9088], desc: "明代北京紫禁城核心殿宇，沿用南京明故宫殿宇命名与布局。"},
+                    // 湖北（1座，仅总览图显示）
+                    {name: "武汉楚王府", value: [114.3028, 30.5858], desc: "明代楚王藩王府邸，完全复刻明故宫“前朝后寝”核心布局。"}
+                ],
+                qing: [
+                    // 北京（3座）
+                    {name: "北京故宫养心殿", value: [116.3958, 39.9058], desc: "清代皇帝理政寝宫，在明故宫原有建筑基础上改造，延续明故宫空间规制。"},
+                    {name: "北京雍和宫（王府改宫）", value: [116.4128, 39.9458], desc: "清代雍亲王府，沿用明故宫王府规制，后改建为皇家寺院。"},
+                    {name: "北京醇亲王府", value: [116.3828, 39.9558], desc: "清代醇亲王府邸，承袭明故宫王府“中轴对称、多进院落”布局。"},
+                    // 辽宁（2座）
+                    {name: "沈阳故宫崇政殿", value: [123.4378, 41.8158], desc: "清代入关前核心殿宇，首次借鉴南京明故宫“中轴对称”理念，融合满族特色。"},
+                    {name: "沈阳故宫大政殿", value: [123.4428, 41.8178], desc: "满清早期议政殿，借鉴明故宫“殿宇群组”布局逻辑，保留游牧民族特色。"},
+                    // 浙江（1座，仅总览图显示）
+                    {name: "杭州故宫行宫", value: [120.1528, 30.2558], desc: "清代仿明故宫规制营建的皇家行宫，复刻“中轴对称、前朝后寝”核心布局。"},
+                    // 河北（2座）
+                    {name: "承德避暑山庄澹泊敬诚殿", value: [117.9628, 40.9858], desc: "清代皇家行宫核心殿宇，借鉴明故宫“殿宇等级形制”，融合北方园林特色。"},
+                    {name: "承德外八庙普陀宗乘之庙", value: [117.9828, 40.9958], desc: "清代皇家寺院，山门布局承袭明故宫“对称式”规制，融合藏式建筑特色。"},
+                    // 山西/山东（2座，仅总览图显示）
+                    {name: "太原晋王府（遗址）", value: [112.5428, 37.8758], desc: "明代晋王府邸，完全沿用明故宫王府建筑规制，是北方王府典范。"},
+                    {name: "曲阜孔府（衍圣公府）", value: [116.9828, 35.5958], desc: "清代扩建的衍圣公府，承袭明故宫“官式建筑”规制，中轴对称、院落递进。"}
+                ]
+            };
+    
+            // ========== 筛选子地图数据 ==========
+            var beijingData = [
+                ...palaceData.ming.filter(item => item.name.includes("北京")),
+                ...palaceData.qing.filter(item => item.name.includes("北京"))
+            ];
+            var jiangsuData = palaceData.ming.filter(item => item.name.includes("南京"));
+            var liaoningData = palaceData.qing.filter(item => item.name.includes("沈阳"));
+            var hebeiData = palaceData.qing.filter(item => item.name.includes("承德"));
+    
+            // ========== 通用配置函数 ==========
+            function getBaseOption(mapName, zoom, center) {
+                return {
+                    tooltip: {
+                        trigger: 'item',
+                        formatter: function(params) {
+                            if (!params.data || !params.data.desc) {
+                                return `<b>${params.name}</b>`;
+                            }
+                            var shortDesc = params.data.desc.substring(0, 80);
+                            var wrapDesc = '';
+                            var lineLength = 25;
+                            for (var i = 0; i < shortDesc.length; i += lineLength) {
+                                wrapDesc += shortDesc.substring(i, i + lineLength) + '<br/>';
+                            }
+                            return `<b>${params.name}</b><br/>${wrapDesc}`;
+                        },
+                        position: function(point, params, dom, rect, size) {
+                            return [point[0] - size.contentSize[0] / 2, point[1] + 20];
+                        },
+                        textStyle: {
+                            fontSize: 17,
+                            fontFamily: '"agency fb","隶书",sans-serif'
+                        }
+                    },
+                    geo: {
+                        map: mapName,
+                        roam: true,
+                        zoom: zoom,
+                        center: center,
+                        label: {
+                            show: true,
+                            fontSize: 12,
+                            color: '#664422',
+                            textStyle: {
+                                fontFamily: '"agency fb","隶书",sans-serif',
+                                fontSize: 15
+                            }
+                        },
+                        itemStyle: {
+                            areaColor: '#f9f2e8',
+                            borderColor: '#d4b98c',
+                            borderWidth: 1
+                        },
+                        emphasis: {
+                            itemStyle: {
+                                areaColor: '#e8d5b7'
+                            }
+                        }
+                    },
+                    series: []
+                };
+            }
+    
+            // ========== 加载 GeoJSON 并注册 ==========
+            async function loadGeoJSONMap(url, mapName) {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(mapName + ' 地图加载失败：' + response.status);
+                }
+                const geoJson = await response.json();
+                echarts.registerMap(mapName, geoJson);
+            }
+    
+            try {
+                await Promise.all([
+                    loadGeoJSONMap('map/中国_省.geojson', 'china'),
+                    loadGeoJSONMap('map/江苏省_市.geojson', '江苏'),
+                    loadGeoJSONMap('map/北京市_县.geojson', '北京'),
+                    loadGeoJSONMap('map/辽宁省_市.geojson', '辽宁'),
+                    loadGeoJSONMap('map/河北省_市.geojson', '河北')
+                ]);
+            } catch (error) {
+                console.error(error);
+                alert('地图数据加载失败，请检查 GeoJSON 文件路径是否正确。');
+                return;
+            }
+    
+            // ========== 初始化全国总览地图 ==========
+            var totalChart = echarts.init(document.getElementById('map-total'));
+            var totalOption = getBaseOption('china', 1.1, [104.00, 36.00]);
+            totalOption.title = {
+                text: '明故宫对历代宫殿/王府的传承影响分布图（25座）',
+                subtext: '明代宫殿/王府（15座）| 清代宫殿/王府（10座）',
+                left: 'center',
+                textStyle: {
+                    fontSize: 32,
+                    color: '#333',
+                    fontFamily: '"agency fb","隶书",sans-serif'
+                },
+                subtextStyle: {
+                    fontSize: 18,
+                    color: '#666',
+                    fontFamily: '"agency fb","隶书",sans-serif'
+                }
+            };
+            totalOption.legend = {
+                orient: 'vertical',
+                top: '10%',
+                right: '2%',
+                data: ['明代宫殿/王府', '清代宫殿/王府'],
+                selectedMode: 'multiple',
+                selected: {
+                    '明代宫殿/王府': true,
+                    '清代宫殿/王府': true
+                },
+                textStyle: {
+                    fontSize: 16,
+                    color: '#666',
+                    fontFamily: '"agency fb","隶书",sans-serif'
+                }
+            };
+            totalOption.series = [
+                {
+                    name: '明代宫殿/王府',
+                    type: 'scatter',
+                    coordinateSystem: 'geo',
+                    data: palaceData.ming,
+                    symbol: 'circle',
+                    symbolSize: 10,
+                    itemStyle: { color: '#e53935' },
+                    emphasis: {
+                        symbolSize: 18,
+                        itemStyle: { color: '#c62828' }
+                    },
+                    triggerEvent: true,
+                    zlevel: 2
+                },
+                {
+                    name: '清代宫殿/王府',
+                    type: 'scatter',
+                    coordinateSystem: 'geo',
+                    data: palaceData.qing,
+                    symbol: 'circle',
+                    symbolSize: 10,
+                    itemStyle: { color: '#43a047' },
+                    emphasis: {
+                        symbolSize: 18,
+                        itemStyle: { color: '#2e7d32' }
+                    },
+                    triggerEvent: true,
+                    zlevel: 2
+                }
+            ];
+            totalChart.setOption(totalOption);
+    
+            // ========== 初始化子地图 ==========
+            // 江苏
+            var jiangsuChart = echarts.init(document.getElementById('map-jiangsu'));
+            var jiangsuOption = getBaseOption('江苏', 1.2, [119.3008, 33.0858]);
+            jiangsuOption.series = [{
+                name: '明代宫殿/王府',
+                type: 'scatter',
+                coordinateSystem: 'geo',
+                data: jiangsuData,
+                symbol: 'circle',
+                symbolSize: 12,
+                itemStyle: { color: '#e53935' },
+                emphasis: { symbolSize: 20 },
+                triggerEvent: true,
+                zlevel: 2
+            }];
+            jiangsuChart.setOption(jiangsuOption);
+    
+            // 北京
+            var beijingChart = echarts.init(document.getElementById('map-beijing'));
+            var beijingOption = getBaseOption('北京', 1.2, [116.45, 40.301]);
+            beijingOption.series = [{
+                name: '明代/清代宫殿/王府',
+                type: 'scatter',
+                coordinateSystem: 'geo',
+                data: beijingData,
+                symbol: 'circle',
+                symbolSize: 12,
+                itemStyle: { color: '#ff9800' },
+                emphasis: { symbolSize: 20 },
+                triggerEvent: true,
+                zlevel: 2
+            }];
+            beijingChart.setOption(beijingOption);
+    
+            // 辽宁
+            var liaoningChart = echarts.init(document.getElementById('map-liaoning'));
+            var liaoningOption = getBaseOption('辽宁', 1.2, [122.4328, 41.0458]);
+            liaoningOption.series = [{
+                name: '清代宫殿',
+                type: 'scatter',
+                coordinateSystem: 'geo',
+                data: liaoningData,
+                symbol: 'circle',
+                symbolSize: 12,
+                itemStyle: { color: '#43a047' },
+                emphasis: { symbolSize: 20 },
+                triggerEvent: true,
+                zlevel: 2
+            }];
+            liaoningChart.setOption(liaoningOption);
+    
+            // 河北
+            var hebeiChart = echarts.init(document.getElementById('map-hebei'));
+            var hebeiOption = getBaseOption('河北', 1.2, [116.9628, 39.3658]);
+            hebeiOption.series = [{
+                name: '清代宫殿/寺院',
+                type: 'scatter',
+                coordinateSystem: 'geo',
+                data: hebeiData,
+                symbol: 'circle',
+                symbolSize: 12,
+                itemStyle: { color: '#43a047' },
+                emphasis: { symbolSize: 20 },
+                triggerEvent: true,
+                zlevel: 2
+            }];
+            hebeiChart.setOption(hebeiOption);
+    
+            // ========== 交互事件 ==========
+            function handlePointClick(data) {
+                if (!data) return;
+                console.log("选中：", data.name, " - ", data.desc);
+            }
+    
+            [totalChart, beijingChart, jiangsuChart, liaoningChart, hebeiChart].forEach(chart => {
+                chart.on('click', function(params) {
+                    if (params.dataType === 'series') {
+                        handlePointClick(params.data);
+                    }
+                });
+            });
+    
+            // 图例筛选联动
+            totalChart.on('legendselectchanged', function(params) {
+                const selected = params.selected;
+                const mingKey = '明代宫殿/王府';
+                const qingKey = '清代宫殿/王府';
+    
+                totalChart.setOption({
+                    series: [
+                        { name: mingKey, show: selected[mingKey] },
+                        { name: qingKey, show: selected[qingKey] }
+                    ]
+                });
+    
+                jiangsuChart.setOption({
+                    series: [{ show: selected[mingKey] }]
+                });
+    
+                liaoningChart.setOption({
+                    series: [{ show: selected[qingKey] }]
+                });
+    
+                hebeiChart.setOption({
+                    series: [{ show: selected[qingKey] }]
+                });
+    
+                beijingChart.setOption({
+                    series: [{ show: selected[mingKey] || selected[qingKey] }]
+                });
+            });
+    
+            // 窗口大小适配
+            window.addEventListener('resize', function() {
+                [totalChart, beijingChart, jiangsuChart, liaoningChart, hebeiChart].forEach(chart => {
+                    chart.resize();
+                });
+            });
+        };
+    </script>
+</body>
+</html>

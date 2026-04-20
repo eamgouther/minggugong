@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>礼制文化 · 七维视界</title>
+    <style>
+		/* 全局样式 */
+		* {
+		  margin: 0;
+		  padding: 0;
+		  box-sizing: border-box;
+		  font-family: "agency fb","隶书",sans-serif;
+		}
+		/* 页面背景 */
+		body {
+		  background-image: url("img/a明故宫内页.png");
+		  background-size: cover;
+		  background-position: center;
+		  background-attachment: fixed;
+		  min-height: 100vh;
+		  background-color: #f8f9fa;
+		  color: #333;
+		  min-height: 100vh;
+		}
+		/* 标题容器：宽度100%，高度占比20% */
+		.title-container {
+		    width: 100%;
+		    height: 10vh;
+		    display: flex;
+		    align-items: center; /* 垂直居中 */
+		    padding-left: 23rem; /* 左侧内边距 */
+			padding-top: 6rem;
+		}
+		.title-container h1{
+			font-size: 80px;
+			font-weight: 400;
+			margin-bottom: 1px;
+			font-family: "agency fb","隶书";
+		}
+		/* ========== 新增：返回首页按钮样式 ========== */
+		    .back-home-btn {
+		      position: absolute;
+		      top: 70px;
+		      right: 150px;
+		      z-index: 999; /* 确保按钮在最上层 */
+		      width: 180px;
+		      height: 60px;
+		      border: none;
+		      /* border-radius: 8px; */
+		      cursor: pointer;
+		      /* 核心：背景图片与文字分层 */
+		      display: flex;
+		      align-items: center;
+		      justify-content: center;
+		      font-size: 20px;
+		      font-weight: bold;
+		      color: #733900;
+		      text-decoration: none; /* 去掉a标签默认下划线 */
+		      overflow: hidden;
+		    }
+		
+		    /* 背景图层（单独用于旋转） */
+		    .btn-bg {
+		      position: absolute;
+		      top: 0;
+		      left: 0;
+		      width: 100%;
+		      height: 100%;
+		      background: url("img/017.png") no-repeat center center; /* 替换为你的按钮背景图 */
+		      background-size: cover;
+		      z-index: 1; /* 背景在文字下方 */
+		    }
+        /* 外壳容器：透视与尺寸限制 */
+        .shell {
+            position: relative;
+            width: 60vw;
+            height: 40vw;
+            max-width: 480px;
+            max-height: 450px;
+            margin: 90px 0 0 700px;
+            color: white;
+            perspective: 1200px;
+            transform-origin: center;
+        }
+
+        /* 3D轮播内容容器 */
+        .content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            transform-origin: center;
+            transform-style: preserve-3d;
+            /* 初始显示第一个视频 */
+            transform: translateZ(-38vw) rotateY(0deg);
+            transition: transform 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        }
+
+        /* 通用项目卡片：视频容器 */
+        .item {
+            position: absolute;
+            width: 60vw;
+            height: 40vw;
+            max-width: 480px;
+            max-height: 350px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.6), 0 0 0 2px rgba(255, 245, 200, 0.2) inset;
+            border-radius: 16px;
+            background-color: #1a1a2e;
+            overflow: hidden;
+            /* -webkit-box-reflect: below 15px -webkit-linear-gradient(transparent 60%, rgba(255, 240, 200, 0.2)); */
+            transition: box-shadow 0.3s ease;
+			    /* 新增：确保卡片本身可交互 */
+			    pointer-events: auto;
+			    /* 新增：强制层级，避免被其他卡片遮挡 */
+			    z-index: 1;
+			    /* 调整旋转中心为卡片自身中心 */
+			    transform-origin: center center;
+        }
+
+        .item:hover {
+            box-shadow: 0 20px 40px rgba(255, 215, 150, 0.5), 0 0 0 3px #fde6b6 inset;
+        }
+
+        /* 视频元素填满卡片，显示控制控件 */
+        .item video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            border-radius: 16px;
+            /* 显示视频控制栏 */
+			pointer-events: auto;
+			z-index: 2;
+        }
+
+        
+        /* 七个卡片分别定位 */
+        .item:nth-child(1) {
+            transform: rotateY(0deg) translateZ(38vw);
+        }
+        .item:nth-child(2) {
+            transform: rotateY(51.428deg) translateZ(38vw);
+        }
+        .item:nth-child(3) {
+            transform: rotateY(102.856deg) translateZ(38vw);
+        }
+        .item:nth-child(4) {
+            transform: rotateY(154.284deg) translateZ(38vw);
+        }
+        .item:nth-child(5) {
+            transform: rotateY(205.712deg) translateZ(38vw);
+        }
+        .item:nth-child(6) {
+            transform: rotateY(257.14deg) translateZ(38vw);
+        }
+        .item:nth-child(7) {
+            transform: rotateY(308.568deg) translateZ(38vw);
+        }
+
+        /* 轮播箭头样式 */
+        .carousel-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.6);
+            color: #ffcf8a;
+            font-size: 24px;
+            border: 2px solid rgba(255,220,150,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(4px);
+        }
+
+        .carousel-arrow:hover {
+            background: rgba(255,207,138,0.3);
+            color: #fff;
+            box-shadow: 0 0 15px #ffcf8a;
+        }
+
+        .prev-arrow {
+            left: -270px;
+        }
+
+        .next-arrow {
+            right: -270px;
+        }
+
+        /* 响应式调整箭头位置 */
+        @media (max-width: 768px) {
+            .prev-arrow {
+                left: -60px;
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+            }
+            .next-arrow {
+                right: -60px;
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+            }
+        }
+		/* ========== 新增：视频介绍容器样式 ========== */
+		        .video-intro-container {
+		            position: fixed;
+					top: 17%;
+					right: 19%;
+		            width: 80vw;
+		            max-width: 600px;
+		            margin: 470px 0 0 300px;
+		            padding: 20px;
+		            background: url(img/38.png);
+					background-size: 100% 100%;
+		            border-radius: 16px;
+		            /* box-shadow: 0 15px 30px rgba(0, 0, 0, 0.6), 0 0 0 2px rgba(255, 245, 200, 0.2) inset; */
+		            color: #733900;
+		        }
+		        .video-intro-title {
+		            font-size: 24px;
+		            color: #333;
+		            margin-bottom: 10px;
+					padding-left: 10px;
+		            padding-bottom: 2px;
+		            border-bottom: 1px solid rgba(255, 207, 138, 0.5);
+		        }
+		        .video-intro-content {
+					padding-left: 10px;
+					padding-right: 10px;
+		            font-size: 16px;
+		            line-height: 1.8;
+		            text-indent: 2em;
+		        }
+
+		.module3 {
+			position: fixed;
+			top: 25%;
+			left: 2%;
+			width:380px;
+			height: 450px;
+		    background: url("img/037.png") no-repeat center center;
+		    background-size: 100% 100%;
+		    /* border-radius: 12px; */
+		    /* box-shadow: 0 4px 20px rgba(0,0,0,0.08); */
+		    padding-top: 20px;
+		    margin-bottom: 10px;
+			font-size: 16px;
+			line-height: 1.0;
+		}
+		.module3-title {
+		  height: 10px;
+		  font-size: 24px;
+		  color: #733900;
+		  margin-top: 5px;
+		  padding-bottom: 30px;
+		  /* border-bottom: 2px solid #733900; */
+		  text-align: center;
+		}
+			
+		.module3-content {
+		  font-size: 17px;
+		  line-height: 1.8;
+		  color: #333;
+		  margin-left: 15px;
+		  margin-right: 15px;
+		 /* margin-top: 30px; */
+		}
+		
+		/* 简介板块首行缩进2字符（中文排版规范） */
+		.module3 p {;
+		    text-indent: 2em;
+		    margin-bottom: 15px;
+		}
+		/* 图片图层容器 - 独立层级，不影响其他元素 */
+		.images-layer {
+		    position: fixed; /* 和主容器一致的固定定位 */
+		    top: 0;
+		    left: 0;
+		    width: 100vw;
+		    height: 100vh;
+		    z-index: 2; /* 低于信息卡片(10)、指示线(5)，高于背景(0) */
+		    pointer-events: none; /* 不阻挡鼠标交互（图表/卡片点击） */
+		}
+		
+		/* 单个图片样式 - 可独立调整位置/大小/层级 */
+		.layer-image {
+		    position: absolute;
+		    pointer-events: auto; /* 如需点击图片可保留，否则设为none */
+		    /* 基础样式，可根据图片调整 */
+		    width: 100px; /* 初始宽度，按需修改 */
+		    height: auto; /* 保持宽高比 */
+		    opacity: 1; /* 透明度，可选 */
+		    transition: all 0.3s ease; /* 调整时平滑过渡，可选 */
+		}
+		
+		/* 示例：给不同图片加类名，方便单独调整 */
+		.img-1 {
+		    top: 10%; /* 距离顶部百分比/像素 */
+		    left: 2%; /* 距离左侧百分比/像素 */
+		    width: 220px; 
+		    z-index: 3; /* 可单独调整层级 */
+		}
+		
+		.img-2 {
+		    top: 5%;
+		    left: 15%; /* 距离右侧 */
+		    width: 300px;
+		    z-index: 3;
+		}
+		
+		.img-3 {
+		    top: 10%; /* 距离底部 */
+		    left: 33%;
+		    width: 300px;
+		    z-index: 3;
+		}
+		
+		.img-4 {
+		    top: 13%; /* 距离底部 */
+		    left: 48%;
+		    width: 300px;
+		    z-index: 3;
+		}
+		
+		.img-5 {
+		    top: 10%; /* 距离底部 */
+		    left: 65%;
+		    width: 300px;
+		    z-index: 3;
+		}
+		.img-6 {
+		    top: 10%; /* 距离底部 */
+		    left: 81%;
+		    width: 350px;
+		    z-index: 3;
+		}
+		.img-7 {
+		    top: 79%; /* 距离底部 */
+		    right: 55%;
+		    width: 350px;
+		    z-index: 3;
+		}
+    </style>
+</head>
+<body>
+	<!-- 标题容器 -->
+	<div class="title-container">
+	   <h1>宫阙朝暮—帝居日常</h1>
+	</div>
+	<!-- ========== 新增：返回首页按钮 ========== -->
+	    <a href="导航.html" class="back-home-btn"> <!-- 替换index.html为你的首页地址 -->
+	      <div class="btn-bg"></div> <!-- 背景图层（旋转） -->
+	      <span class="btn-text">返回首页</span> <!-- 文字层（静止） -->
+	    </a>
+    <div class="shell">
+        <!-- 左箭头 -->
+        <div class="carousel-arrow prev-arrow" id="prevBtn">◀</div>
+        <!-- 右箭头 -->
+        <div class="carousel-arrow next-arrow" id="nextBtn">▶</div>
+        
+        <div class="content" id="carouselContent">
+            <!-- 七个卡片，关闭自动播放，显示控件 - 修复视频路径 -->
+            <div class="item" data-index="1">
+                <video controls playsinline>
+                    <source src="mp4/皇帝1.mp4" type="video/mp4">
+                    您的浏览器不支持 video 标签。
+                </video>
+            </div>
+            <div class="item" data-index="2">
+                <video controls playsinline>
+                    <source src="mp4/皇帝2.mp4" type="video/mp4">
+                    您的浏览器不支持 video 标签。
+                </video>
+            </div>
+            <div class="item" data-index="3">
+                <video controls playsinline>
+                    <source src="mp4/皇帝3.mp4" type="video/mp4"> <!-- 修复：原路径无错误，确认文件存在 -->
+                    您的浏览器不支持 video 标签。
+                </video>
+            </div>
+            <div class="item" data-index="4">
+                <video controls playsinline>
+                    <source src="mp4/皇帝4.mp4" type="video/mp4">
+                    您的浏览器不支持 video 标签。
+                </video>
+            </div>
+            <div class="item" data-index="5">
+                <video controls playsinline>
+                    <source src="mp4/皇帝5.mp4" type="video/mp4"> <!-- 修复：原路径错误为皇帝7.mp4 -->
+                    您的浏览器不支持 video 标签。
+                </video>
+            </div>
+            <div class="item" data-index="6">
+                <video controls playsinline>
+                    <source src="mp4/皇帝6.mp4" type="video/mp4"> <!-- 修复：原路径错误为皇帝5.mp4 -->
+                    您的浏览器不支持 video 标签。
+                </video>
+            </div>
+            <div class="item" data-index="7">
+                <video controls playsinline>
+                    <source src="mp4/皇帝7.mp4" type="video/mp4"> <!-- 修复：原路径错误为皇帝6.mp4 -->
+                    您的浏览器不支持 video 标签。
+                </video>
+            </div>
+        </div>
+    </div>
+	 <!-- ========== 新增：视频介绍容器 ========== -->
+	    <div class="video-intro-container" id="videoIntroContainer">
+	        <div class="video-intro-title" id="videoIntroTitle">晨起整仪·乾清宫盥洗整装</div>
+	        <div class="video-intro-content" id="videoIntroContent">
+	            天色微明，朱元璋于明故宫乾清宫起身，内侍侍奉盥洗整装。乾清宫为明故宫内廷核心寝宫，殿宇恢弘，雕梁画栋，帝王在此梳理冠冕、规整龙袍，依礼制整肃仪容，为朝会理政做好准备，尽显明故宫内帝王晨起的威严气度与宫廷仪轨。
+	        </div>
+	    </div>
+	<div class="module3">
+		<div class="module3-title">
+			帝居日常
+		</div>
+		<div class="module3-content">
+			<p>明太祖朱元璋的一日起居活动，皆在明故宫内展开，并始终遵循严整有序的皇家规制。作为明初皇权运行的核心宫殿建筑群，明故宫的空间布局与帝王日常紧密相连：清晨自乾清宫起身整仪，随后前往奉天门御门听政，处理朝政；午间于谨身殿进膳，之后至西苑闲游小憩；继而移驾文华殿聆听儒臣讲学、研习经史，再赴武英殿批阅奏章；入夜后回到乾清宫静思社稷。明故宫中的每一座宫殿，都是朱元璋理政、治学与生活的重要空间载体，也体现了明初皇家礼制与宫殿建筑规制的深度融合。</p>
+		</div>
+	</div>
+   <!-- 图片图层容器 - 独立于原有结构 -->
+   <!-- <div class="images-layer">
+       <img src="img/d下马坊.png" alt="装饰图片1" class="layer-image img-1">
+       <img src="img/d神烈山.png" alt="装饰图片2" class="layer-image img-2">
+       <img src="img/d红门.png" alt="装饰图片3" class="layer-image img-3">
+       <img src="img/d四方城.png" alt="装饰图片4" class="layer-image img-4">
+   	<img src="img/d神道.png" alt="装饰图片5" class="layer-image img-5">
+   	<img src="img/d享殿.png" alt="装饰图片6" class="layer-image img-6">
+   	<img src="img/d宝城.png" alt="装饰图片7" class="layer-image img-7">
+   </div> -->
+
+    <script>
+        // 当前轮播索引 (从0开始，对应1-7号视频)
+        let currentIndex = 0;
+        // 每个卡片的旋转角度
+        const anglePerItem = 360 / 7;
+        // 轮播容器
+        const carouselContent = document.getElementById('carouselContent');
+        // 箭头按钮
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+		
+		  // ========== 新增：视频介绍数据（聚焦明故宫宫殿） ==========
+        const videoIntroData = [
+            {
+				title: "晨起整仪·乾清宫盥洗整装",
+                content: "天色微明，朱元璋于明故宫乾清宫起身，内侍侍奉盥洗整装。乾清宫为明故宫内廷核心寝宫，殿宇坐北朝南，是明初帝王日常起居的核心区域，帝王在此梳理冠冕、规整龙袍，依礼制整肃仪容，为朝会理政做好准备，尽显明故宫内晨起仪轨的威严。"
+            },
+            {
+				title: "奉天门早朝·御门听政",
+				content: "御门听政为朱元璋一日理政之始，于明故宫奉天门举行。奉天门为明故宫外朝核心建筑，面阔五间，气势恢宏，皇帝临朝端坐，文武百官按班奏事，军国政务在此一一裁断，朝仪森严，尽显明故宫作为朝政中心的规制。"
+            },
+            {
+                title: "御膳进奉·谨身殿午膳用度",
+                content: "政务间隙，朱元璋于明故宫谨身殿进用午膳。谨身殿位于外朝三大殿东侧，是帝王日常用膳的重要场所，御膳按明宫礼制备置，菜品丰俭有度，侍从布菜进退有序，既体现明故宫饮食规制，也展现宫廷生活的严谨。"
+            },
+            {
+                title: "御园漫步·明故宫西苑闲游",
+                content: "午膳之后，朱元璋步入明故宫西苑（御花园）休憩散心。西苑依玄武湖而建，亭台错落、花木繁茂，是明故宫内唯一的自然休憩区，帝王沿径闲游，暂释朝务烦忧，在雅致景致中调养身心，体现明故宫功能布局的张弛有度。"
+            },
+            {
+                title: "文华殿论道・修身励政",
+                content: "游园休憩之后，朱元璋移至明故宫文华殿与儒臣论道。文华殿位于外朝东侧，为帝王讲学修书之所，殿内藏有诸多经史典籍，皇帝在此虚心受教、深思明辨，以修齐治平践行君道，尽显明故宫“文治”的建筑内涵。"
+            },
+            {
+                title: "武英殿批阅·日理万机",
+                content: "与儒臣论道之后，朱元璋于明故宫武英殿批阅奏章。武英殿紧邻文华殿，是帝王日常处理政务的核心区域，全国政务汇集案前，皇帝凝神批答、宵衣旰食，以勤勉理政维系王朝运转，彰显明故宫作为治国中枢的功能。"
+            },
+            {
+                title: "月夜凭栏·乾清宫静夜沉思",
+                content: "夜幕降临，宫灯初上，朱元璋于明故宫乾清宫凭栏远眺。乾清宫作为内廷主殿，可俯瞰整个明故宫内廷区域，明月高悬，万籁俱寂，帝王静思社稷民生，在静谧中沉淀一日政务，尽显明故宫建筑与帝王心境的交融。"
+            }
+        ];
+
+        // 更新轮播位置
+        function updateCarousel() {
+            const rotateAngle = -currentIndex * anglePerItem;
+            carouselContent.style.transform = `translateZ(-38vw) rotateY(${rotateAngle}deg)`;
+			
+			 // 更新介绍容器内容
+            const introTitle = document.getElementById('videoIntroTitle');
+            const introContent = document.getElementById('videoIntroContent');
+            introTitle.textContent = videoIntroData[currentIndex].title;
+            introContent.textContent = videoIntroData[currentIndex].content;
+        }
+
+        // 上一个
+        prevBtn.addEventListener('click', () => {
+            currentIndex = (currentIndex - 1 + 7) % 7;
+            updateCarousel();
+        });
+
+        // 下一个
+        nextBtn.addEventListener('click', () => {
+            currentIndex = (currentIndex + 1) % 7;
+            updateCarousel();
+        });
+
+        // 初始显示第一个视频
+        updateCarousel();
+
+        // 可选：键盘左右键控制
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') {
+                prevBtn.click();
+            } else if (e.key === 'ArrowRight') {
+                nextBtn.click();
+            }
+        });
+    </script>
+</body>
+</html>

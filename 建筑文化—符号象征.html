@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>符号象征</title>
+		<style type="text/css">
+			/* 全局样式 */
+			* {
+			  margin: 0;
+			  padding: 0;
+			  box-sizing: border-box;
+			  font-family: "agency fb","隶书",sans-serif;
+			}
+			/* 页面背景 */
+			body {
+			  background-image: url("img/a明故宫内页5.png");
+			  background-size: cover;
+			  background-position: center;
+			  background-attachment: fixed;
+			  min-height: 100vh;
+			  background-color: #f8f9fa;
+			  color: #333;
+			  min-height: 100vh;
+			}
+			/* 标题容器：宽度100%，高度占比20% */
+			.title-container {
+			    width: 100%;
+			    height: 10vh;
+			    display: flex;
+			    align-items: center; /* 垂直居中 */
+			    padding-left: 25rem; /* 左侧内边距 */
+				padding-top: 3rem;
+			}
+			.title-container h1{
+				font-size: 80px;
+				font-weight: 400;
+				margin-bottom: 1px;
+				font-family: "agency fb","隶书";
+			}
+			/* ========== 新增：返回首页按钮样式 ========== */
+			    .back-home-btn {
+			      position: absolute;
+			      top: 40px;
+			      left: 120px;
+			      z-index: 999; /* 确保按钮在最上层 */
+			      width: 180px;
+			      height: 60px;
+			      border: none;
+			      /* border-radius: 8px; */
+			      cursor: pointer;
+			      /* 核心：背景图片与文字分层 */
+			      display: flex;
+			      align-items: center;
+			      justify-content: center;
+			      font-size: 20px;
+			      font-weight: bold;
+			      color: #733900;
+			      text-decoration: none; /* 去掉a标签默认下划线 */
+			      overflow: hidden;
+			    }
+			
+			    /* 背景图层（单独用于旋转） */
+			    .btn-bg {
+			      position: absolute;
+			      top: 0;
+			      left: 0;
+			      width: 100%;
+			      height: 100%;
+			      background: url("img/017.png") no-repeat center center; /* 替换为你的按钮背景图 */
+			      background-size: cover;
+			     
+			      z-index: 1; /* 背景在文字下方 */
+			    }
+				.content-container {
+				            position: relative;
+				            width: 100%;
+				            height: 600px;
+				            overflow: hidden;
+				            /* border: 1px solid #eee; */
+				            margin-bottom: 10px;
+							margin-top: 50px;
+				        }
+				
+				        .content-item {
+				            position: absolute;
+				            top: 0;
+				            left: 0;
+				            width: 100%;
+				            height: 100%;
+				            padding: 20px;
+				            display: flex;
+				            flex-direction: column;
+				            align-items: center;
+				            justify-content: center;
+				            font-size: 32px;
+				            color: #733900;
+				            transition: all 0.5s ease;
+				            opacity: 0;
+				            transform: translateX(100%);
+				            /* 关键：默认禁止未激活区块的交互 */
+				            pointer-events: none; 
+				        }
+				
+				        /* 只有激活的区块允许交互 */
+				        .content-item.active {
+				            opacity: 1;
+				            transform: translateX(0);
+				            pointer-events: auto;
+				        }
+				
+				        .content-item.slide-out-left {
+				            opacity: 0;
+				            transform: translateX(-100%);
+				        }
+				
+				        .content-item.slide-out-right {
+				            opacity: 0;
+				            transform: translateX(100%);
+				        }
+				
+				        .btn-container {
+				            display: flex;
+				            justify-content: center;
+				            gap: 80px;
+							z-index: 100;
+				        }
+				
+				        .toggle-btn {
+							width: 190px;
+				            padding: 10px 10px;
+				            border: none;
+				            /* border-radius: 4px; */
+				            background: url("img/30.png") no-repeat center center; /* 替换为你的按钮背景图 */
+				            background-size: 100% 100%;
+				            cursor: pointer;
+				            font-size: 20px;
+				            transition: background-color 0.3s;
+				        }
+				
+				        .toggle-btn.active {
+				           color: #c0392b;
+				           font-weight: bold;
+				        }
+				
+				        .toggle-btn:hover:not(.active) {
+				             transform: scale(1.05);
+				        }
+						
+					/* 区块1专属样式 - 三个容器并排 */
+					        #item1 { 
+					            /* background-color: #f44336; */
+					            display: flex;
+					            flex-direction: row; /* 横向排列三个容器 */
+					            gap: 20px; /* 容器之间的间距 */
+					            padding: 30px;
+					        }
+					
+					        /* 区块1的每个子容器样式 */
+					        .item1-card {
+					            width: 100%;
+					            height: 100%; /* 占区块高度的90%，留少量边距 */
+					            /* border-radius: 8px; */
+					            /* background-color: rgba(255, 255, 255, 0.2); */
+					            display: flex;
+					            flex-direction: column;
+					            overflow: hidden;
+								gap: 10px; /* 上下区域的间距，视觉分隔 */
+					        }
+					
+					        /* 卡片上70%区域 */
+					        .card-top {
+					            height: 70%;
+					            display: flex; /* 左右分栏 */
+					        }
+					
+					        /* 上半区左侧图片容器 */
+					        .card-img-left {
+					            width: 50%;
+					            height: 100%;
+					            /* background-color: rgba(0, 0, 0, 0.1); */
+					            display: flex;
+					            align-items: center;
+					            justify-content: center;
+					            cursor: pointer;
+					        }
+					
+					        .card-img-left img {
+					            width: 100%; /* 保留内边距，避免贴边 */
+					                height: 110%;
+					                object-fit: contain; /* 核心修改：完整显示图片，保持比例 */
+					                object-position: center; /* 图片居中显示 */
+					        }
+					
+					        /* 上半区右侧文字容器 */
+					        .card-text-right {
+					            width: 50%;
+					            height: 100%;
+					            padding: 18px;
+					            display: flex;
+					            align-items: center;
+					            font-size: 16px;
+					            color: #733900;
+					            background: url(img/038.png);
+								background-size: 100% 100%;
+								flex-direction: column;
+					        }
+							
+							.module3-title {
+							  height: 5px;
+							  font-size: 20px;
+							  color: #733900;
+							  margin-top: 1px;
+							  padding-bottom: 23px;
+							  padding-top: 1px;
+							  /* border-bottom: 2px solid #733900; */
+							  text-align: center;
+							}
+								
+							.module3-content {
+							  font-size: 16px;
+							  line-height: 1.5;
+							  color: #333;
+							 /* margin-left: 7px;
+							  margin-right: 7px; */
+							 /* margin-top: 30px; */
+							}
+							
+							/* 简介板块首行缩进2字符（中文排版规范） */
+							.card-text-right p {
+							    text-indent: 2em;
+							    margin-bottom: 15px;
+							}
+					
+					        /* 卡片下30%区域 */
+					        .card-bottom {
+					            height: 30%;
+					            display: flex;
+					            align-items: center;
+					            justify-content: center;
+					            /* background-color: rgba(0, 0, 0, 0.1); */
+					            font-size: 16px;
+					            color: #733900;
+					            overflow: hidden; /* 隐藏超出的图片 */
+					            position: relative; /* 新增：为子元素绝对定位做准备 */
+					        }
+					
+					        /* 修改默认样式：将文字替换为默认图片 */
+					        .default-img {
+					            position: absolute; /* 绝对定位占满底部区域 */
+					            z-index: 1; /* 默认图片在下层 */
+					            width: 100%;
+					            height: 100%;
+					            object-fit: contain; /* 保持图片比例 */
+					            object-position: center;
+					        }
+					
+					        /* 底部图片容器（默认隐藏） */
+					        .bottom-img-container {
+					            width: 100%;
+					            height: 100%;
+					            display: none; /* 默认不显示 */
+					            position: absolute; /* 新增：占满底部区域 */
+					            z-index: 2; /* 新增：显示时覆盖文字 */
+					        }
+					
+					        .bottom-img-container img {
+					            width: 100%;
+					                height: 100%;
+					                object-fit: contain; /* 底部图片也完整显示，可选改为cover */
+					                object-position: center;
+					        }
+							
+							/* ========== 区块2专属样式 ========== */
+							        #item2 { 
+							             
+							            display: flex;
+							            flex-direction: row; /* 三个容器横向排列 */
+							            gap: 20px; /* 容器间距，和区块1一致 */
+							            padding: 30px;
+							        }
+							
+							        /* 区块2的每个子容器样式 */
+							        .item2-card {
+							            width: 100%;
+							            height: 100%;
+							            border-radius: 8px;
+							           /* background-color: rgba(255, 255, 255, 0.2); */
+							            display: flex;
+							            flex-direction: column; /* 上下分栏 */
+							            overflow: hidden;
+							            padding: 10px;
+							            gap: 8px; /* 上下区域间距 */
+							        }
+							
+							        /* 区块2卡片上70% - 图片区域 */
+							        .item2-card-img {
+							            height: 70%;
+							            
+							           /* background-color: rgba(0, 0, 0, 0.1); */
+							            border-radius: 4px;
+							            display: flex;
+							            align-items: center;
+							            justify-content: center;
+										position: relative; /* 新增：让放大镜基于卡片定位 */
+										overflow: hidden; /* 防止放大镜超出卡片 */
+							        }
+							
+							        .item2-card-img img {
+							            width: 100%;
+							            height: 100%;
+							            object-fit: contain; /* 完整显示图片，保持比例 */
+							            object-position: center;
+							        }
+									
+									.mirror {
+									    width: 120px;
+									    height: 120px;
+									    border-radius: 50%;
+									    overflow: hidden;
+									    position: absolute;
+									    border: 10px solid #733900;
+									    top: 20px;
+									    left: 20px;
+									    transform: translate(-10px, -10px);
+									    /* box-shadow: 0 0 40px rgba(0, 0, 0, .7); */
+										pointer-events: none; /* 避免遮挡鼠标事件 */
+										/*  display: none; */ /* 默认隐藏 */
+									}
+									
+									.mirror img {
+									    position: absolute;
+										width: 600%; /* 图片放大3倍，可根据需要调整 */
+										height: 600%;
+									}
+							
+							        /* 区块2卡片下30% - 文字区域 */
+							        .item2-card-text {
+										
+										width: 100%;
+							            height: 40%;
+							            display: flex; 
+							            background: url(img/037.png);
+							            background-size: 100% 100%;
+							            padding: 15px;
+							            align-items: center;
+							            justify-content: center;
+							            font-size: 16px;
+							            color: #733900;
+							            /* text-align: center; */
+										flex-direction: column;
+							        }
+									.item2-card-text p {
+									    text-indent: 2em;
+									    margin-bottom: 15px;
+									}
+				
+				        /* 区块内的示例容器样式 */
+				        /* .inner-box {
+				            width: 200px;
+				            height: 100px;
+				            margin: 20px 0;
+				            background-color: rgba(255, 255, 255, 0.3);
+				            border-radius: 8px;
+				            display: flex;
+				            align-items: center;
+				            justify-content: center;
+				            cursor: pointer;
+				            transition: background-color 0.3s;
+				        }
+				
+				        .inner-box:hover {
+				            background-color: rgba(255, 255, 255, 0.5);
+				        } */
+				
+				         /* ========== 区块3专属样式（核心新增） ========== */
+				                #item3 {
+				                    flex-direction: row !important;
+				                    display: flex; /* 左右分栏（50%+50%） */
+				                    padding: 20px;
+				                    gap: 5px;
+				                }
+				        
+				                /* 区块3左侧50%：图片+亮点+介绍 */
+				                .item3-left {
+				                    width: 50%;
+				                    height: 100%;
+				                    position: relative; /* 亮点/介绍卡片定位基准 */
+				                    border-radius: 8px;
+				                    overflow: hidden;
+				                }
+				        
+				                /* 左侧图片容器 */
+				                .item3-img-container {
+									
+				                    width: 100%;
+				                    height: 100%;
+				                }
+				        
+				                .item3-img-container img {
+				                    width: 100%;
+				                    height: 650px;
+									object-fit: contain; 
+									object-position: center -40px;
+				                }
+				        
+				                /* 1. 重置亮点容器样式（移除动画、背景，仅保留定位） */
+				                .highlight-point {
+				                    position: absolute;
+				                    width: 24px;
+				                    height: 24px;
+				                    cursor: pointer;
+				                    z-index: 10;
+				                    /* 移除原有动画、背景、阴影（移到 .point-dot 中） */
+				                    transition: all 0.3s ease;
+				                }
+				                
+				                /* 2. 新增圆点样式（承载所有动画/视觉效果） */
+				                .point-dot {
+				                    width: 100%;
+				                    height: 100%;
+				                    border-radius: 50%;
+				                    background: radial-gradient(circle, #fff 0%, #ffd700 50%, #ff9800 100%);
+				                    /* 闪烁动画仅作用于圆点 */
+				                    animation: flash 2s infinite alternate;
+				                    box-shadow: 0 0 8px rgba(255, 215, 0, 0.8);
+				                    transition: all 0.3s ease;
+				                }
+				                
+				                /* 3. 保留 hover 效果（仅放大圆点） */
+				                .highlight-point:hover .point-dot {
+				                    transform: scale(1.4);
+				                    box-shadow: 0 0 25px rgba(255, 215, 0, 1);
+				                }
+				                
+				                /* 4. 卡片样式不变（仅隐藏/显示） */
+				                .highlight-card {
+				                    position: absolute;
+				                    left: calc(100% + 10px);
+				                    top: 50%;
+				                    transform: translateY(-50%);
+				                    width: 200px;
+				                    padding: 15px;
+				                    background-color: rgba(255, 255, 255, 0.95);
+				                    border-radius: 8px;
+				                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+				                    font-size: 14px;
+				                    color: #333;
+				                    line-height: 1.4;
+				                    z-index: 11;
+				                    display: none;
+				                    transition: all 0.3s ease;
+				                    /* 强制取消卡片继承动画（兜底） */
+				                    animation: none !important;
+				                }
+				                
+				                /* hover亮点时显示卡片（逻辑不变） */
+				                .highlight-point:hover .highlight-card {
+				                    display: block;
+				                }
+				        
+				                /* 区块3右侧50%：文字框+画板 */
+				                .item3-right {
+				                    width: 50%;
+				                    height: 100%;
+				                    display: flex;
+				                    flex-direction: column; /* 上下分栏 */
+				                    gap: 15px;
+									transform: translateX(-100px);
+				                }
+				        
+				                /* 右侧上半部分：文字框 */
+				                .item3-text-box {
+									
+									width: 95%;
+				                    height: 52%; /* 上半部分占40% */
+				                    padding: 20px;
+				                    background: url(img/037.png);
+				                    background-size: 100% 100%;
+				                    
+				                    font-size: 16px;
+				                    color: #333;
+				                    line-height: 1.5;
+				                    overflow-y: auto; /* 文字超出可滚动 */
+				                }
+								
+								/* .item3-text-box h1{
+									font-size: 23px;
+									color: #733900;
+									text-align: center;
+								} */
+								/* .item3-title {
+								  height: 5px;
+								  font-size: 23px;
+								  color: #733900;
+								  margin-bottom: 40px;
+								  padding-bottom: 29px;
+								  padding-top: 1px;
+								  
+								  text-align: center;
+								} */
+								.item3-content p{
+									text-indent: 2em;
+								}
+								.item3-content {
+									
+									margin-bottom: 6px;
+								  font-size: 17px;
+								  line-height: 1.5;
+								  color: #333;
+								  
+								 /* margin-left: 7px;
+								  margin-right: 7px; */
+								 /* margin-top: 30px; */
+								}
+								.item3-content h1{
+									font-size: 21px;
+									color: #733900;
+									text-align: center;
+								}
+				        
+				                /* 右侧下半部分：画板 */
+				                .item3-draw-board {
+									width: 95%;
+				                    height: 60%; /* 下半部分占60% */
+				                    border-radius: 8px;
+				                    background-image: url("img/e卷草纹.png"); /* 默认背景图 */
+									background-size: 100% 100%;
+									background-position: center;
+				                    position: relative;
+				                    overflow: hidden;
+				                    cursor: crosshair;
+				                }
+				        
+				                /* 画板画布（用于绘画） */
+				                #drawCanvas {
+				                    position: absolute;
+				                    top: 0;
+				                    left: 0;
+				                    width: 95%;
+				                    height: 100%;
+				                    z-index: 1; /* 画布在背景图上层 */
+									
+				                    background-color: transparent; /* 透明背景，显示底层背景图 */
+				                }
+								/* 清空画板按钮样式 */
+								.clear-canvas-btn {
+								    position: absolute;
+								    top: 10px;
+								    right: 30px;
+								    z-index: 10; /* 确保按钮在画布上层 */
+								    padding: 8px 15px;
+								    border: none;
+								    border-radius: 4px;
+								    background-color: rgba(115, 57, 0, 0.8); /* 匹配页面主色调 */
+								    color: #fff;
+								    font-size: 14px;
+								    cursor: pointer;
+								    transition: all 0.3s ease;
+								    font-family: "agency fb","隶书",sans-serif;
+								}
+								
+								/* 按钮hover效果 */
+								.clear-canvas-btn:hover {
+								    background-color: rgba(115, 57, 0, 1);
+								    transform: scale(1.05);
+								    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+								}
+								
+								/* 按钮点击反馈 */
+								.clear-canvas-btn:active {
+								    transform: scale(0.98);
+								}
+				        /* ========== 区块4专属样式 ========== */
+							#item4 {
+							    flex-direction: row !important;
+							    display: flex; /* 左右分栏（50%+50%） */
+							    padding: 20px;
+							    gap: 20px;
+							}
+							
+							/* 区块4左侧文字容器 */
+							.item4-left {
+							    width: 40%;
+							    height: 70%;
+							    padding: 20px;
+							    background: url(img/037.png);
+							    background-size: 100% 100%;
+							    display: flex;
+							    flex-direction: column;
+							    justify-content: center;
+							}
+							
+							/* 区块4右侧图片容器 */
+							.item4-right {
+							    width: 60%;
+							    height: 100%;
+							    display: flex;
+							    align-items: center;
+							    justify-content: center;
+							}
+							
+							.item4-right img {
+							    width: 100%;
+							    height: 100%;
+							    object-fit: contain;
+							    object-position: center;
+							}
+							
+							/* .item4-left p {
+							    text-indent: 2em;
+							    margin-bottom: 15px;
+							    font-size: 16px;
+							    line-height: 1.5;
+							    color: #333;
+							} */
+				        /* .item4-title {
+				          height:90px;
+				          font-size: 30px;
+				          color: #733900;
+				          margin-bottom: 150px;
+				          padding-bottom: 1px;
+				          padding-top: 1px;
+						  border: #000000 solid;
+				          
+				          text-align: center;
+				        } */
+				        	
+				        .item4-content {
+				          font-size: 18px;
+				          line-height: 1.8;
+				          color: #333;
+						  /* border: #000000 solid; */
+				         /* margin-left: 7px;
+				          margin-right: 7px; */
+				         margin-bottom: 60px;
+				        }
+						.item4-content p{
+							text-indent: 2em;
+						}
+						.item4-content h1{
+							font-size: 30px;
+							color: #733900;
+							text-align: center;
+							
+						}
+						
+						.module4 {
+							z-index: 1;
+							position: fixed;
+							bottom: 92%;
+							left: 5%;
+							width:250px;
+							height: 50px;
+						    /* background: white; */
+						    border-radius: 12px;
+						    /* box-shadow: 0 4px 20px rgba(0,0,0,0.08); */
+						    padding: 10px;
+						    margin-bottom: 10px;
+						}
+						.module4-content {
+						  font-size: 1.2rem;
+						  font-weight: 400;
+						  line-height: 1.8;
+						  color: #983016;
+						  /* margin-left: 10px;
+						  margin-right: 10px;
+						  margin-top: 10px; */
+						}
+				        
+		</style>
+	</head>
+	<body>
+		<!-- 标题容器 -->
+		<div class="title-container">
+		   <h1>古纹藏韵—史蕴匠心</h1>
+		</div>
+		<!-- ========== 新增：返回首页按钮 ========== -->
+		    <a href="导航.html" class="back-home-btn"> <!-- 替换index.html为你的首页地址 -->
+		      <div class="btn-bg"></div> <!-- 背景图层（旋转） -->
+		      <span class="btn-text">返回首页</span> <!-- 文字层（静止） -->
+		    </a>
+		<div class="content-container">
+		    <!-- 区块1：新增三个带交互的容器 -->
+		            <div id="item1" class="content-item active">
+		                <div class="item4-left">
+		                    
+		                    <div class="item4-content">
+								<h1>古纹藏韵</h1>
+		                        <p>明故宫的建筑与石刻之上，遍布各类古代经典纹样。这些纹样题材丰富、工艺精湛，线条遒劲古朴、气韵雄浑，既彰显皇家威仪与礼制秩序，又承载着对王朝永固、江山万代、吉祥安康的美好祈愿，蕴含深厚的文化底蕴与明初审美气象。它们历经百年风雨依旧清晰可辨，是明代官式雕刻与建筑装饰的杰出代表，其内涵可从传统龙纹、祥瑞鸟兽、几何花卉三个维度，系统解读其造型特征、工艺技法与精神内核。</p>
+		                    </div>
+		                </div>
+		                <div class="item4-right">
+		                    <img src="img/e纹样总览2.png" alt="纹样总览">
+		                </div>
+		            </div>
+		         <!-- 区块2：新增三个容器（上70%图片 + 下30%文字） -->
+		                <div id="item2" class="content-item">
+							<div class="module4">
+								<div class="module4-content">
+									<p>点击图片查看纹样</p>
+								</div>
+							</div>
+		                    <!-- 第一个子容器 -->
+		                    <div class="item1-card">
+		                        <div class="card-top">
+		                            <div class="card-img-left" data-target="bottom1">
+		                                <img src="img/e龙陛石.png" alt="示例图片1">
+		                            </div>
+		                            <div class="card-text-right">
+		                                <div class="module3-title">
+		                                	云龙纹陛石
+		                                </div>
+		                                <div class="module3-content">
+		                                	<p>南京午朝门公园内的云龙纹陛石，为明故宫奉天门遗存的皇家石刻构件。陛石以深浮雕技法雕出矫健云龙，龙纹气势雄浑，五爪张扬，祥云环绕，线条刚劲流畅。作为帝王御道专用石，它严守皇家规制，尽显皇权威严。历经百余年风雨，虽略有风化，仍保存完好，是明代宫廷建筑与雕刻艺术的珍贵实物见证。</p>
+		                                </div>
+		                            </div>
+		                        </div>
+		                        <div class="card-bottom">
+		                            <img src="img/048.png" class="default-img" alt="默认纹样提示">
+		                            <div class="bottom-img-container" id="bottom1">
+		                                <img src="img/e龙纹1.png" alt="纹样1">
+		                            </div>
+		                        </div>
+		                    </div>
+		                    		    
+		                    <!-- 第二个子容器 -->
+		                    <div class="item1-card">
+		                        <div class="card-top">
+		                            <div class="card-img-left" data-target="bottom2">
+		                                <img src="img/e龙照壁.png" alt="示例图片2">
+		                            </div>
+		                            <div class="card-text-right">
+		                                <div class="module3-title">
+		                                	双龙翻腾
+		                                </div>
+		                                <div class="module3-content">
+		                                	<p>明故宫遗址午朝门公园内的双龙纹石照壁，是明初皇家云龙鸟兽石壁的核心构件。它以整块青石透雕而成，双龙翻腾于祥云间，五爪劲健、鳞甲分明，海浪纹衬底更显气势雄浑。作为明初宫廷雕刻的精品，它严守皇家规制，历经百年风雨仍细节清晰，是见证明故宫辉煌与皇权威仪的珍贵实物。</p>
+		                                </div>
+		                            </div>
+		                        </div>
+		                        <div class="card-bottom">
+		                            <img src="img/048.png" class="default-img" alt="默认纹样提示">
+		                            <div class="bottom-img-container" id="bottom2">
+		                                <img src="img/e龙纹2.png" alt="纹样2">
+		                            </div>
+		                        </div>
+		                    </div>
+		                    		    
+		                    <!-- 第三个子容器 -->
+		                    <div class="item1-card">
+		                        <div class="card-top">
+		                            <div class="card-img-left" data-target="bottom3">
+		                                <img src="img/e黄釉龙纹滴水.png" alt="示例图片3">
+		                            </div>
+		                            <div class="card-text-right">
+		                                <div class="module3-title">
+		                                	黄釉龙纹滴水
+		                                </div>
+		                                <div class="module3-content">
+		                                	<p>明故宫遗址出土的黄釉龙纹滴水，是明初官窑专为皇家宫殿烧制的重要建筑构件。滴水采用模印技法在陶坯上精细压印出行龙轮廓，纹饰清晰生动，线条刚劲有力，再施以纯正低温铅黄釉入窑烧制而成，虽尺寸仅十余厘米见方，却依然保持了五爪、双角、须髯俱全的皇家规制，尽显明初宫廷器物的严谨气度。</p>
+		                                </div>
+		                            </div>
+		                        </div>
+		                        <div class="card-bottom">
+		                            <img src="img/048.png" class="default-img" alt="默认纹样提示">
+		                            <div class="bottom-img-container" id="bottom3">
+		                                <img src="img/e龙纹5.png" alt="纹样3">
+		                            </div>
+		                        </div>
+		                    </div>
+		                </div>
+		         <!-- 区块3：新增左侧图片+亮点+右侧文字+画板（核心改造） -->
+		                <div id="item3" class="content-item">
+							<div class="module4">
+								<div class="module4-content">
+									<p>请移动鼠标使用放大镜</p>
+								</div>
+							</div>
+		                    <!-- 区块2第一个容器 -->
+		                    <div class="item2-card">
+		                        <div class="item2-card-img">
+		                            <img src="img/e双鹿含花.png" alt="区块2容器2图片">
+		                            <div class="mirror">
+		                              <img src="img/e双鹿含花.png" alt=""> <!-- 和外层图片路径一致 -->
+		                            </div>
+		                          </div>
+		                        <div class="item2-card-text">
+		                            <div class="module3-title">
+		                            	双鹿含花
+		                            </div>
+		                            <div class="module3-content">
+		                            	<p>明故宫遗址午朝门公园的双鹿含花石刻，是明初宫廷石雕的精品代表。画面以透雕技法雕琢双鹿漫步花丛，雄鹿昂首衔枝，雌鹿依偎相伴，周身牡丹盛放、祥云缭绕，线条灵动柔美。鹿谐音 “禄”，寓意福禄绵长，既严守皇家祥瑞规制，又尽显明初工匠细腻的审美与精湛技艺，是明代吉祥寓意与雕刻艺术的完美融合。</p>
+		                            </div>
+		                        </div>
+		                    </div>
+		                    <!-- 区块2第二个容器 -->
+		                    <div class="item2-card">
+		                        <div class="item2-card-img">
+		                            <img src="img/e双欢配鹊.png" alt="区块2容器2图片">
+		                            <div class="mirror" style="display: none;">
+		                              <img src="img/e双欢配鹊.png" alt=""> <!-- 和外层图片路径一致 -->
+		                            </div>
+		                          </div>
+		                        <div class="item2-card-text">
+		                            <div class="module3-title">
+		                            	双獾配鹊
+		                            </div>
+		                            <div class="module3-content">
+		                            	<p>明故宫遗址的双獾配鹊石刻，以深浮雕与透雕结合的工艺，刻画双獾嬉戏、喜鹊栖枝的祥和图景。獾体态憨态可掬，鹊羽纹清晰灵动，二者呼应成趣，暗含 “欢欢喜喜” 的吉祥寓意。作为明初皇家建筑构件，它在严谨的规制中融入世俗祥瑞意趣，既彰显宫廷气度，又传递对太平喜乐的祈愿，是明代石雕艺术的鲜活见证。</p>
+		                            </div>
+		                        </div>
+		                    </div>
+		                    <!-- 区块2第三个容器 -->
+		                    <div class="item2-card">
+		                         <div class="item2-card-img">
+		                            <img src="img/e双狮戏球.png" alt="区块2容器3图片">
+		                            <div class="mirror" style="display: none;">
+		                              <img src="img/e双狮戏球.png" alt=""> <!-- 和外层图片路径一致 -->
+		                            </div>
+		                          </div>
+		                        <div class="item2-card-text">
+		                            <div class="module3-title">
+		                            	双狮戏球
+		                            </div>
+		                            <div class="module3-content">
+		                            	<p>明故宫遗址的双狮戏球石刻，是明初皇家威严与祥瑞寓意的载体。工匠以高浮雕技法雕琢双狮腾跃戏球，雄狮鬃毛飞扬、爪踏绣球，雌狮顾盼呼应，狮身肌肉线条刚劲有力，气势雄浑。狮谐音 “师”，寓意 “太师少保”，既彰显皇权护卫的威严，又寄托对朝堂稳固的祈愿，是明代宫廷石雕中力量与礼制的典型表达。</p>
+		                            </div>
+		                        </div>
+		                    </div>
+		                </div>
+						<!-- 区块4：新增左右分栏布局（左文字+右图片） -->
+						<div id="item4" class="content-item">
+						    <!-- 左侧50%：图片+亮点 -->
+						    <div class="item3-left">
+						        <div class="item3-img-container">
+						            <img src="img/e八字墙.png" alt="区块3左侧主图">
+						        </div>
+						        <!-- 亮点1：可调整top/left定位 -->
+						        <div class="highlight-point" style="top: 54%; left: 31%;" data-bg="img/e卷草纹.png">
+						            <!-- 仅圆点有闪烁动画 -->
+						                <div class="point-dot"></div>
+						                <div class="highlight-card">
+						                   卷草纹：以柔和的涡旋形线条为骨架，枝叶呈波状连续缠绕，蕴含着生机永续的吉祥寓意。
+						                </div>
+						        </div>
+						        <!-- 亮点2 -->
+						        <div class="highlight-point" style="top: 68%; left: 55%;" data-bg="img/e石榴纹.png">
+						            <!-- 仅圆点有闪烁动画 -->
+						                <div class="point-dot"></div>
+						                <div class="highlight-card">
+						                    石榴纹：饱满的石榴果实与缠绕的枝叶，寓意着子孙繁衍、江山永固。
+						                </div>
+						        </div>
+						        <!-- 亮点3 -->
+						        <div class="highlight-point" style="top: 77%; left: 38%;" data-bg="img/e卷云纹.png">
+						            <!-- 仅圆点有闪烁动画 -->
+						                <div class="point-dot"></div>
+						                <div class="highlight-card">
+						                    卷云纹：以流畅的涡卷云头为主体，左右对称排列，象征吉祥如意、皇权天授。
+						                </div>
+						        </div>
+						        <!-- 亮点4 -->
+						        <div class="highlight-point" style="top: 83%; left: 60%;" data-bg="img/e方胜结带纹.png">
+						            <!-- 仅圆点有闪烁动画 -->
+						                <div class="point-dot"></div>
+						                <div class="highlight-card">
+						                    方胜结带纹：由两个菱形相互交叠的几何骨架（方胜纹）与两侧的卷草纹组合而成，寓意江山永固、福泽绵长。
+						                </div>
+						        </div>
+						    </div>
+						    <!-- 右侧50%：文字框+画板 -->
+						    <div class="item3-right">
+						        <!-- 上半部分：文字框 -->
+						        <div class="item3-text-box">
+						            <!-- <div class="item3-title">
+						            	方城明楼八字墙
+						            </div> -->
+						            <div class="item3-content">
+										<h1>几何花卉</h1>
+						            	<p>卷草纹、石榴纹、卷云纹和方胜结带纹，是这一组装饰中最具代表性的纹样。卷草纹线条回旋舒展，富有连续生长的动感；石榴纹果实饱满，寓意繁衍昌盛；卷云纹流动翻卷，象征吉祥如意；方胜结带纹则以几何交织的形式传达福泽绵长、秩序和美的意味。这些纹样不仅具有很强的装饰性，也承载着丰富的文化寓意。类似的纹样在明初建筑中十分常见，常被运用于墙体、须弥座、砖石构件等部位，既丰富了建筑细部层次，也体现了明初装饰艺术中礼制意味与吉祥观念的统一。</p>
+						            </div>
+						        </div>
+						        <!-- 下半部分：画板 -->
+						        <div class="item3-draw-board" id="drawBoard">
+						    		 <!-- 新增：清空画板按钮 -->
+						    		<button id="clearCanvasBtn" class="clear-canvas-btn">清空画板</button>
+						            <canvas id="drawCanvas"></canvas>
+						        </div>
+						    </div>
+						</div>
+		        
+		    </div>
+		
+		    <div class="btn-container">
+				
+		        <button class="toggle-btn active" data-target="1">纹样总览</button>
+		        <button class="toggle-btn" data-target="2">传统龙纹</button>
+		        <button class="toggle-btn" data-target="3">祥瑞鸟兽</button>
+		        <button class="toggle-btn" data-target="4">几何花卉</button>
+		    </div>
+		
+		      <script>
+		    document.addEventListener('DOMContentLoaded', function() {
+		        const contentItems = document.querySelectorAll('.content-item');
+		        const toggleBtns = document.querySelectorAll('.toggle-btn');
+		        let currentActiveIndex = 0;
+		    
+		        // 区块1交互逻辑
+		        const cardImgLefts = document.querySelectorAll('.card-img-left');
+		        cardImgLefts.forEach(imgContainer => {
+		            imgContainer.addEventListener('click', function() {
+		                const targetId = this.dataset.target;
+		                const targetBottomImg = document.getElementById(targetId);
+		                const cardBottom = this.closest('.item1-card').querySelector('.card-bottom');
+		                const defaultText = cardBottom.querySelector('.default-img');
+		    
+		                if (defaultText && targetBottomImg) {
+		                    defaultText.style.display = 'none';
+		                    targetBottomImg.style.display = 'block';
+		                }
+		            });
+		        });
+		    
+		        // 其他区块交互（原代码中box3未定义，先注释避免报错）
+		        // document.getElementById('box3').addEventListener('click', () => {
+		        //     document.getElementById('tip3').textContent = '区块3的容器被点击了！';
+		        // });
+		        // document.getElementById('box4').addEventListener('click', () => {
+		        //     document.getElementById('tip4').textContent = '区块4的容器被点击了！';
+		        // });
+		    
+		        // 按钮切换逻辑
+		        toggleBtns.forEach(btn => {
+		            btn.addEventListener('click', function() {
+		                const targetIndex = parseInt(this.dataset.target) - 1;
+		                if (targetIndex === currentActiveIndex) return;
+		    
+		                toggleBtns.forEach(b => b.classList.remove('active'));
+		                this.classList.add('active');
+		    
+		                const currentItem = contentItems[currentActiveIndex];
+		                const targetItem = contentItems[targetIndex];
+		    
+		                if (targetIndex > currentActiveIndex) {
+		                    currentItem.classList.add('slide-out-left');
+		                } else {
+		                    currentItem.classList.add('slide-out-right');
+		                }
+		                targetItem.classList.add('active');
+		    
+		                setTimeout(() => {
+		                    currentItem.classList.remove('active', 'slide-out-left', 'slide-out-right');
+		                    currentActiveIndex = targetIndex;
+		                }, 500);
+		            });
+		        });
+		    
+		        // 区块2放大镜批量逻辑
+		        const imgContainers = document.querySelectorAll('.item2-card-img');
+		        imgContainers.forEach(container => {
+		            const mirror = container.querySelector('.mirror');
+		            const bigImg = mirror.querySelector('img');
+		    
+		            // 鼠标移入显示放大镜
+		            container.addEventListener('mouseenter', () => {
+		                mirror.style.display = 'block';
+		            });
+		    
+		            // 鼠标移出隐藏放大镜
+		            container.addEventListener('mouseleave', () => {
+		                mirror.style.display = 'none';
+		            });
+		    
+		            // 鼠标移动跟随放大（补全逻辑）
+		            container.addEventListener('mousemove', e => {
+		                const rect = container.getBoundingClientRect();
+		                let x = e.clientX - rect.left;
+		                let y = e.clientY - rect.top;
+		    
+		                // 限制鼠标坐标在容器内
+		                x = Math.max(0, Math.min(x, rect.width));
+		                y = Math.max(0, Math.min(y, rect.height));
+		    
+		                 // 计算放大镜位置（居中跟随鼠标）
+		                      let mirrorLeft = x - mirror.offsetWidth / 2;
+		                      let mirrorTop = y - mirror.offsetHeight / 2;
+		                      
+		                      // 限制放大镜不超出容器可视区域
+		                      mirrorLeft = Math.max(0, Math.min(mirrorLeft, rect.width - mirror.offsetWidth));
+		                      mirrorTop = Math.max(0, Math.min(mirrorTop, rect.height - mirror.offsetHeight));
+		                      
+		                      // 设置放大镜位置
+		                      mirror.style.left = mirrorLeft + 'px';
+		                      mirror.style.top = mirrorTop + 'px';
+		                      
+		                      // 计算放大图片的偏移（反向偏移实现跟随）
+		                      const scale = 3; // 放大倍数，和CSS中bigImg的宽高倍数一致
+		                      let bigImgLeft = (x / rect.width) * bigImg.offsetWidth - mirror.offsetWidth / 2;
+		                      let bigImgTop = (y / rect.height) * bigImg.offsetHeight - mirror.offsetHeight / 2;
+		                      
+		                      // 反向偏移（让放大镜显示对应区域）
+		                      bigImg.style.left = -bigImgLeft + 'px';
+		                      bigImg.style.top = -bigImgTop + 'px';
+		              
+		            });
+		        });
+		    
+		        // 区块3画板逻辑（补充，避免后续截断）
+		        const drawCanvas = document.getElementById('drawCanvas');
+		        const drawBoard = document.getElementById('drawBoard');
+		        if (drawCanvas && drawBoard) {
+		            const ctx = drawCanvas.getContext('2d');
+		            // 设置canvas尺寸与画板一致
+		            function resizeCanvas() {
+		                drawCanvas.width = drawBoard.offsetWidth;
+		                drawCanvas.height = drawBoard.offsetHeight;
+		            }
+		            resizeCanvas();
+		            window.addEventListener('resize', resizeCanvas);
+		    
+		            // 画板绘画逻辑（简化版）
+		            let isDrawing = false;
+		            drawCanvas.addEventListener('mousedown', (e) => {
+		                isDrawing = true;
+		                ctx.beginPath();
+		                ctx.moveTo(e.offsetX, e.offsetY);
+		            });
+		            drawCanvas.addEventListener('mousemove', (e) => {
+		                if (isDrawing) {
+		                    ctx.lineTo(e.offsetX, e.offsetY);
+		                    ctx.strokeStyle = '#733900';
+		                    ctx.lineWidth = 2;
+		                    ctx.stroke();
+		                }
+		            });
+		            drawCanvas.addEventListener('mouseup', () => isDrawing = false);
+		            drawCanvas.addEventListener('mouseleave', () => isDrawing = false);
+		    
+		            // 亮点切换画板背景
+		            const highlightPoints = document.querySelectorAll('.highlight-point');
+		            highlightPoints.forEach(point => {
+		                point.addEventListener('click', () => {
+		                    const bg = point.dataset.bg;
+		                    if (bg) drawBoard.style.backgroundImage = `url("${bg}")`;
+		                });
+		            });
+		        }
+		    });
+			
+			// 画板清空逻辑（新增）
+			const clearCanvasBtn = document.getElementById('clearCanvasBtn');
+			if (clearCanvasBtn && drawCanvas) {
+			    clearCanvasBtn.addEventListener('click', () => {
+			        // 清空画布（核心：重置画布宽高/清除绘制内容）
+			        const ctx = drawCanvas.getContext('2d');
+			        ctx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
+			        
+			    });
+			}
+		         </script>
+	</body>
+</html>

@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>宫阙遗瓦——明故宫琉璃瓦考古专题</title>
+  <style>
+    :root {
+      --gold: #550000;
+      --gold-strong: #7f550c;
+      --gold-line: rgba(113, 96, 64, 0.3);
+      --text-light: rgba(130, 65, 0, 0.9);
+      --text-sub: rgba(170, 124, 50, 0.8);
+      --panel-border: rgba(246, 209, 139, 0.12);
+      --shadow:
+        0 14px 36px rgba(0, 0, 0, 0.26),
+        0 0 24px rgba(246, 209, 139, 0.08);
+      --transition: 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+      --bg-img: url("img/a明故宫内页6.png");
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: "agency fb", "隶书", sans-serif;
+      background: var(--bg-img) center / cover no-repeat;
+      color: var(--text-light);
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.12;
+      background: var(--bg-img) center / cover no-repeat;
+      z-index: 0;
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      width: 100vw;
+      height: 100vh;
+      padding: 20px 24px 18px;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: 14px;
+    }
+
+    .header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
+      padding-left: 40px;
+    }
+
+    .title-wrap h1 {
+      font-size: clamp(36px, 4vw, 66px);
+      line-height: 1;
+      letter-spacing: 2px;
+      color: #5a2d00;
+      text-shadow: 0 0 18px rgba(246, 209, 139, 0.16);
+    }
+
+    .title-wrap p {
+      margin-top: 10px;
+      max-width: 960px;
+      font-size: 17px;
+      line-height: 1.25;
+      color: var(--text-sub);
+      letter-spacing: 1px;
+    }
+
+    .back-home-btn {
+      position: absolute;
+      top: 40px;
+      right: 120px;
+      z-index: 999;
+      width: 180px;
+      height: 60px;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: bold;
+      color: #733900;
+      text-decoration: none;
+      overflow: hidden;
+    }
+
+    .btn-bg {
+      position: absolute;
+      inset: 0;
+      background: url("img/017.png") no-repeat center center;
+      background-size: cover;
+      z-index: 1;
+    }
+
+    .btn-text {
+      position: relative;
+      z-index: 2;
+    }
+
+    .main {
+      padding-left: 40px;
+      padding-right: 40px;
+      max-height: 650px;
+      display: grid;
+      grid-template-columns: 300px 1fr 390px;
+      gap: 18px;
+      align-items: stretch;
+      min-height: 0;
+    }
+
+    .panel {
+      background: url("img/037.png") no-repeat center center;
+      background-size: 100% 100%;
+      backdrop-filter: blur(16px);
+      min-height: 0;
+    }
+
+    /* 左侧 */
+    .cards-panel {
+      padding: 20px 18px;
+      display: grid;
+      grid-template-rows: auto auto 1fr;
+      gap: 14px;
+      min-height: 0;
+    }
+
+    .panel-title {
+      text-align: center;
+      font-size: 28px;
+      color: #000000;
+      font-weight: 500;
+      letter-spacing: 1px;
+    }
+
+    .panel-desc {
+      text-indent: 2em;
+      font-size: 17px;
+      line-height: 1.6;
+      color: rgba(121, 60, 0, 0.8);
+    }
+
+    .cards-list {
+      display: grid;
+      gap: 12px;
+      align-content: start;
+      overflow-y: auto;
+      overflow-x: hidden;
+      min-height: 0;
+      padding-right: 4px;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .cards-list::-webkit-scrollbar {
+      display: none;
+    }
+
+    .artifact-card {
+      display: block;
+      width: 100%;
+      padding: 8px 16px;
+      border-radius: 18px;
+      border: 1px solid rgba(246, 209, 139, 0.14);
+      background: rgba(255,255,255,0.04);
+      color: #000000;
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: inherit;
+      text-align: left;
+    }
+
+    .artifact-card:hover,
+    .artifact-card.active {
+      transform: translateX(4px);
+      background: rgba(198, 106, 68, 0.18);
+      border-color: rgba(246, 209, 139, 0.34);
+      box-shadow: 0 10px 22px rgba(0,0,0,0.14);
+    }
+
+    .artifact-meta strong {
+      display: block;
+      font-size: 21px;
+      color: var(--gold-strong);
+      font-weight: 500;
+      margin-bottom: 5px;
+    }
+
+    .artifact-meta span {
+      display: block;
+      font-size: 17px;
+      line-height: 1.5;
+      color: rgba(122, 61, 0, 0.8);
+    }
+
+    /* 中间 */
+    .stage-panel {
+      padding: 18px;
+      display: grid;
+      grid-template-rows: auto auto 1fr;
+      gap: 12px;
+      min-height: 0;
+    }
+
+    .stage-top {
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-left: 160px;
+    }
+
+    .link-tip {
+      padding: 10px 16px;
+      border-radius: 999px;
+      border: 1px solid rgba(246,209,139,0.18);
+      background: rgba(170, 139, 114, 0.9);
+      color: rgba(170, 85, 0, 0.9);
+      font-size: 17px;
+      letter-spacing: 1px;
+    }
+
+    .mode-switch {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .mode-btn {
+      font-family: "agency fb", "隶书", sans-serif;
+      padding: 10px 18px;
+      border-radius: 999px;
+      border: 1px solid rgba(246,209,139,0.22);
+      background: rgba(232, 175, 142, 0);
+      color: rgba(170, 85, 0, 0.9);
+      font-size: 17px;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .mode-btn:hover,
+    .mode-btn.active {
+      background: rgba(198,106,68,0.24);
+      border-color: rgba(246,209,139,0.42);
+      color: var(--gold-strong);
+      transform: translateY(-2px);
+    }
+
+    .stage-center {
+      position: relative;
+      border-radius: 24px;
+      border: 1px solid rgba(246, 209, 139, 0.1);
+      background:
+        radial-gradient(circle at 50% 32%, rgba(246,209,139,0.08), transparent 22%),
+        linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.015));
+      overflow: hidden;
+      min-height: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .main-switch-image {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+      filter: drop-shadow(0 10px 24px rgba(0,0,0,0.18));
+    }
+
+    /* 右侧 */
+    .info-panel {
+      padding: 20px 20px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .artifact-name {
+      text-align: center;
+      font-size: 28px;
+      color: #000000;
+      font-weight: 500;
+      line-height: 1.2;
+      flex-shrink: 0;
+    }
+
+    .info-scroll {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      padding-right: 4px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .info-scroll::-webkit-scrollbar {
+      display: none;
+    }
+
+    .artifact-text {
+      text-indent: 2em;
+      font-size: 17px;
+      line-height: 1.95;
+      color: rgba(170, 85, 0, 0.9);
+    }
+
+    .info-grid {
+      display: grid;
+      gap: 12px;
+      align-content: start;
+    }
+
+    .info-item {
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: rgba(241, 195, 141, 0.7);
+      border: 1px solid rgba(246,209,139,0.1);
+    }
+
+    .info-item strong {
+      display: block;
+      font-size: 18px;
+      color: var(--gold-strong);
+      font-weight: 500;
+      margin-bottom: 6px;
+    }
+
+    .info-item span {
+      display: block;
+      font-size: 14px;
+      line-height: 1.85;
+      color: rgba(95, 66, 19, 0.8);
+    }
+
+    @media (max-width: 1280px) {
+      .main {
+        grid-template-columns: 280px 1fr 350px;
+      }
+    }
+
+    @media (max-width: 1100px) {
+      html, body {
+        overflow: auto;
+      }
+
+      .page {
+        height: auto;
+        min-height: 100vh;
+      }
+
+      .main {
+        grid-template-columns: 1fr;
+      }
+
+      .stage-center {
+        min-height: 560px;
+      }
+
+      .back-home-btn {
+        width: 84px;
+        height: 84px;
+        font-size: 14px;
+      }
+
+      .info-panel {
+        min-height: 520px;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .page {
+        padding: 14px;
+      }
+
+      .title-wrap h1 {
+        font-size: 38px;
+      }
+
+      .title-wrap p,
+      .artifact-text,
+      .info-item span,
+      .artifact-meta span,
+      .panel-desc {
+        font-size: 13px;
+      }
+
+      .panel-title,
+      .artifact-name {
+        font-size: 26px;
+      }
+
+      .artifact-meta strong {
+        font-size: 18px;
+      }
+
+      .mode-btn {
+        font-size: 13px;
+        padding: 8px 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a href="华章.html" class="back-home-btn" aria-label="返回">
+    <div class="btn-bg"></div>
+    <span class="btn-text">返回</span>
+  </a>
+
+  <div class="page">
+    <header class="header">
+      <div class="title-wrap">
+        <h1>宫阙遗瓦</h1>
+        <p>明故宫遗址出土的琉璃瓦，不只是古代建筑构件，更是今天理解宫殿屋面制度、装饰风貌与皇家气象的重要实物依据。</p>
+        <p>点击左侧构件名称，切换中间图片查看构件实物或其在屋面中的位置，并在右侧查看对应说明。</p>
+      </div>
+    </header>
+
+    <main class="main">
+      <section class="panel cards-panel">
+        <h2 class="panel-title">出土构件</h2>
+        <p class="panel-desc">这些琉璃瓦构件不仅是文物残件，也是在今天重建明故宫屋面想象的重要线索。</p>
+
+        <div class="cards-list">
+          <button class="artifact-card active" data-key="tube">
+            <div class="artifact-meta">
+              <strong>筒瓦</strong>
+              <span>帮助判断宫殿坡面节奏与屋面起伏秩序。</span>
+            </div>
+          </button>
+
+          <button class="artifact-card" data-key="flat">
+            <div class="artifact-meta">
+              <strong>板瓦</strong>
+              <span>帮助理解明故宫屋面基层的铺设方式。</span>
+            </div>
+          </button>
+
+          <button class="artifact-card" data-key="endcap">
+            <div class="artifact-meta">
+              <strong>瓦当</strong>
+              <span>帮助观察明故宫檐口装饰与正面形象。</span>
+            </div>
+          </button>
+
+          <button class="artifact-card" data-key="drip">
+            <div class="artifact-meta">
+              <strong>滴水</strong>
+              <span>帮助理解明故宫檐口排水与边缘处理方式。</span>
+            </div>
+          </button>
+        </div>
+      </section>
+
+      <section class="panel stage-panel">
+        <div class="stage-top">
+          <h2 class="panel-title">明故宫屋面局部复原联动</h2>
+          <div class="link-tip" id="linkTip">当前查看：筒瓦出土实物</div>
+        </div>
+
+        <div class="mode-switch">
+          <button class="mode-btn active" data-mode="artifact">查看实物</button>
+          <button class="mode-btn" data-mode="position">查看屋面位置</button>
+        </div>
+
+        <div class="stage-center" id="stageCenter">
+          <img id="focusImg" class="main-switch-image" src="img/liuliwa/tube-artifact.png" alt="当前选中构件图片" />
+        </div>
+      </section>
+
+      <aside class="panel info-panel">
+        <h2 class="artifact-name" id="infoTitle">筒瓦</h2>
+
+        <div class="info-scroll">
+          <p class="artifact-text" id="infoText">
+            筒瓦多覆盖于板瓦之间的接缝位置，使屋面在防水基础上形成连续而富有秩序的起伏线条。对于明故宫而言，这类出土构件不仅说明了屋面铺设方式，也让我们得以进一步想象宫殿屋顶在阳光下整齐铺陈、层层展开的整体风貌。
+          </p>
+
+          <div class="info-grid" id="infoGrid">
+            <div class="info-item">
+              <strong>构件等级</strong>
+              <span>筒瓦常见于宫殿建筑屋面，是皇家建筑屋顶系统中的重要构件之一。其材质、规格和釉色，往往与建筑等级和礼制要求密切相关。</span>
+            </div>
+            <div class="info-item">
+              <strong>形制特点</strong>
+              <span>筒瓦整体呈半圆拱形，覆盖在板瓦接缝之上，形成一道道起伏分明的瓦垄线。大面积连续铺设后，可增强屋面秩序感和节奏感。</span>
+            </div>
+            <div class="info-item">
+              <strong>颜色特征</strong>
+              <span>明故宫琉璃瓦以黄色系最能体现皇家气象。筒瓦成排铺陈后，在光照下会形成统一而明亮的色彩效果，使整片屋顶更显庄丽华贵。</span>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <script>
+    const dataMap = {
+      tube: {
+        name: "筒瓦",
+        artifactImg: "img/j筒瓦.png",
+        positionImg: "img/j筒瓦位置.png",
+        text: "筒瓦多覆盖于板瓦之间的接缝位置，使屋面在防水基础上形成连续而富有秩序的起伏线条。对于明故宫而言，这类出土构件不仅说明了屋面铺设方式，也让我们得以进一步想象宫殿屋顶在阳光下整齐铺陈、层层展开的整体风貌。",
+        info: [
+          ["构件等级", "筒瓦常见于宫殿建筑屋面，是皇家建筑屋顶系统中的重要构件之一。其材质、规格和釉色，往往与建筑等级和礼制要求密切相关。"],
+          ["形制特点", "筒瓦整体呈半圆拱形，覆盖在板瓦接缝之上，形成一道道起伏分明的瓦垄线。大面积连续铺设后，可增强屋面秩序感和节奏感。"],
+          ["颜色特征", "明故宫琉璃瓦以黄色系最能体现皇家气象。筒瓦成排铺陈后，在光照下会形成统一而明亮的色彩效果，使整片屋顶更显庄丽华贵。"]
+        ]
+      },
+
+      flat: {
+        name: "板瓦",
+        artifactImg: "img/j板瓦.png",
+        positionImg: "img/j板瓦位置.png",
+        text: "板瓦通常先铺在屋面基层上，是承接雨水、构成屋面底层的重要构件。对于明故宫而言，板瓦类出土实物让我们能够更接近真实的屋面铺设逻辑，理解宫殿屋顶并不是单一装饰面，而是由基础层与覆缝层共同构成的完整系统。",
+        info: [
+          ["构件等级", "板瓦是宫殿屋面系统中的基础构件，常与筒瓦配合使用。虽然不属于最醒目的礼制标志，但其材质和规格仍能反映屋面的等级要求。"],
+          ["形制特点", "板瓦整体较平缓，主要铺设在屋面基层之上，为后续覆瓦提供基础。单看并不张扬，但在大面积连续铺设中决定了屋面的基本秩序。"],
+          ["颜色特征", "板瓦的色彩通常与整体琉璃屋面保持统一，在宫殿建筑中共同形成整齐、稳定的屋顶基调，是整体色彩效果的重要组成部分。"]
+        ]
+      },
+
+      endcap: {
+        name: "瓦当",
+        artifactImg: "img/j瓦当.png",
+        positionImg: "img/j瓦当位置.png",
+        text: "瓦当多位于檐口前端，是屋面边缘最具识别性的构件之一。对于明故宫而言，瓦当类出土构件尤其重要，因为它们不仅反映檐头的收边方式，也直接关系到宫殿正面视觉形象的重建，让我们得以想象檐口在近距离观看时的装饰效果与皇家气象。",
+        info: [
+          ["构件等级", "瓦当多见于宫殿檐口前端，是檐部较具标识性的构件之一。用于重要建筑的瓦当，在纹样、做工和釉色上往往更讲究，也更能体现皇家气象。"],
+          ["形制特点", "瓦当通常位于檐头正面，正面轮廓清晰，装饰性较强。它既承担檐口收边作用，也通过纹样和形体增强建筑立面的完整感。"],
+          ["颜色特征", "瓦当与整片琉璃屋面在色彩上保持协调，常在檐口形成更鲜明的视觉焦点。釉色在光照下更容易被直接看到，因此也更能体现宫殿建筑的华丽感。"]
+        ]
+      },
+
+      drip: {
+        name: "滴水",
+        artifactImg: "img/e黄釉龙纹滴水.png",
+        positionImg: "img/j滴水位置.png",
+        text: "滴水位于屋檐前缘，是檐口排水体系中的关键构件之一。对于明故宫而言，这类构件让我们看到皇家建筑如何把实用性的排水需求处理得严整而优美：它既保护檐口，也塑造了宫殿边缘线条的层次感，是理解明故宫檐部细节的重要依据。",
+        info: [
+          ["构件等级", "滴水是檐口边缘的重要构件，常用于宫殿建筑屋面系统之中。虽然体量不大，但在明故宫建筑中，它与其他檐口构件共同服务于精细而讲究的屋面边缘。"],
+          ["形制特点", "滴水位于檐口前缘，形体紧贴屋面边界，既便于排水，也让檐口轮廓更清晰。它体现了传统建筑在细部处理上的严整与讲究。"],
+          ["颜色特征", "滴水与瓦当、筒瓦等共同构成檐口的综合色彩效果。由于位于前缘位置，它在光线变化下更容易形成明暗层次，使屋檐边界更有立体感。"]
+        ]
+      }
+    };
+
+    const cards = document.querySelectorAll(".artifact-card");
+    const modeButtons = document.querySelectorAll(".mode-btn");
+
+    const linkTip = document.getElementById("linkTip");
+    const focusImg = document.getElementById("focusImg");
+
+    const infoTitle = document.getElementById("infoTitle");
+    const infoText = document.getElementById("infoText");
+    const infoGrid = document.getElementById("infoGrid");
+
+    let currentKey = "tube";
+    let currentMode = "artifact";
+
+    function setMode(mode) {
+      currentMode = mode;
+      modeButtons.forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.mode === mode);
+      });
+      renderArtifact(currentKey);
+    }
+
+    function renderArtifact(key) {
+      currentKey = key;
+      const data = dataMap[key];
+
+      cards.forEach(card => {
+        card.classList.toggle("active", card.dataset.key === key);
+      });
+
+      linkTip.textContent = currentMode === "artifact"
+        ? `当前查看：${data.name}出土实物`
+        : `当前查看：${data.name}在屋面中的位置`;
+
+      focusImg.src = currentMode === "artifact" ? data.artifactImg : data.positionImg;
+      focusImg.alt = data.name;
+
+      infoTitle.textContent = data.name;
+      infoText.textContent = data.text;
+
+      infoGrid.innerHTML = data.info.map(([title, body]) => `
+        <div class="info-item">
+          <strong>${title}</strong>
+          <span>${body}</span>
+        </div>
+      `).join("");
+    }
+
+    cards.forEach(card => {
+      card.addEventListener("click", () => {
+        renderArtifact(card.dataset.key);
+      });
+    });
+
+    modeButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        setMode(btn.dataset.mode);
+      });
+    });
+
+    renderArtifact("tube");
+  </script>
+</body>
+</html>
